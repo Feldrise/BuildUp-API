@@ -1,4 +1,5 @@
 ﻿using BuildUp.API.Entities;
+using BuildUp.API.Entities.Form;
 using BuildUp.API.Models.Users;
 using BuildUp.API.Services.Interfaces;
 using BuildUp.API.Settings.Interfaces;
@@ -17,6 +18,8 @@ namespace BuildUp.API.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<BuildupForm> _forms;
+        private readonly IMongoCollection<BuildupFormQA> _formsQA;
 
         private readonly IBuildupSettings _buildupSettings;
 
@@ -26,6 +29,8 @@ namespace BuildUp.API.Services
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
 
             _users = database.GetCollection<User>("users");
+            _forms = database.GetCollection<BuildupForm>("forms");
+            _formsQA = database.GetCollection<BuildupFormQA>("forms_qa");
 
             _buildupSettings = buildupSettings;
         }
@@ -63,7 +68,7 @@ namespace BuildUp.API.Services
             if (userRegister.Role == Role.Admin) throw new ArgumentException("Only admins can register admins", "userRegister.Role");
             if (userRegister.Role != Role.Builder && userRegister.Role != Role.Coach) throw new ArgumentException("You can only register builders and coachs", "userRegister.Role");
 
-            return RegisterToDatabase(userRegister);
+            return RegisterToDatabaseAsync(userRegister);
         }
 
         public Task<string> RegisterAdminAsync(RegisterModel userRegister)
@@ -71,10 +76,35 @@ namespace BuildUp.API.Services
             // Basic checks
             if (userRegister.Role != Role.Admin) throw new ArgumentException("You did not registerd an admin", "userRegister.Role");
 
-            return RegisterToDatabase(userRegister);
+            return RegisterToDatabaseAsync(userRegister);
         }
 
-        private async Task<string> RegisterToDatabase(RegisterModel userRegister)
+        public async Task<string> RegisterWithFormAsync(FormRegisterModel formRegister)
+        {
+            // Basic checks
+            if (formRegister.Role == Role.Admin) throw new ArgumentException("Only admins can register admins", "userRegister.Role");
+            if (formRegister.Role != Role.Builder && formRegister.Role != Role.Coach) throw new ArgumentException("You can only register builders and coachs", "userRegister.Role");
+
+            string userId = await RegisterToDatabaseAsync(new RegisterModel()
+            {
+                FirstName = formRegister.FirstName,
+                LastName = formRegister.LastName,
+                Birthdate = formRegister.Birthdate,
+
+                Email = formRegister.Email,
+                DiscordTag = formRegister.DiscordTag,
+                Username = formRegister.Username,
+
+                Password = formRegister.Password,
+                Role = formRegister.Role
+            });
+
+            await RegisterFormToDatabseAsync(userId, formRegister.FormQAs);
+
+            return userId;
+        }
+
+        private async Task<string> RegisterToDatabaseAsync(RegisterModel userRegister)
         {
             // Basic cheks
             if (string.IsNullOrWhiteSpace(userRegister.Password)) throw new ArgumentException("The password is required", "userRegister.Password");
@@ -104,6 +134,24 @@ namespace BuildUp.API.Services
             await _users.InsertOneAsync(databaseUser);
 
             return databaseUser.Id;
+        }
+
+        private async Task RegisterFormToDatabseAsync(string userId, List<BuildupFormQA> qas)
+        {
+            BuildupForm newForm = new BuildupForm()
+            {
+                UserId = userId
+            };
+
+            await _forms.InsertOneAsync(newForm);
+
+            for (int i = 0; i < qas.Count; ++i)
+            {
+                qas[i].FormId = newForm.Id;
+                qas[i].Index = i;
+            }
+
+            await _formsQA.InsertManyAsync(qas);
         }
 
         private bool UserExist(String email, String username)

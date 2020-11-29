@@ -10,8 +10,10 @@ namespace BuildUp.API.Services.Interfaces
     public interface IAuthenticationService
     {
         Task<User> LoginAsync(string username, string password);
+        
         Task<string> RegisterAsync(RegisterModel userRegister);
         Task<string> RegisterAdminAsync(RegisterModel userRegister);
+        Task<string> RegisterWithFormAsync(FormRegisterModel formRegister);
 
 
     }
