@@ -42,7 +42,7 @@ namespace BuildUp.API
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "Builduo API",
+                    Title = "Buildup API",
                     Description = "The API for the Buildup Program of New Talents",
                     Contact = new OpenApiContact
                     {
@@ -99,6 +99,8 @@ namespace BuildUp.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseStaticFiles();
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
@@ -112,6 +114,9 @@ namespace BuildUp.API
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "ISATI WEI API V1");
+                c.InjectStylesheet("/swagger/themes/theme-material.css");
+                c.InjectJavascript("/swagger/custom-script.js", "text/javascript");
+                c.RoutePrefix = "documentation";
             });
 
             app.UseHttpsRedirection();
