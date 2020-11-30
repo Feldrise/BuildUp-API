@@ -96,20 +96,20 @@ namespace BuildUp.API.Services
 
         public async Task<List<Builder>> GetCandidatingBuildersAsync()
         {
-            var _candidatingBuilders = await (await _builders.FindAsync(databaseBuilder =>
+            var candidatingBuilders = await (await _builders.FindAsync(databaseBuilder =>
                 databaseBuilder.Status == BuilderStatus.Candidating
             )).ToListAsync();
 
-            return _candidatingBuilders;
+            return candidatingBuilders;
         }
 
         public async Task<List<Builder>> GetActiveBuildersAsync()
         {
-            var _candidatingBuilders = await (await _builders.FindAsync(databaseBuilder =>
+            var activeBuilders = await (await _builders.FindAsync(databaseBuilder =>
                 databaseBuilder.Step == BuilderSteps.Active
             )).ToListAsync();
 
-            return _candidatingBuilders;
+            return activeBuilders;
         }
 
         private async Task<string> RegisterToDatabase(BuilderRegisterModel builderRegisterModel)
