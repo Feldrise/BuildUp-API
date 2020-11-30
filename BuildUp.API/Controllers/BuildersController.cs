@@ -31,7 +31,7 @@ namespace BuildUp.API.Controllers
         /// <returns>The builder with all informations</returns>
         /// <response code="403">You are not allowed to view this builder info</response>
         /// <response code="404">The builder doesn't exist</response>
-        /// <response code="201">Return the logged user infos</response>
+        /// <response code="200">Return the logged user infos</response>
         [Authorize]
         [HttpGet("{id:length(24)}")]
         public async Task<ActionResult<Builder>> GetBuilder(string id)
@@ -76,7 +76,7 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <returns>A list of candidating builders</returns>
         /// <response code="401">You are not allowed to view candidating builders</response>
-        /// <response code="201">return a list of candidating builders</response>
+        /// <response code="200">return a list of candidating builders</response>
         [Authorize(Roles = Role.Admin)]
         [HttpGet("candidating")]
         public async Task<ActionResult<List<Builder>>> GetCandidatingBuilders()
@@ -91,7 +91,7 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <returns>A list of active builders</returns>
         /// <response code="401">You are not allowed to view active builders</response>
-        /// <response code="201">return a list of active builders</response>
+        /// <response code="200">return a list of active builders</response>
         [Authorize(Roles = Role.Admin)]
         [HttpGet("active")]
         public async Task<ActionResult<List<Builder>>> GetActiveBuilders()
