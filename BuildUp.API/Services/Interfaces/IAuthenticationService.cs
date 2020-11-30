@@ -13,7 +13,6 @@ namespace BuildUp.API.Services.Interfaces
         
         Task<string> RegisterAsync(RegisterModel userRegister);
         Task<string> RegisterAdminAsync(RegisterModel userRegister);
-        Task<string> RegisterWithFormAsync(FormRegisterModel formRegister);
 
 
     }

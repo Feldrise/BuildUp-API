@@ -76,33 +76,6 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (*) Register a user as a coach or builder with form question and answer
-        /// </summary>
-        /// <remarks>
-        /// The role must be "Coach" or "Builder"
-        /// </remarks>
-        /// <param name="formRegisterModel"></param>
-        /// <returns>The registered user ID</returns>
-        /// <response code="400">The user can't be registered</response>
-        /// <response code="200">Return the registered user id</response>
-        [AllowAnonymous]
-        [HttpPost("register/with_form")]
-        public async Task<ActionResult<string>> RegisterWithForm([FromBody]FormRegisterModel formRegisterModel)
-        {
-            string userId;
-            try
-            {
-                userId = await _authenticationService.RegisterWithFormAsync(formRegisterModel);
-            }
-            catch (Exception e)
-            {
-                return BadRequest($"Can't regster the user: {e.Message}");
-            }
-
-            return Ok(userId);
-        }
-
-        /// <summary>
         /// (Admin) Register a user as an admin
         /// </summary>
         /// <remarks>
