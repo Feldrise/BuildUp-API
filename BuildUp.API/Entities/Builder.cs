@@ -13,17 +13,45 @@ namespace BuildUp.API.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        /// <summary>
+        /// The builder's user id
+        /// </summary>
+        /// <example>5f1fe90a58c8ab093c4f772a</example>
         [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
+        /// <summary>
+        /// The builder's coach id
+        /// </summary>
+        /// <example>5f1fed8458c8ab093c4f77bf</example>
         [BsonRepresentation(BsonType.ObjectId)]
         public string CoachId { get; set; }
 
+        /// <summary>
+        /// The builder current status. Can be : Waiting Validated, Refused
+        /// </summary>
+        /// <example>Waiting/Validated/Refused</example>
         public string Status { get; set; }
+        /// <summary>
+        /// The builder current step. Can be : Preselected, AdminMeeting, CoachMeeting, Active, Finished, Abandoned
+        /// </summary>
+        /// <example>Preselected/AdminMeeting/CoachMeeting/Active/Finished/Abandoned</example>
         public string Step { get; set; }
 
+        /// <summary>
+        /// The builder's department
+        /// </summary>
+        /// <example>35</example>
         public int Department { get; set; }
 
+        /// <summary>
+        /// The builder current situation
+        /// </summary>
+        /// <example>Student</example>
         public string Situation { get; set; }
+        /// <summary>
+        /// The builder description
+        /// </summary>
+        /// <example>I'm an awesome builder</example>
         public string Description { get; set; }
     }
 }

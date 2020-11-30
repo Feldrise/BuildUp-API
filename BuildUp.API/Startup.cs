@@ -52,6 +52,8 @@ namespace BuildUp.API
                     }
                 });
 
+                var filePath = Path.Combine(System.AppContext.BaseDirectory, "BuildUp.API.xml");
+                c.IncludeXmlComments(filePath);
             });
 
             // Settings

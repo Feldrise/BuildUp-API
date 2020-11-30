@@ -19,7 +19,15 @@ namespace BuildUp.API.Entities.Form
 
         [JsonIgnore]
         public int Index { get; set; }
+        /// <summary>
+        /// The question
+        /// </summary>
+        /// <example>My Question?</example>
         public string Question { get; set; }
+        /// <summary>
+        /// The answer to the question
+        /// </summary>
+        /// <example>My super answer</example>
         public string Answer { get; set; }
     }
 }

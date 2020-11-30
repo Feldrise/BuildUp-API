@@ -1,0 +1,362 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BuildUp.API</name>
+    </assembly>
+    <members>
+        <member name="M:BuildUp.API.Controllers.AuthenticationController.Login(BuildUp.API.Models.Users.LoginModel)">
+            <summary>
+            (*) Login a user
+            </summary>
+            <remarks>
+            The username can be both the email or the actual username
+            </remarks>
+            <param name="loginModel">Represent the username and the password</param>
+            <returns>The user with all informations (especially the authentication token)</returns>
+            <response code="400">The user doesn't exist or the password doesn't match the username</response>
+            <response code="200">Return the logged user infos</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.AuthenticationController.Register(BuildUp.API.Models.Users.RegisterModel)">
+            <summary>
+            (*) Register a user as a coach or builder
+            </summary>
+            <remarks>
+            The role must be "Coach" or "Builder"
+            </remarks>
+            <param name="registerModel"></param>
+            <returns>The registered user ID</returns>
+            <response code="400">The user can't be registered</response>
+            <response code="200">Return the registered user id</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.AuthenticationController.RegisterWithForm(BuildUp.API.Models.Users.FormRegisterModel)">
+            <summary>
+            (*) Register a user as a coach or builder with form question and answer
+            </summary>
+            <remarks>
+            The role must be "Coach" or "Builder"
+            </remarks>
+            <param name="formRegisterModel"></param>
+            <returns>The registered user ID</returns>
+            <response code="400">The user can't be registered</response>
+            <response code="200">Return the registered user id</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.AuthenticationController.RegisterAdmin(BuildUp.API.Models.Users.RegisterModel)">
+            <summary>
+            (Admin) Register a user as an admin
+            </summary>
+            <remarks>
+            The role  must be admin
+            </remarks>
+            <param name="registerModel"></param>
+            <returns>The registered user ID</returns>
+            <response code="400">The user can't be registered</response>
+            <response code="401">You are not logged in</response>
+            <response code="403">You are not an admin</response>
+            <response code="200">Return the registered user id</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetBuilder(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get a builder from his user's ID
+            </summary>
+            <param name="id" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns>The builder with all informations</returns>
+            <response code="403">You are not allowed to view this builder info</response>
+            <response code="404">The builder doesn't exist</response>
+            <response code="201">Return the logged user infos</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetCandidatingBuilders">
+            <summary>
+            (Admin) Get candidating builders
+            </summary>
+            <returns>A list of candidating builders</returns>
+            <response code="401">You are not allowed to view candidating builders</response>
+            <response code="201">return a list of candidating builders</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetActiveBuilders">
+            <summary>
+            (Admin) Get active builders
+            </summary>
+            <returns>A list of active builders</returns>
+            <response code="401">You are not allowed to view active builders</response>
+            <response code="201">return a list of active builders</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.AssignCoach(System.String,BuildUp.API.Models.CoachAssignmentModel)">
+            <summary>
+            (Admin) Assigna coach to a builder
+            </summary>
+            <param name="id" example="5f1fed8458c8ab093c4f77bf"></param>
+            <param name="coachAssignmentModel"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view active builders</response>
+            <response code="200">The coach has been successfully assigned</response>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.UserId">
+            <summary>
+            The builder's user id
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.CoachId">
+            <summary>
+            The builder's coach id
+            </summary>
+            <example>5f1fed8458c8ab093c4f77bf</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.Status">
+            <summary>
+            The builder current status. Can be : Waiting Validated, Refused
+            </summary>
+            <example>Waiting/Validated/Refused</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.Step">
+            <summary>
+            The builder current step. Can be : Preselected, AdminMeeting, CoachMeeting, Active, Finished, Abandoned
+            </summary>
+            <example>Preselected/AdminMeeting/CoachMeeting/Active/Finished/Abandoned</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.Department">
+            <summary>
+            The builder's department
+            </summary>
+            <example>35</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.Situation">
+            <summary>
+            The builder current situation
+            </summary>
+            <example>Student</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.Description">
+            <summary>
+            The builder description
+            </summary>
+            <example>I'm an awesome builder</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.UserId">
+            <summary>
+            The coach's user id
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.Status">
+            <summary>
+            The coach current status. Can be : Waiting Validated, Refused
+            </summary>
+            <example>Waiting/Validated/Refused</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.Step">
+            <summary>
+            The coach current step. Can be : Preselected, Meeting, Active, Stopped
+            </summary>
+            <example>Preselected/Meeting/Active/Stopped</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.Department">
+            <summary>
+            The coach's department
+            </summary>
+            <example>35</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.Situation">
+            <summary>
+            The coach current situation
+            </summary>
+            <example>Entrepreneur</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.Description">
+            <summary>
+            The coach description
+            </summary>
+            <example>I'm an awesome coach</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Form.BuildupFormQA.Question">
+            <summary>
+            The question
+            </summary>
+            <example>My Question?</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Form.BuildupFormQA.Answer">
+            <summary>
+            The answer to the question
+            </summary>
+            <example>My super answer</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.ProfilePictureId">
+            <summary>
+            The profil picture file ID
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.FirstName">
+            <summary>
+            The user's first name
+            </summary>
+            <example>Victor</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.LastName">
+            <summary>
+            The user's last name
+            </summary>
+            <example>DENIS</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.Birthdate">
+            <summary>
+            The user's birthdate
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.Email">
+            <summary>
+            The user's email
+            </summary>
+            <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.DiscordTag">
+            <summary>
+            The user's Discord tag
+            </summary>
+            <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.Username">
+            <summary>
+            The user's username
+            </summary>
+            <example>Feldrise</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.Role">
+            <summary>
+            The user role. Could be Builder, Coach or Admin
+            </summary>
+            <example>Builder</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.Token">
+            <summary>
+            The user connection token. Only returned on login
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.FirstName">
+            <summary>
+            The user's first name
+            </summary>
+            <example>Victor</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.LastName">
+            <summary>
+            The user's last name
+            </summary>
+            <example>DENIS</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Birthdate">
+            <summary>
+            The user's bithdate
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Email">
+            <summary>
+            The uers's email
+            </summary>
+            <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.DiscordTag">
+            <summary>
+            The user's Discord tag
+            </summary>
+            <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Username">
+            <summary>
+            The user's username
+            </summary>
+            <example>Feldrise</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Password">
+            <summary>
+            The uers's role
+            </summary>
+            <example>MySecurePassword</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Role">
+            <summary>
+            The user's role
+            </summary>
+            <example>Builder/Coach/Builder</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.FormQAs">
+            <summary>
+            The forms answers
+            </summary>
+            <example>
+            [
+                {
+                    "question": "My First Question",
+                    "answer": "My First Answer"
+                },
+                {
+                    "question": "My Second Question",
+                    "answer": "My Second Answer"
+                }
+            ]
+            </example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.LoginModel.Username">
+            <summary>
+            Could be either the email or the actual username
+            </summary>
+            <example>Feldrise</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.LoginModel.Password">
+            <summary>
+            The user password
+            </summary>
+            <example>MySecurePassword</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.FirstName">
+            <summary>
+            The user's first name
+            </summary>
+            <example>Victor</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.LastName">
+            <summary>
+            The user's last name
+            </summary>
+            <example>DENIS</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.Birthdate">
+            <summary>
+            The user's bithdate
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.Email">
+            <summary>
+            The uers's email
+            </summary>
+            <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.DiscordTag">
+            <summary>
+            The user's Discord tag
+            </summary>
+            <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.Username">
+            <summary>
+            The user's username
+            </summary>
+            <example>Feldrise</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.Password">
+            <summary>
+            The uers's role
+            </summary>
+            <example>MySecurePassword</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.Role">
+            <summary>
+            The user's role
+            </summary>
+            <example>Builder/Coach/Builder</example>
+        </member>
+    </members>
+</doc>
