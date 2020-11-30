@@ -28,18 +28,6 @@
             <response code="400">The user can't be registered</response>
             <response code="200">Return the registered user id</response>
         </member>
-        <member name="M:BuildUp.API.Controllers.AuthenticationController.RegisterWithForm(BuildUp.API.Models.Users.FormRegisterModel)">
-            <summary>
-            (*) Register a user as a coach or builder with form question and answer
-            </summary>
-            <remarks>
-            The role must be "Coach" or "Builder"
-            </remarks>
-            <param name="formRegisterModel"></param>
-            <returns>The registered user ID</returns>
-            <response code="400">The user can't be registered</response>
-            <response code="200">Return the registered user id</response>
-        </member>
         <member name="M:BuildUp.API.Controllers.AuthenticationController.RegisterAdmin(BuildUp.API.Models.Users.RegisterModel)">
             <summary>
             (Admin) Register a user as an admin
@@ -62,7 +50,7 @@
             <returns>The builder with all informations</returns>
             <response code="403">You are not allowed to view this builder info</response>
             <response code="404">The builder doesn't exist</response>
-            <response code="201">Return the logged user infos</response>
+            <response code="200">Return the logged user infos</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetCandidatingBuilders">
             <summary>
@@ -70,7 +58,7 @@
             </summary>
             <returns>A list of candidating builders</returns>
             <response code="401">You are not allowed to view candidating builders</response>
-            <response code="201">return a list of candidating builders</response>
+            <response code="200">return a list of candidating builders</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetActiveBuilders">
             <summary>
@@ -78,7 +66,16 @@
             </summary>
             <returns>A list of active builders</returns>
             <response code="401">You are not allowed to view active builders</response>
-            <response code="201">return a list of active builders</response>
+            <response code="200">return a list of active builders</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.RegisterBuilder(BuildUp.API.Models.Builders.BuilderRegisterModel)">
+            <summary>
+            (*) Register the builder
+            </summary>
+            <param name="builderRegisterModel"></param>
+            <returns>The registered user ID</returns>
+            <response code="400">The builder can't be registered</response>
+            <response code="200">Return the registered builder id</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.AssignCoach(System.String,BuildUp.API.Models.CoachAssignmentModel)">
             <summary>
@@ -233,55 +230,31 @@
             The user connection token. Only returned on login
             </summary>
         </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.FirstName">
+        <member name="P:BuildUp.API.Models.Builders.BuilderRegisterModel.UserId">
             <summary>
-            The user's first name
+            The builder's user id
             </summary>
-            <example>Victor</example>
+            <example>5f1fe90a58c8ab093c4f772a</example>
         </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.LastName">
+        <member name="P:BuildUp.API.Models.Builders.BuilderRegisterModel.Department">
             <summary>
-            The user's last name
+            The builder's department
             </summary>
-            <example>DENIS</example>
+            <example>35</example>
         </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Birthdate">
+        <member name="P:BuildUp.API.Models.Builders.BuilderRegisterModel.Situation">
             <summary>
-            The user's bithdate
+            The builder current situation
             </summary>
-            <example>2001-08-15T14:40:04.1351158+01:00</example>
+            <example>Student</example>
         </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Email">
+        <member name="P:BuildUp.API.Models.Builders.BuilderRegisterModel.Description">
             <summary>
-            The uers's email
+            The builder description
             </summary>
-            <example>admin@feldrise.com</example>
+            <example>I'm an awesome builder</example>
         </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.DiscordTag">
-            <summary>
-            The user's Discord tag
-            </summary>
-            <example>Feldrise#8497</example>
-        </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Username">
-            <summary>
-            The user's username
-            </summary>
-            <example>Feldrise</example>
-        </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Password">
-            <summary>
-            The uers's role
-            </summary>
-            <example>MySecurePassword</example>
-        </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.Role">
-            <summary>
-            The user's role
-            </summary>
-            <example>Builder/Coach/Builder</example>
-        </member>
-        <member name="P:BuildUp.API.Models.Users.FormRegisterModel.FormQAs">
+        <member name="P:BuildUp.API.Models.Builders.BuilderRegisterModel.FormQAs">
             <summary>
             The forms answers
             </summary>

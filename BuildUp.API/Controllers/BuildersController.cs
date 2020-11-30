@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using BuildUp.API.Entities;
 using BuildUp.API.Models;
+using BuildUp.API.Models.Builders;
 
 namespace BuildUp.API.Controllers
 {
@@ -99,6 +100,30 @@ namespace BuildUp.API.Controllers
             var result = await _buildersService.GetActiveBuildersAsync();
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// (*) Register the builder
+        /// </summary>
+        /// <param name="builderRegisterModel"></param>
+        /// <returns>The registered user ID</returns>
+        /// <response code="400">The builder can't be registered</response>
+        /// <response code="200">Return the registered builder id</response>
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<ActionResult<String>> RegisterBuilder([FromBody]BuilderRegisterModel builderRegisterModel)
+        {
+            string builderId;
+            try
+            {
+                builderId = await _buildersService.RegisterBuilderAsync(builderRegisterModel);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't regster the builder: {e.Message}");
+            }
+
+            return Ok(builderId);
         }
 
         /// <summary>

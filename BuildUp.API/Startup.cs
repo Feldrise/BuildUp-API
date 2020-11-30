@@ -89,6 +89,8 @@ namespace BuildUp.API
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IBuildersService, BuildersService>();
 
+            services.AddScoped<IFormsService, FormsService>();
+
             // Other
             services.AddControllers();
         }

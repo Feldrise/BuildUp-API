@@ -18,8 +18,6 @@ namespace BuildUp.API.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IMongoCollection<User> _users;
-        private readonly IMongoCollection<BuildupForm> _forms;
-        private readonly IMongoCollection<BuildupFormQA> _formsQA;
 
         private readonly IBuildupSettings _buildupSettings;
 
@@ -29,8 +27,6 @@ namespace BuildUp.API.Services
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
 
             _users = database.GetCollection<User>("users");
-            _forms = database.GetCollection<BuildupForm>("forms");
-            _formsQA = database.GetCollection<BuildupFormQA>("forms_qa");
 
             _buildupSettings = buildupSettings;
         }
@@ -79,31 +75,6 @@ namespace BuildUp.API.Services
             return RegisterToDatabaseAsync(userRegister);
         }
 
-        public async Task<string> RegisterWithFormAsync(FormRegisterModel formRegister)
-        {
-            // Basic checks
-            if (formRegister.Role == Role.Admin) throw new ArgumentException("Only admins can register admins", "userRegister.Role");
-            if (formRegister.Role != Role.Builder && formRegister.Role != Role.Coach) throw new ArgumentException("You can only register builders and coachs", "userRegister.Role");
-
-            string userId = await RegisterToDatabaseAsync(new RegisterModel()
-            {
-                FirstName = formRegister.FirstName,
-                LastName = formRegister.LastName,
-                Birthdate = formRegister.Birthdate,
-
-                Email = formRegister.Email,
-                DiscordTag = formRegister.DiscordTag,
-                Username = formRegister.Username,
-
-                Password = formRegister.Password,
-                Role = formRegister.Role
-            });
-
-            await RegisterFormToDatabseAsync(userId, formRegister.FormQAs);
-
-            return userId;
-        }
-
         private async Task<string> RegisterToDatabaseAsync(RegisterModel userRegister)
         {
             // Basic cheks
@@ -135,26 +106,8 @@ namespace BuildUp.API.Services
 
             return databaseUser.Id;
         }
-
-        private async Task RegisterFormToDatabseAsync(string userId, List<BuildupFormQA> qas)
-        {
-            BuildupForm newForm = new BuildupForm()
-            {
-                UserId = userId
-            };
-
-            await _forms.InsertOneAsync(newForm);
-
-            for (int i = 0; i < qas.Count; ++i)
-            {
-                qas[i].FormId = newForm.Id;
-                qas[i].Index = i;
-            }
-
-            await _formsQA.InsertManyAsync(qas);
-        }
-
-        private bool UserExist(String email, String username)
+        
+        private bool UserExist(string email, string username)
         {
             return _users.AsQueryable<User>().Any(user =>
                 user.Email == email ||
