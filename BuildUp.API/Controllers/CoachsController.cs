@@ -24,14 +24,14 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Builder,Coach,Admin) Get a coach from his user's ID
+        /// (Coach,Admin) Get a coach from his user's ID
         /// </summary>
         /// <param name="id" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns>The coach with all informations</returns>
         /// <response code="403">You are not allowed to view this coach info</response>
         /// <response code="404">The coach doesn't exist</response>
         /// <response code="200">Return the coach infos</response>
-        [Authorize]
+        [Authorize(Roles = Role.Admin + "," + Role.Coach)]
         [HttpGet("{id:length(24)}")]
         public async Task<ActionResult<Coach>> GetCoach(string id)
         {

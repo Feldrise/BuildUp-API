@@ -50,7 +50,7 @@
             <returns>The builder with all informations</returns>
             <response code="403">You are not allowed to view this builder info</response>
             <response code="404">The builder doesn't exist</response>
-            <response code="200">Return the logged user infos</response>
+            <response code="200">Return builder infos</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetCandidatingBuilders">
             <summary>
@@ -86,6 +86,41 @@
             <returns></returns>
             <response code="401">You are not allowed to view active builders</response>
             <response code="200">The coach has been successfully assigned</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetCoach(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get a coach from his user's ID
+            </summary>
+            <param name="id" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns>The coach with all informations</returns>
+            <response code="403">You are not allowed to view this coach info</response>
+            <response code="404">The coach doesn't exist</response>
+            <response code="200">Return the coach infos</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetCandidatingCoachs">
+            <summary>
+            (Admin) Get candidating coachs
+            </summary>
+            <returns>A list of candidating coachs</returns>
+            <response code="401">You are not allowed to view candidating coachs</response>
+            <response code="200">return a list of candidating coachs</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetActiveCoachs">
+            <summary>
+            (Admin) Get active coachs
+            </summary>
+            <returns>A list of active coachs</returns>
+            <response code="401">You are not allowed to view active coachs</response>
+            <response code="200">return a list of active coachs</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.RegisterCoach(BuildUp.API.Models.Coachs.CoachRegisterModel)">
+            <summary>
+            (*) Register the coach
+            </summary>
+            <param name="coachRegisterModel"></param>
+            <returns>The registered user ID</returns>
+            <response code="400">The coach can't be registered</response>
+            <response code="200">Return the registered coach id</response>
         </member>
         <member name="P:BuildUp.API.Entities.Builder.UserId">
             <summary>
@@ -255,6 +290,47 @@
             <example>I'm an awesome builder</example>
         </member>
         <member name="P:BuildUp.API.Models.Builders.BuilderRegisterModel.FormQAs">
+            <summary>
+            The forms answers
+            </summary>
+            <example>
+            [
+                {
+                    "question": "My First Question",
+                    "answer": "My First Answer"
+                },
+                {
+                    "question": "My Second Question",
+                    "answer": "My Second Answer"
+                }
+            ]
+            </example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.UserId">
+            <summary>
+            The coach's user id
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.Department">
+            <summary>
+            The coach's department
+            </summary>
+            <example>35</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.Situation">
+            <summary>
+            The coach current situation
+            </summary>
+            <example>Student</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.Description">
+            <summary>
+            The coach description
+            </summary>
+            <example>I'm an awesome coach</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.FormQAs">
             <summary>
             The forms answers
             </summary>
