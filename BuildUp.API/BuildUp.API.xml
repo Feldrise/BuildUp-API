@@ -52,6 +52,28 @@
             <response code="404">The builder doesn't exist</response>
             <response code="200">Return builder infos</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetCoachForBuilder(System.String)">
+            <summary>
+            Get the coach of a builder
+            </summary>
+            <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns>The builder's coach</returns>
+            <response code="401">You are not allowed to view this builder's coach</response>s
+            <response code="403">You are not allowed to view this builder's coach</response>
+            <response code="404">The builder's coach doesn't exist</response>
+            <response code="200">Return builder's coach</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetBuilderFormQAs(System.String)">
+            <summary>
+            Get builder's form answers
+            </summary>
+            <param name="builderId"></param>
+            <returns>The builder's form answer</returns>
+            <response code="401">You are not allowed to view this builder's form</response>s
+            <response code="403">You are not allowed to view this builder's form</response>
+            <response code="404">The builder's form doesn't exist</response>
+            <response code="200">Return builder's form</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetCandidatingBuilders">
             <summary>
             (Admin) Get candidating builders
@@ -81,15 +103,35 @@
             <summary>
             (Admin) Assigna coach to a builder
             </summary>
-            <param name="id" example="5f1fed8458c8ab093c4f77bf"></param>
+            <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
             <param name="coachAssignmentModel"></param>
             <returns></returns>
             <response code="401">You are not allowed to view active builders</response>
             <response code="200">The coach has been successfully assigned</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.UpdateBuilder(System.String,BuildUp.API.Models.Builders.BuilderUpdateModel)">
+            <summary>
+            (Builder,Admin) Update a builder
+            </summary>
+            <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+            <param name="builderUpdateModel"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to update this builder</response>
+            <response code="403">You are not allowed to update this builder</response>
+            <response code="200">The builder has been successfully updated</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.RefuseBuilder(System.String)">
+            <summary>
+            Refuse a builder
+            </summary>
+            <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to refuse this builder</response>
+            <response code="200">The builder has been successfully refused</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetCoach(System.String)">
             <summary>
-            (Builder,Coach,Admin) Get a coach from his user's ID
+            (Coach,Admin) Get a coach from his user's ID
             </summary>
             <param name="id" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <returns>The coach with all informations</returns>
@@ -305,6 +347,48 @@
                 }
             ]
             </example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.UserId">
+            <summary>
+            The builder's user id
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.CoachId">
+            <summary>
+            The builder's coach id
+            </summary>
+            <example>5f1fed8458c8ab093c4f77bf</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.Status">
+            <summary>
+            The builder current status. Can be : Waiting Validated, Refused
+            </summary>
+            <example>Waiting/Validated/Refused</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.Step">
+            <summary>
+            The builder current step. Can be : Preselected, AdminMeeting, CoachMeeting, Active, Finished, Abandoned
+            </summary>
+            <example>Preselected/AdminMeeting/CoachMeeting/Active/Finished/Abandoned</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.Department">
+            <summary>
+            The builder's department
+            </summary>
+            <example>35</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.Situation">
+            <summary>
+            The builder current situation
+            </summary>
+            <example>Student</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.Description">
+            <summary>
+            The builder description
+            </summary>
+            <example>I'm an awesome builder</example>
         </member>
         <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.UserId">
             <summary>

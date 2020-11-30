@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using BuildUp.API.Entities;
 using BuildUp.API.Models;
 using BuildUp.API.Models.Builders;
+using BuildUp.API.Entities.Form;
 
 namespace BuildUp.API.Controllers
 {
@@ -73,6 +74,98 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// Get the coach of a builder
+        /// </summary>
+        /// <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns>The builder's coach</returns>
+        /// <response code="401">You are not allowed to view this builder's coach</response>s
+        /// <response code="403">You are not allowed to view this builder's coach</response>
+        /// <response code="404">The builder's coach doesn't exist</response>
+        /// <response code="200">Return builder's coach</response>
+        [Authorize(Roles = Role.Admin + "," + Role.Builder)] 
+        [HttpGet("{builderId:length(24)}/coach")]
+        public async Task<ActionResult<Coach>> GetCoachForBuilder(string builderId)
+        {
+            var currentUserId = User.Identity.Name;
+            Coach coach;
+
+            try
+            {
+                if (User.IsInRole(Role.Admin))
+                {
+                    coach = await _buildersService.GetCoachForBuilderFromAdminAsync(builderId);
+                }
+                else if (User.IsInRole(Role.Builder))
+                {
+                    coach = await _buildersService.GetCoachForBuilderFromBuilderAsync(currentUserId, builderId);
+                }
+                else
+                {
+                    return Forbid("You must be part of the Buildup program");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't get the coach: {e.Message}");
+            }
+
+            if (coach == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(coach);
+        }
+
+        /// <summary>
+        /// Get builder's form answers
+        /// </summary>
+        /// <param name="builderId"></param>
+        /// <returns>The builder's form answer</returns>
+        /// <response code="401">You are not allowed to view this builder's form</response>s
+        /// <response code="403">You are not allowed to view this builder's form</response>
+        /// <response code="404">The builder's form doesn't exist</response>
+        /// <response code="200">Return builder's form</response>
+        [Authorize]
+        [HttpGet("{builderId:length(24)}/form")]
+        public async Task<ActionResult<List<BuildupFormQA>>> GetBuilderFormQAs(string builderId)
+        {
+            var currentUserId = User.Identity.Name;
+            List<BuildupFormQA> result;
+
+            try
+            {
+                if (User.IsInRole(Role.Admin))
+                {
+                    result = await _buildersService.GetBuilderFormFromAdminAsync(builderId);
+                }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    result = await _buildersService.GetBuilderFormFromCoachAsync(currentUserId, builderId);
+                }
+                else if (User.IsInRole(Role.Builder))
+                {
+                    result = await _buildersService.GetBuilderFormFromBuilderAsync(currentUserId, builderId);
+                }
+                else
+                {
+                    return Forbid("You must be part of the Buildup program");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't get the builder's form: {e.Message}");
+            }
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
         /// (Admin) Get candidating builders
         /// </summary>
         /// <returns>A list of candidating builders</returns>
@@ -129,16 +222,70 @@ namespace BuildUp.API.Controllers
         /// <summary>
         /// (Admin) Assigna coach to a builder
         /// </summary>
-        /// <param name="id" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <param name="coachAssignmentModel"></param>
         /// <returns></returns>
         /// <response code="401">You are not allowed to view active builders</response>
         /// <response code="200">The coach has been successfully assigned</response>
         [Authorize(Roles = Role.Admin)]
-        [HttpPost("{id:length(24)}/assign")]
-        public async Task<IActionResult> AssignCoach(string id, [FromBody]CoachAssignmentModel coachAssignmentModel)
+        [HttpPost("{builderId:length(24)}/assign")]
+        public async Task<IActionResult> AssignCoach(string builderId, [FromBody]CoachAssignmentModel coachAssignmentModel)
         {
-            await _buildersService.AssignCoach(coachAssignmentModel.CoachId, id);
+            await _buildersService.AssignCoachAsync(coachAssignmentModel.CoachId, builderId);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// (Builder,Admin) Update a builder
+        /// </summary>
+        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <param name="builderUpdateModel"></param>
+        /// <returns></returns>
+        /// <response code="401">You are not allowed to update this builder</response>
+        /// <response code="403">You are not allowed to update this builder</response>
+        /// <response code="200">The builder has been successfully updated</response>
+        [Authorize(Roles = Role.Admin + "," + Role.Builder)]
+        [HttpPut("{builderId:length(24)}/update")]
+        public async Task<IActionResult> UpdateBuilder(string builderId, [FromBody]BuilderUpdateModel builderUpdateModel)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                if (User.IsInRole(Role.Admin))
+                {
+                    await _buildersService.UpdateBuilderFromAdminAsync(builderId, builderUpdateModel);
+                }
+                else if (User.IsInRole(Role.Builder))
+                {
+                    await _buildersService.UpdateBuilderFromBuilderAsync(currentUserId, builderId, builderUpdateModel);
+                }
+                else
+                {
+                    return Forbid("You must be part of the Buildup program");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't get the coach: {e.Message}");
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Refuse a builder
+        /// </summary>
+        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <returns></returns>
+        /// <response code="401">You are not allowed to refuse this builder</response>
+        /// <response code="200">The builder has been successfully refused</response>
+        [Authorize(Roles = Role.Admin)]
+        [HttpPut("{builderId:length(24)}/refuse")]
+        public async Task<IActionResult> RefuseBuilder(string builderId)
+        {
+            await _buildersService.RefuseBuilderAsync(builderId);
 
             return Ok();
         }

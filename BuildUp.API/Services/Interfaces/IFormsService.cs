@@ -9,5 +9,6 @@ namespace BuildUp.API.Services.Interfaces
     public interface IFormsService
     {
         Task RegisterFormToDatabseAsync(string userId, List<BuildupFormQA> qas);
+        Task<List<BuildupFormQA>> GetFormQAsAsync(string userId);
     }
 }

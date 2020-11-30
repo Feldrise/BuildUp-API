@@ -15,9 +15,21 @@ namespace BuildUp.API.Services.Interfaces
         Task<Builder> GetBuilderFromCoachAsync(string currentUserId, string userId);
         Task<Builder> GetBuilderFromBuilderAsync(string currentUserId, string userId);
 
-        Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel);
+        Task<Coach> GetCoachForBuilderFromAdminAsync(string builderId);
+        Task<Coach> GetCoachForBuilderFromBuilderAsync(string currentUserId, string builderId);
 
-        Task AssignCoach(string coachId, string builderId);
+        Task<List<BuildupFormQA>> GetBuilderFormFromAdminAsync(string builderId);
+        Task<List<BuildupFormQA>> GetBuilderFormFromCoachAsync(string currentUserId, string builderId);
+        Task<List<BuildupFormQA>> GetBuilderFormFromBuilderAsync(string currentUserId, string builderId);
+
+
+        Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel);
+        Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel);
+
+        Task UpdateBuilderFromBuilderAsync(string currentUserId, string builderId, BuilderUpdateModel builderUpdateModel);
+
+        Task RefuseBuilderAsync(string builderId);
+        Task AssignCoachAsync(string coachId, string builderId);
 
         Task<List<Builder>> GetCandidatingBuildersAsync();
         Task<List<Builder>> GetActiveBuildersAsync();

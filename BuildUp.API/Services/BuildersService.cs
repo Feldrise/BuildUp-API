@@ -37,7 +37,7 @@ namespace BuildUp.API.Services
 
         public Task<Builder> GetBuilderFromAdminAsync(string userId)
         {
-            return GetBuilder(userId);
+            return GetBuilderFromUserId(userId);
         }
 
         public async Task<Builder> GetBuilderFromCoachAsync(string currentUserId, string userId)
@@ -46,7 +46,7 @@ namespace BuildUp.API.Services
 
             if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
 
-            Builder builder = await GetBuilder(userId);
+            Builder builder = await GetBuilderFromUserId(userId);
 
             if (builder == null)
             {
@@ -58,7 +58,7 @@ namespace BuildUp.API.Services
 
         public async Task<Builder> GetBuilderFromBuilderAsync(string currentUserId, string userId)
         {
-            Builder builder = await GetBuilder(userId);
+            Builder builder = await GetBuilderFromUserId(userId);
 
             if (builder == null)
             {
@@ -68,6 +68,72 @@ namespace BuildUp.API.Services
             if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see info", "currentUserId");
 
             return builder;
+        }
+
+        public async Task<Coach> GetCoachForBuilderFromAdminAsync(string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null)
+            {
+                return null;
+            }
+
+            return await GetCoach(builder.CoachId);
+        }
+
+        public async Task<Coach> GetCoachForBuilderFromBuilderAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.UserId != currentUserId)
+            {
+                throw new Exception("This builder can view this coach");
+            }
+
+            return await GetCoach(builder.CoachId);
+        }
+
+        public async Task<List<BuildupFormQA>> GetBuilderFormFromAdminAsync(string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null)
+            {
+                return null;
+            }
+
+            return await _formsService.GetFormQAsAsync(builder.UserId);
+        }
+
+        public async Task<List<BuildupFormQA>> GetBuilderFormFromCoachAsync(string currentUserId, string builderId)
+        {
+            Coach coach = await GetCoach(currentUserId);
+
+            if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
+
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.CoachId != coach.Id)
+            {
+                return null;
+            }
+
+            return await _formsService.GetFormQAsAsync(builder.UserId);
+        }
+
+        public async Task<List<BuildupFormQA>> GetBuilderFormFromBuilderAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null)
+            {
+                return null;
+            }
+
+            if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see form answers", "currentUserId");
+
+            return await _formsService.GetFormQAsAsync(builder.UserId);
         }
 
         public async Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel)
@@ -83,7 +149,36 @@ namespace BuildUp.API.Services
 
         }
 
-        public async Task AssignCoach(string coachId, string builderId)
+        public async Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel)
+        {
+            await UpdateBuilder(builderId, builderUpdateModel);
+        }
+        
+        public async Task UpdateBuilderFromBuilderAsync(string currentUserId, string builderId, BuilderUpdateModel builderUpdateModel)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.UserId != currentUserId)
+            {
+                throw new Exception("This builder can't be update by current user");
+            }
+
+            await UpdateBuilder(builderId, builderUpdateModel);
+        }
+
+        public async Task RefuseBuilderAsync(string builderId)
+        {
+            var update = Builders<Builder>.Update
+                .Set(databaseBuilder => databaseBuilder.Status, BuilderStatus.Deleted)
+                .Set(databaseBuilder => databaseBuilder.Step, BuilderSteps.Abandoned);
+
+            await _builders.UpdateOneAsync(databaseBuilder =>
+                databaseBuilder.Id == builderId,
+                update
+            );
+        }
+
+        public async Task AssignCoachAsync(string coachId, string builderId)
         {
             var update = Builders<Builder>.Update
                 .Set(dbBuilder => dbBuilder.CoachId, coachId);
@@ -130,10 +225,40 @@ namespace BuildUp.API.Services
             return databaseBuilder.Id;
         }
 
-        private async Task<Builder> GetBuilder(string userId)
+        private async Task UpdateBuilder(string id, BuilderUpdateModel builderUpdateModel)
+        {
+            await _builders.ReplaceOneAsync(databaseBuilder =>
+                databaseBuilder.Id == id,
+                new Builder()
+                {
+                    Id = id,
+
+                    UserId = builderUpdateModel.UserId,
+                    CoachId = builderUpdateModel.CoachId,
+
+                    Status = builderUpdateModel.Status,
+                    Step = builderUpdateModel.Step,
+
+                    Department = builderUpdateModel.Department,
+                    Situation = builderUpdateModel.Situation,
+                    Description = builderUpdateModel.Description
+                }
+            );
+        }
+
+        private async Task<Builder> GetBuilderFromUserId(string userId)
         {
             var builder = await _builders.FindAsync(databaseBuilder =>
                 databaseBuilder.UserId == userId
+            );
+
+            return await builder.FirstOrDefaultAsync();
+        }
+
+        private async Task<Builder> GetBuilderFromBuilderId(string builderId)
+        {
+            var builder = await _builders.FindAsync(databaseBuilder =>
+                databaseBuilder.Id == builderId
             );
 
             return await builder.FirstOrDefaultAsync();
