@@ -14,6 +14,10 @@ namespace BuildUp.API.Services.Interfaces
         Task<Coach> GetCoachFromCoachAsync(string currentUserId, string userId);
         Task<List<Coach>> GetAllCoachsAsync();
 
+        Task<User> GetUserFromAdminAsync(string coachId);
+        Task<User> GetUserFromBuilderAsync(string currentUserId, string coachId);
+
+
         Task<List<Builder>> GetBuildersFromAdminAsync(string coachId);
         Task<List<Builder>> GetBuildersFromCoachAsync(string currentUserId, string coachId);
 

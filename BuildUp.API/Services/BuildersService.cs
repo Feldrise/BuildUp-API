@@ -70,6 +70,33 @@ namespace BuildUp.API.Services
             return builder;
         }
 
+        public async Task<User> GetUserFromAdminAsync(string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+
+            return await (await _users.FindAsync(databaseUser =>
+                databaseUser.Id == builder.UserId
+            )).FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetUserFromBuilderAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+
+            if (builder.UserId != currentUserId)
+            {
+                throw new Exception("You can't get user for this builder");
+            }
+
+            return await (await _users.FindAsync(databaseUser =>
+                databaseUser.Id == builder.UserId
+            )).FirstOrDefaultAsync();
+        }
+
         public async Task<Coach> GetCoachForBuilderFromAdminAsync(string builderId)
         {
             Builder builder = await GetBuilderFromBuilderId(builderId);

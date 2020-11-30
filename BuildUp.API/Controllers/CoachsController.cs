@@ -83,6 +83,49 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// (Coach,Admin) Return the user corresponding to the coach
+        /// </summary>
+        /// <param name="coachId"></param>
+        /// <returns></returns>
+        /// <response code="403">You are not allowed to view this user info</response>
+        /// <response code="404">The user doesn't exist</response>
+        /// <response code="200">Return user infos</response>
+        [Authorize(Roles = Role.Admin + "," + Role.Coach)]
+        [HttpGet("{builderId:length(24)}/user")]
+        public async Task<ActionResult<User>> GetUser(string coachId)
+        {
+            var currentUserId = User.Identity.Name;
+            User user;
+
+            try
+            {
+                if (User.IsInRole(Role.Admin))
+                {
+                    user = await _coachService.GetUserFromAdminAsync(coachId);
+                }
+                else if (User.IsInRole(Role.Builder))
+                {
+                    user = await _coachService.GetUserFromBuilderAsync(currentUserId, coachId);
+                }
+                else
+                {
+                    return Forbid("You must be part of the Buildup program");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't get the user: {e.Message}");
+            }
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+
+        /// <summary>
         /// (Admin,Coach) Get the builders of a coach
         /// </summary>
         /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
