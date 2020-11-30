@@ -268,7 +268,7 @@ namespace BuildUp.API.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Can't get the coach: {e.Message}");
+                return BadRequest($"Can't update the builder: {e.Message}");
             }
 
             return Ok();
