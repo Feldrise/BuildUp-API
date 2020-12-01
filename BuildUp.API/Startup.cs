@@ -116,7 +116,7 @@ namespace BuildUp.API
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ISATI WEI API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "BuildUp API");
                 c.InjectStylesheet("/swagger/themes/theme-material.css");
                 c.InjectJavascript("/swagger/custom-script.js", "text/javascript");
                 c.RoutePrefix = "documentation";
