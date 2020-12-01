@@ -84,6 +84,17 @@
             <response code="404">The builder's form doesn't exist</response>
             <response code="200">Return builder's form</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetBuilderProject(System.String)">
+            <summary>
+            Get builder's project
+            </summary>
+            <param name="builderId"></param>
+            <returns>The builder's form answer</returns>
+            <response code="401">You are not allowed to view this builder's project</response>s
+            <response code="403">You are not allowed to view this builder's project</response>
+            <response code="404">The builder's project doesn't exist</response>
+            <response code="200">Return builder's project</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetCandidatingBuilders">
             <summary>
             (Admin) Get candidating builders
@@ -104,10 +115,20 @@
             <summary>
             (*) Register the builder
             </summary>
-            <param name="builderRegisterModel"></param>
+            <param name="builderRegisterModel" example="5f1fed8458c8ab093c4f77bf"></param>
             <returns>The registered user ID</returns>
             <response code="400">The builder can't be registered</response>
             <response code="200">Return the registered builder id</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.SubmitProject(System.String,BuildUp.API.Models.ProjectSubmitModel)">
+            <summary>
+            (*) Submit a project for a builder
+            </summary>
+            <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+            <param name="projectSubmitModel"></param>
+            <returns></returns>
+            <response code="400">The project can't be submit</response>
+            <response code="200">Return the submited project's id</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.AssignCoach(System.String,BuildUp.API.Models.CoachAssignmentModel)">
             <summary>
@@ -324,6 +345,60 @@
             </summary>
             <example>My super answer</example>
         </member>
+        <member name="P:BuildUp.API.Entities.Project.BuilderId">
+            <summary>
+            The builder who own the project
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.Name">
+            <summary>
+            The project's name
+            </summary>
+            <example>Pluctis</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.Description">
+            <summary>
+            The project's description
+            </summary>
+            <example>Pluctis is the tool to never let your plants die again</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.Keywords">
+            <summary>
+            Keywords that represent the project
+            </summary>
+            <example>Plantes, application, tool</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.Team">
+            <summary>
+            The team behind the project
+            </summary>
+            <example>I'm alone but supported by my friends!</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.LaunchDate">
+            <summary>
+            The project launch date
+            </summary>
+            <example>2020-04-20T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.IsLucratif">
+            <summary>
+            Indicate if the project is lucratif or not
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.CurrentBuildOn">
+            <summary>
+            The id of the current buildon for the project
+            </summary>
+            <example>5f1fe90a58c8att73c4f882b</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.CurrentBuildOnStep">
+            <summary>
+            The id of the current step in the current buildon
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
         <member name="P:BuildUp.API.Entities.User.ProfilePictureId">
             <summary>
             The profil picture file ID
@@ -536,6 +611,48 @@
             The coach description
             </summary>
             <example>I'm an awesome coach</example>
+        </member>
+        <member name="P:BuildUp.API.Models.ProjectSubmitModel.BuilderId">
+            <summary>
+            The builder who own the project
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Models.ProjectSubmitModel.Name">
+            <summary>
+            The project's name
+            </summary>
+            <example>Pluctis</example>
+        </member>
+        <member name="P:BuildUp.API.Models.ProjectSubmitModel.Description">
+            <summary>
+            The project's description
+            </summary>
+            <example>Pluctis is the tool to never let your plants die again</example>
+        </member>
+        <member name="P:BuildUp.API.Models.ProjectSubmitModel.Keywords">
+            <summary>
+            Keywords that represent the project
+            </summary>
+            <example>Plantes, application, tool</example>
+        </member>
+        <member name="P:BuildUp.API.Models.ProjectSubmitModel.Team">
+            <summary>
+            The team behind the project
+            </summary>
+            <example>I'm alone but supported by my friends!</example>
+        </member>
+        <member name="P:BuildUp.API.Models.ProjectSubmitModel.LaunchDate">
+            <summary>
+            The project launch date
+            </summary>
+            <example>2020-04-20T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Models.ProjectSubmitModel.IsLucratif">
+            <summary>
+            Indicate if the project is lucratif or not
+            </summary>
+            <example>true</example>
         </member>
         <member name="P:BuildUp.API.Models.Users.LoginModel.Username">
             <summary>

@@ -209,6 +209,54 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// Get builder's project
+        /// </summary>
+        /// <param name="builderId"></param>
+        /// <returns>The builder's form answer</returns>
+        /// <response code="401">You are not allowed to view this builder's project</response>s
+        /// <response code="403">You are not allowed to view this builder's project</response>
+        /// <response code="404">The builder's project doesn't exist</response>
+        /// <response code="200">Return builder's project</response>
+        [Authorize]
+        [HttpGet("{builderId:length(24)}/project")]
+        public async Task<ActionResult<Project>> GetBuilderProject(string builderId)
+        {
+            var currentUserId = User.Identity.Name;
+            Project result;
+
+            try
+            {
+                if (User.IsInRole(Role.Admin))
+                {
+                    result = await _buildersService.GetBuilderProjectFromAdminAsync(builderId);
+                }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    result = await _buildersService.GetBuilderProjectFromCoachAsync(currentUserId, builderId);
+                }
+                else if (User.IsInRole(Role.Builder))
+                {
+                    result = await _buildersService.GetBuilderProjectFromBuilderAsync(currentUserId, builderId);
+                }
+                else
+                {
+                    return Forbid("You must be part of the Buildup program");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't get the builder's project: {e.Message}");
+            }
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
         /// (Admin) Get candidating builders
         /// </summary>
         /// <returns>A list of candidating builders</returns>
@@ -241,7 +289,7 @@ namespace BuildUp.API.Controllers
         /// <summary>
         /// (*) Register the builder
         /// </summary>
-        /// <param name="builderRegisterModel"></param>
+        /// <param name="builderRegisterModel" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <returns>The registered user ID</returns>
         /// <response code="400">The builder can't be registered</response>
         /// <response code="200">Return the registered builder id</response>
@@ -260,6 +308,28 @@ namespace BuildUp.API.Controllers
             }
 
             return Ok(builderId);
+        }
+
+        /// <summary>
+        /// (*) Submit a project for a builder
+        /// </summary>
+        /// <param name="builderId" example="5f1fe90a58c8ab093c4f772a"></param>
+        /// <param name="projectSubmitModel"></param>
+        /// <returns></returns>
+        /// <response code="400">The project can't be submit</response>
+        /// <response code="200">Return the submited project's id</response>
+        [AllowAnonymous]
+        [HttpPost("{builderId:length(24)}/submit_project")]
+        public async Task<ActionResult<string>> SubmitProject(string builderId, [FromBody]ProjectSubmitModel projectSubmitModel)
+        {
+            if (builderId != projectSubmitModel.BuilderId)
+            {
+                return BadRequest("The submitted project doesn't have the same builder ID as the current builder");
+            }
+
+            await _buildersService.SubmitProjectAsync(projectSubmitModel);
+
+            return Ok();
         }
 
         /// <summary>

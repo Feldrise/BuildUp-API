@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
+using BuildUp.API.Models;
 using BuildUp.API.Models.Builders;
 
 namespace BuildUp.API.Services.Interfaces
@@ -26,8 +27,14 @@ namespace BuildUp.API.Services.Interfaces
         Task<List<BuildupFormQA>> GetBuilderFormFromCoachAsync(string currentUserId, string builderId);
         Task<List<BuildupFormQA>> GetBuilderFormFromBuilderAsync(string currentUserId, string builderId);
 
+        Task<Project> GetBuilderProjectFromAdminAsync(string builderId);
+        Task<Project> GetBuilderProjectFromCoachAsync(string currentUserId, string builderId);
+        Task<Project> GetBuilderProjectFromBuilderAsync(string currentUserId, string builderId);
+
 
         Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel);
+        Task<string> SubmitProjectAsync(ProjectSubmitModel projectSubmitModel);
+        
         Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel);
 
         Task UpdateBuilderFromBuilderAsync(string currentUserId, string builderId, BuilderUpdateModel builderUpdateModel);

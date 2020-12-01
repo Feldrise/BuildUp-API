@@ -12,6 +12,7 @@ using MongoDB.Bson;
 using BuildUp.API.Entities.Steps;
 using BuildUp.API.Entities.Status;
 using BuildUp.API.Models.Builders;
+using BuildUp.API.Models;
 
 namespace BuildUp.API.Services
 {
@@ -22,8 +23,9 @@ namespace BuildUp.API.Services
         private readonly IMongoCollection<Coach> _coachs;
 
         private readonly IFormsService _formsService;
+        private readonly IProjectsService _projectsService;
 
-        public BuildersService(IMongoSettings mongoSettings, IFormsService formsService)
+        public BuildersService(IMongoSettings mongoSettings, IFormsService formsService, IProjectsService projectsService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -33,6 +35,7 @@ namespace BuildUp.API.Services
             _coachs = database.GetCollection<Coach>("coachs");
 
             _formsService = formsService;
+            _projectsService = projectsService;
         }
 
         public Task<Builder> GetBuilderFromAdminAsync(string userId)
@@ -163,6 +166,48 @@ namespace BuildUp.API.Services
             return await _formsService.GetFormQAsAsync(builder.UserId);
         }
 
+        public async Task<Project> GetBuilderProjectFromAdminAsync(string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null)
+            {
+                return null;
+            }
+
+            return await _projectsService.GetProjectAsync(builder.UserId);
+        }
+
+        public async Task<Project> GetBuilderProjectFromCoachAsync(string currentUserId, string builderId)
+        {
+            Coach coach = await GetCoach(currentUserId);
+
+            if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
+
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.CoachId != coach.Id)
+            {
+                return null;
+            }
+
+            return await _projectsService.GetProjectAsync(builder.UserId);
+        }
+
+        public async Task<Project> GetBuilderProjectFromBuilderAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null)
+            {
+                return null;
+            }
+
+            if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see the project", "currentUserId");
+
+            return await _projectsService.GetProjectAsync(builder.UserId);
+        }
+
         public async Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel)
         {
             if (!UserExist(builderRegisterModel.UserId)) throw new ArgumentException("The user doesn't existe", "builderRegisterModel.UserId");
@@ -174,6 +219,11 @@ namespace BuildUp.API.Services
 
             return builderId;
 
+        }
+
+        public Task<string> SubmitProjectAsync(ProjectSubmitModel projectSubmitModel)
+        {
+            return _projectsService.SubmitProjectAsync(projectSubmitModel);
         }
 
         public async Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel)
