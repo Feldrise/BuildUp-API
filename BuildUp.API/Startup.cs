@@ -59,9 +59,11 @@ namespace BuildUp.API
             // Settings
             services.Configure<MongoSettings>(Configuration.GetSection(nameof(MongoSettings)));
             services.Configure<BuildupSettings>(Configuration.GetSection(nameof(BuildupSettings)));
+            services.Configure<OvhMailCredentials>(Configuration.GetSection(nameof(OvhMailCredentials)));
             
             services.AddSingleton<IMongoSettings>(sp => sp.GetRequiredService<IOptions<MongoSettings>>().Value);
             services.AddSingleton<IBuildupSettings>(sp => sp.GetRequiredService<IOptions<BuildupSettings>>().Value);
+            services.AddSingleton<IMailCredentials>(sp => sp.GetRequiredService<IOptions<OvhMailCredentials>>().Value);
 
             // JWT Authentication 
             var buildupSettings = Configuration.GetSection(nameof(BuildupSettings)).Get<BuildupSettings>();
@@ -89,6 +91,7 @@ namespace BuildUp.API
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IBuildersService, BuildersService>();
             services.AddScoped<ICoachsService, CoachsService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             services.AddScoped<IFormsService, FormsService>();
 

@@ -21,7 +21,8 @@ namespace BuildUp.API.Services
 
         private readonly IBuildupSettings _buildupSettings;
 
-        public AuthenticationService(IMongoSettings mongoSettings, IBuildupSettings buildupSettings)
+        private readonly INotificationService _notificationService;
+        public AuthenticationService(IMongoSettings mongoSettings, IBuildupSettings buildupSettings, INotificationService notificationService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -29,6 +30,8 @@ namespace BuildUp.API.Services
             _users = database.GetCollection<User>("users");
 
             _buildupSettings = buildupSettings;
+
+            _notificationService = notificationService;
         }
 
         public async Task<User> LoginAsync(string username, string password)
@@ -78,13 +81,14 @@ namespace BuildUp.API.Services
         private async Task<string> RegisterToDatabaseAsync(RegisterModel userRegister)
         {
             // Basic cheks
-            if (string.IsNullOrWhiteSpace(userRegister.Password)) throw new ArgumentException("The password is required", "userRegister.Password");
             if (string.IsNullOrWhiteSpace(userRegister.Email)) throw new Exception("You must provide an email");
             if (string.IsNullOrWhiteSpace(userRegister.Username)) throw new Exception("You must provide a username");
             if (UserExist(userRegister.Email, userRegister.Username)) throw new Exception("The email or the username is already in use");
 
+            string password = GeneratePassword();
+
             // Password stuff, to ensure we never have clear password stored
-            CreatePasswordHash(userRegister.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
             User databaseUser = new User()
             {
@@ -103,6 +107,7 @@ namespace BuildUp.API.Services
             };
 
             await _users.InsertOneAsync(databaseUser);
+            await _notificationService.NotifieAccountCreationAsync(userRegister, password);
 
             return databaseUser.Id;
         }
@@ -113,6 +118,28 @@ namespace BuildUp.API.Services
                 user.Email == email ||
                 user.Username == username
             );
+        }
+
+        private string GeneratePassword()
+        {
+            string[] randomChars = new[] {
+                "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
+                "abcdefghijkmnopqrstuvwxyz",    // lowercase
+                "0123456789",                   // digits
+            };
+            
+            Random rand = new Random(Environment.TickCount);
+            List<char> chars = new List<char>();
+
+            for (int i = chars.Count; i < 10 || chars.Distinct().Count() < 8; ++i)
+            {
+                string rcs = randomChars[rand.Next(0, randomChars.Length)];
+                
+                chars.Insert(rand.Next(0, chars.Count), rcs[rand.Next(0, rcs.Length)]);
+            }
+
+            return new string(chars.ToArray());
+
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

@@ -47,12 +47,6 @@ namespace BuildUp.API.Models.Users
         public string Username { get; set; }
 
         /// <summary>
-        /// The uers's role
-        /// </summary>
-        /// <example>MySecurePassword</example>
-        [Required]
-        public string Password { get; set; }
-        /// <summary>
         /// The user's role
         /// </summary>
         /// <example>Builder/Coach/Builder</example>

@@ -585,12 +585,6 @@
             </summary>
             <example>Feldrise</example>
         </member>
-        <member name="P:BuildUp.API.Models.Users.RegisterModel.Password">
-            <summary>
-            The uers's role
-            </summary>
-            <example>MySecurePassword</example>
-        </member>
         <member name="P:BuildUp.API.Models.Users.RegisterModel.Role">
             <summary>
             The user's role
