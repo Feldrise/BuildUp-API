@@ -165,7 +165,7 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// Get coach's form answers
+        /// (Coach,Admin) Get coach's form answers
         /// </summary>
         /// <param name="coachId"></param>
         /// <returns>The builder's form answer</returns>
@@ -301,7 +301,7 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// Refuse a coach
+        /// (Admin) Refuse a coach
         /// </summary>
         /// <param name="coachId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <returns></returns>

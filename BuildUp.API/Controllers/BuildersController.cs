@@ -117,7 +117,7 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// Get the coach of a builder
+        /// (Builder,Admin) Get the coach of a builder
         /// </summary>
         /// <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns>The builder's coach</returns>
@@ -161,7 +161,7 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// Get builder's form answers
+        /// (Builder,Coach,Admin) Get builder's form answers
         /// </summary>
         /// <param name="builderId"></param>
         /// <returns>The builder's form answer</returns>
@@ -209,7 +209,7 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// Get builder's project
+        /// (Builder,Coach,Admin) Get builder's project
         /// </summary>
         /// <param name="builderId"></param>
         /// <returns>The builder's form answer</returns>
@@ -388,7 +388,7 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// Refuse a builder
+        /// (Admin) Refuse a builder
         /// </summary>
         /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <returns></returns>
