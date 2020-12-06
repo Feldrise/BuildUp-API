@@ -193,6 +193,7 @@ namespace BuildUp.API.Services
             Coach databaseCoach = new Coach()
             {
                 UserId = coachRegisterModel.UserId,
+                CandidatingDate = DateTime.Now,
                 Status = CoachStatus.Candidating,
                 Step = CoachSteps.Preselected,
 

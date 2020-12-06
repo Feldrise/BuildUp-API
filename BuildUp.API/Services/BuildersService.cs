@@ -168,14 +168,7 @@ namespace BuildUp.API.Services
 
         public async Task<Project> GetBuilderProjectFromAdminAsync(string builderId)
         {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null)
-            {
-                return null;
-            }
-
-            return await _projectsService.GetProjectAsync(builder.UserId);
+            return await _projectsService.GetProjectAsync(builderId);
         }
 
         public async Task<Project> GetBuilderProjectFromCoachAsync(string currentUserId, string builderId)
@@ -191,7 +184,7 @@ namespace BuildUp.API.Services
                 return null;
             }
 
-            return await _projectsService.GetProjectAsync(builder.UserId);
+            return await _projectsService.GetProjectAsync(builderId);
         }
 
         public async Task<Project> GetBuilderProjectFromBuilderAsync(string currentUserId, string builderId)
@@ -205,7 +198,7 @@ namespace BuildUp.API.Services
 
             if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see the project", "currentUserId");
 
-            return await _projectsService.GetProjectAsync(builder.UserId);
+            return await _projectsService.GetProjectAsync(builderId);
         }
 
         public async Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel)
@@ -289,6 +282,7 @@ namespace BuildUp.API.Services
             Builder databaseBuilder = new Builder()
             {
                 UserId = builderRegisterModel.UserId,
+                CandidatingDate = DateTime.Now,
                 Status = BuilderStatus.Candidating,
                 Step = BuilderSteps.Preselected,
 

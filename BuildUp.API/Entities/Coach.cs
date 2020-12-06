@@ -14,6 +14,12 @@ namespace BuildUp.API.Entities
         public string Id { get; set; }
 
         /// <summary>
+        /// The date whene the coach canidated
+        /// </summary>
+        /// <example><example>2020-08-15T14:40:04.1351158+01:00</example></example>
+        public DateTime CandidatingDate { get; set; }
+        
+        /// <summary>
         /// The coach's user id
         /// </summary>
         /// <example>5f1fe90a58c8ab093c4f772a</example>
