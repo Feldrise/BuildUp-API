@@ -64,7 +64,7 @@
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetCoachForBuilder(System.String)">
             <summary>
-            Get the coach of a builder
+            (Builder,Admin) Get the coach of a builder
             </summary>
             <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <returns>The builder's coach</returns>
@@ -75,7 +75,7 @@
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetBuilderFormQAs(System.String)">
             <summary>
-            Get builder's form answers
+            (Builder,Coach,Admin) Get builder's form answers
             </summary>
             <param name="builderId"></param>
             <returns>The builder's form answer</returns>
@@ -86,7 +86,7 @@
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetBuilderProject(System.String)">
             <summary>
-            Get builder's project
+            (Builder,Coach,Admin) Get builder's project
             </summary>
             <param name="builderId"></param>
             <returns>The builder's form answer</returns>
@@ -153,7 +153,7 @@
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.RefuseBuilder(System.String)">
             <summary>
-            Refuse a builder
+            (Admin) Refuse a builder
             </summary>
             <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
             <returns></returns>
@@ -201,7 +201,7 @@
         </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetCoachFormQAs(System.String)">
             <summary>
-            Get coach's form answers
+            (Coach,Admin) Get coach's form answers
             </summary>
             <param name="coachId"></param>
             <returns>The builder's form answer</returns>
@@ -248,12 +248,18 @@
         </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.RefuseCoach(System.String)">
             <summary>
-            Refuse a coach
+            (Admin) Refuse a coach
             </summary>
             <param name="coachId" example="5f1fed8458c8ab093c4f77bf"></param>
             <returns></returns>
             <response code="401">You are not allowed to refuse this coach</response>
             <response code="200">The coach has been successfully refused</response>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.CandidatingDate">
+            <summary>
+            The date whene the builder canidated
+            </summary>
+            <example><example>2020-08-15T14:40:04.1351158+01:00</example></example>
         </member>
         <member name="P:BuildUp.API.Entities.Builder.UserId">
             <summary>
@@ -297,6 +303,12 @@
             </summary>
             <example>I'm an awesome builder</example>
         </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOn.ImageId">
+            <summary>
+            Represent the image file ID 
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example> 
+        </member>
         <member name="P:BuildUp.API.Entities.BuildOn.BuildOn.Index">
             <summary>
             The number of the buildon
@@ -314,6 +326,12 @@
             The buildon description
             </summary>
             <example>Dans ce buildon vous allez...</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnStep.ImageId">
+            <summary>
+            Represent the image file ID 
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example> 
         </member>
         <member name="P:BuildUp.API.Entities.BuildOn.BuildOnStep.BuildOnId">
             <summary>
@@ -344,6 +362,12 @@
             The description of the proof needed to validate the buildon
             </summary>
             <example>Vous devrez rendre...</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.CandidatingDate">
+            <summary>
+            The date whene the coach canidated
+            </summary>
+            <example><example>2020-08-15T14:40:04.1351158+01:00</example></example>
         </member>
         <member name="P:BuildUp.API.Entities.Coach.UserId">
             <summary>
@@ -582,6 +606,56 @@
             The builder description
             </summary>
             <example>I'm an awesome builder</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnManageModel.Id">
+            <summary>
+            The id of the step in the database
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnManageModel.Image">
+            <summary>
+            Represent the image
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnManageModel.Name">
+            <summary>
+            The buildon name
+            </summary>
+            <example>Buildon 1</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnManageModel.Description">
+            <summary>
+            The buildon description
+            </summary>
+            <example>Dans ce buildon vous allez...</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.Id">
+            <summary>
+            The id of the step in the database
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.Image">
+            <summary>
+            Represent the image file 
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.Name">
+            <summary>
+            The name of the step
+            </summary>
+            <example>Clarifier mon idée</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.Description">
+            <summary>
+            The description of the step
+            </summary>
+            <example>Dans cet étape vous allez...</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.ProofDescription">
+            <summary>
+            The description of the proof needed to validate the buildon
+            </summary>
+            <example>Vous devrez rendre...</example>
         </member>
         <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.UserId">
             <summary>

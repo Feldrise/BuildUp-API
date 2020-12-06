@@ -91,7 +91,7 @@ namespace BuildUp.API.Controllers
         /// <response code="404">The user doesn't exist</response>
         /// <response code="200">Return user infos</response>
         [Authorize(Roles = Role.Admin + "," + Role.Coach)]
-        [HttpGet("{builderId:length(24)}/user")]
+        [HttpGet("{coachId:length(24)}/user")]
         public async Task<ActionResult<User>> GetUser(string coachId)
         {
             var currentUserId = User.Identity.Name;

@@ -54,6 +54,7 @@ namespace BuildUp.API.Models.Builders
         /// The builder description
         /// </summary>
         /// <example>I'm an awesome builder</example>
+        [Required]
         public string Description { get; set; }
     }
 }
