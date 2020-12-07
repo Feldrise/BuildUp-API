@@ -33,11 +33,21 @@ namespace BuildUp.API.Models.BuildOn
         /// <example>Dans cet étape vous allez...</example>
         [Required]
         public string Description { get; set; }
+
+        /// <summary>
+        /// The type of returning expected for buildon
+        /// </summary>
+        /// <example>File/External/Comment</example>
+        public string ReturningType { get; set; }
         /// <summary>
         /// The description of the proof needed to validate the buildon
         /// </summary>
         /// <example>Vous devrez rendre...</example>
-        [Required]
-        public string ProofDescription { get; set; }
+        public string ReturningDescription { get; set; }
+        /// <summary>
+        /// A link to show to the builder
+        /// </summary>
+        /// <example>https://form.google.com/...</example>
+        public string ReturningLink { get; set; }
     }
 }

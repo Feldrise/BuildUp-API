@@ -175,7 +175,9 @@ namespace BuildUp.API.Services
 
                 Name = buildOnStepManageModel.Name,
                 Description = buildOnStepManageModel.Description,
-                ProofDescription = buildOnStepManageModel.ProofDescription
+                ReturningType = buildOnStepManageModel.ReturningType,
+                ReturningDescription = buildOnStepManageModel.ReturningDescription,
+                ReturningLink = buildOnStepManageModel.ReturningLink
             };
 
             await _buildOnSteps.InsertOneAsync(buildOnStep);
@@ -190,7 +192,9 @@ namespace BuildUp.API.Services
                 .Set(dbBuildOnStep => dbBuildOnStep.Index, index)
                 .Set(dbBuildOnStep => dbBuildOnStep.Name, buildOnStepManageModel.Name)
                 .Set(dbBuildOnStep => dbBuildOnStep.Description, buildOnStepManageModel.Description)
-                .Set(dbBuildOnStep => dbBuildOnStep.ProofDescription, buildOnStepManageModel.ProofDescription);
+                .Set(dbBuildOnStep => dbBuildOnStep.ReturningType, buildOnStepManageModel.ReturningDescription)
+                .Set(dbBuildOnStep => dbBuildOnStep.ReturningDescription, buildOnStepManageModel.ReturningDescription)
+                .Set(dbBuildOnStep => dbBuildOnStep.ReturningLink, buildOnStepManageModel.ReturningLink);
 
             string fileId = "";
 
@@ -213,7 +217,9 @@ namespace BuildUp.API.Services
 
                 Name = buildOnStepManageModel.Name,
                 Description = buildOnStepManageModel.Description,
-                ProofDescription = buildOnStepManageModel.ProofDescription
+                ReturningType = buildOnStepManageModel.ReturningType,
+                ReturningDescription = buildOnStepManageModel.ReturningDescription,
+                ReturningLink = buildOnStepManageModel.ReturningLink
             };
         }
 
