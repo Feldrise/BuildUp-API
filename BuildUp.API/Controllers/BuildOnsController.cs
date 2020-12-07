@@ -59,6 +59,7 @@ namespace BuildUp.API.Controllers
         /// <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns></returns>
         /// <response code="401">You are not allowed to view buildon's image</response>
+        /// <response code="404">The image was not found</response>
         /// <response code="200">Return buildon's image</response>
         [HttpGet("{buildOnId:length(24)}/image")]
         public async Task<ActionResult<byte[]>> GetBuildOnImage(string buildOnId)
