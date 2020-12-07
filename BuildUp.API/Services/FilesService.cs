@@ -44,5 +44,18 @@ namespace BuildUp.API.Services
         {
             return _gridFS.DownloadAsBytesAsync(new ObjectId(fileId));
         }
+
+        public async Task<byte[]> GetFileByName(string filename) 
+        {
+            var filter = Builders<GridFSFileInfo<ObjectId>>.Filter.Eq(x => x.Filename, filename);
+            var currentFile = await(await _gridFS.FindAsync(filter)).FirstOrDefaultAsync();
+
+            if (currentFile == null)
+            {
+                return null;
+            }
+
+            return await _gridFS.DownloadAsBytesAsync(currentFile.Id);
+        }
     }
 }

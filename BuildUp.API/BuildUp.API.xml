@@ -309,6 +309,35 @@
             <response code="401">You are not allowed to refuse this coach</response>
             <response code="200">The coach has been successfully refused</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.FilesController.GetFile(System.String)">
+            <summary>
+            (Admin) Get a file from its id
+            </summary>
+            <param name="id"></param>
+            <returns>The file</returns>
+            <response code="401">You are not allowed to view files</response>
+            <response code="200">Return the file</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.FilesController.GetFileByName(System.String)">
+            <summary>
+            (Admin) Get a file from its name
+            </summary>
+            <param name="name"></param>
+            <returns>The file</returns>
+            <response code="401">You are not allowed to view files</response>
+            <response code="200">Return the file</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.FilesController.UploadFile(System.String,System.Byte[])">
+            <summary>
+            Upload file to the server
+            </summary>
+            <param name="name" example="profil_898935a43"></param>
+            <param name="file"></param>
+            <returns></returns>
+            <response code="400">Their is an error in the request</response>
+            <response code="401">You are not allowed to upload files</response>
+            <response code="200">Return the file's id on the server</response>
+        </member>
         <member name="P:BuildUp.API.Entities.Builder.CandidatingDate">
             <summary>
             The date whene the builder canidated
