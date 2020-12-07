@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BuildUp.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("buildup/[controller]")]
     [ApiController]
     [Authorize(Roles = Role.Admin)]
     public class FilesController : ControllerBase
