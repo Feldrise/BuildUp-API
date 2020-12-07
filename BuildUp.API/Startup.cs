@@ -92,8 +92,10 @@ namespace BuildUp.API
             services.AddScoped<IBuildersService, BuildersService>();
             services.AddScoped<ICoachsService, CoachsService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IBuildOnsService, BuildOnsService>();
 
             services.AddScoped<IFormsService, FormsService>();
+            services.AddScoped<IFilesService, FilesService>();
             services.AddScoped<IProjectsService, ProjectsService>();
 
             // Other

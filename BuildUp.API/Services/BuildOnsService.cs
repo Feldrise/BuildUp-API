@@ -40,6 +40,23 @@ namespace BuildUp.API.Services
             )).ToListAsync();
         }
 
+        public async Task<byte[]> GetImageForBuildOnAsync(string buildOnId)
+        {
+            BuildOn buildOn = await GetBuildOn(buildOnId);
+
+            if (buildOn == null || buildOn.ImageId == null) { return null;  }
+
+            return await _filesService.GetFile(buildOn.ImageId);
+        }
+        public async Task<byte[]> GetImageForBuildOnStepAsync(string buildOnStepId)
+        {
+            BuildOnStep buildOnStep = await GetBuildOnStep(buildOnStepId);
+
+            if (buildOnStep == null || buildOnStep.ImageId == null) { return null; }
+
+            return await _filesService.GetFile(buildOnStep.ImageId);
+        }
+
         public async Task<List<BuildOn>> UpdateBuildOnsAsync(List<BuildOnManageModel> buildOnManageModels)
         {
             List<BuildOn> result = new List<BuildOn>();
@@ -114,7 +131,7 @@ namespace BuildUp.API.Services
             };
 
             await _buildOns.InsertOneAsync(buildOn);
-            await UpdateBuildOnAsync(buildOn.Id, index, buildOnManageModel);
+            buildOn = await UpdateBuildOnAsync(buildOn.Id, index, buildOnManageModel);
 
             return buildOn;
         }
@@ -131,7 +148,7 @@ namespace BuildUp.API.Services
             if (buildOnManageModel.Image != null && buildOnManageModel.Image.Length >= 1)
             {
                 fileId = await _filesService.UploadFile($"buildon_{buildOnId}", buildOnManageModel.Image);
-                update.Set(dbBuildOn => dbBuildOn.ImageId, fileId);
+                update = update.Set(dbBuildOn => dbBuildOn.ImageId, fileId);
             }
 
             await _buildOns.UpdateOneAsync(databaseBuildOn =>
@@ -162,7 +179,7 @@ namespace BuildUp.API.Services
             };
 
             await _buildOnSteps.InsertOneAsync(buildOnStep);
-            await UpdateBuildOnStepAsync(buildOnId, buildOnStep.Id, index, buildOnStepManageModel);
+            buildOnStep = await UpdateBuildOnStepAsync(buildOnId, buildOnStep.Id, index, buildOnStepManageModel);
 
             return buildOnStep;
         }
@@ -180,7 +197,7 @@ namespace BuildUp.API.Services
             if (buildOnStepManageModel.Image != null && buildOnStepManageModel.Image.Length >= 1)
             {
                 fileId = await _filesService.UploadFile($"buildonstep_{buildonStepId}", buildOnStepManageModel.Image);
-                update.Set(dbBuildOnStep => dbBuildOnStep.ImageId, fileId);
+                update = update.Set(dbBuildOnStep => dbBuildOnStep.ImageId, fileId);
             }
 
             await _buildOnSteps.UpdateOneAsync(databaseBuildOnStep =>
@@ -199,5 +216,24 @@ namespace BuildUp.API.Services
                 ProofDescription = buildOnStepManageModel.ProofDescription
             };
         }
+
+        private async Task<BuildOn> GetBuildOn(string buildOnId)
+        {
+            var buildOn = await _buildOns.FindAsync(databaseBuildOn =>
+                databaseBuildOn.Id == buildOnId
+            );
+
+            return await buildOn.FirstOrDefaultAsync();
+        }
+
+        private async Task<BuildOnStep> GetBuildOnStep(string buildOnStepId)
+        {
+            var buildOnStep = await _buildOnSteps.FindAsync(databaseBuildOnStep =>
+                databaseBuildOnStep.Id == buildOnStepId
+            );
+
+            return await buildOnStep.FirstOrDefaultAsync();
+        }
+
     }
 }

@@ -35,14 +35,14 @@ namespace BuildUp.API.Services
                 }
             }
 
-            var file = _gridFS.UploadFromBytesAsync(filename, fileBytes);
+            var file = await _gridFS.UploadFromBytesAsync(filename, fileBytes);
 
             return file.ToString();
         }
 
         public Task<byte[]> GetFile(string fileId)
         {
-            return _gridFS.DownloadAsBytesAsync(fileId);
+            return _gridFS.DownloadAsBytesAsync(new ObjectId(fileId));
         }
     }
 }

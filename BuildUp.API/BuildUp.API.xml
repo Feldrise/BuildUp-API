@@ -160,6 +160,60 @@
             <response code="401">You are not allowed to refuse this builder</response>
             <response code="200">The builder has been successfully refused</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOns">
+            <summary>
+            Get all build-ons
+            </summary>
+            <returns>All build-ons</returns>
+            <response code="401">You are not allowed to view buildons</response>
+            <response code="200">Return buildons</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOnSteps(System.String)">
+            <summary>
+            Get all buildon's steps
+            </summary>
+            <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view buildon's step</response>
+            <response code="200">Return buildon's step</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOnImage(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get buildon's image
+            </summary>
+            <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view buildon's image</response>
+            <response code="200">Return buildon's image</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOnStepImage(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get buildon's step's image
+            </summary>
+            <param name="buildOnStepId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view buildon's step's image</response>
+            <response code="200">Return buildon's image</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.SyncBuildOns(System.Collections.Generic.List{BuildUp.API.Models.BuildOn.BuildOnManageModel})">
+            <summary>
+            (Admin) Sync build-ons with server
+            </summary>
+            <param name="buildOnManageModels"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view buildon's step</response>
+            <response code="200">Return synced buildons</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.SyncBuildOnSteps(System.String,System.Collections.Generic.List{BuildUp.API.Models.BuildOn.BuildOnStepManageModel})">
+            <summary>
+            (Admin) Sync build-on steps with server
+            </summary>
+            <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <param name="buildOnManageStepModels"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view buildon's step</response>
+            <response code="200">Return synced buildons</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetAllCoach">
             <summary>
             (Admin) Get all coachs
