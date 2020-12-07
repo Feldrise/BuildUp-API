@@ -184,6 +184,7 @@
             <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <returns></returns>
             <response code="401">You are not allowed to view buildon's image</response>
+            <response code="404">The image was not found</response>
             <response code="200">Return buildon's image</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOnStepImage(System.String)">
@@ -338,6 +339,27 @@
             <response code="401">You are not allowed to upload files</response>
             <response code="200">Return the file's id on the server</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.UsersController.GetProfilePicture(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get the profile picture of the user
+            </summary>
+            <param name="id" example="5f1fe90a58c8ab093c4f772a"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view user's profile picture</response>
+            <response code="404">The profile_picture was not found</response>
+            <response code="200">Return user's profile picture</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.UsersController.UpdateUser(System.String,BuildUp.API.Models.Users.UserUpdateModel)">
+            <summary>
+            (Builder,Coach,Admin) Update a user. Only admin can edit every users
+            </summary>
+            <param name="id" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <param name="userUpdateModel"></param>
+            <returns></returns>
+            <response code="400">Their is an error in the request</response>
+            <response code="403">You are not allowed to edit this user</response>
+            <response code="200">The user has been updated</response>
+        </member>
         <member name="P:BuildUp.API.Entities.Builder.CandidatingDate">
             <summary>
             The date whene the builder canidated
@@ -440,11 +462,23 @@
             </summary>
             <example>Dans cet étape vous allez...</example>
         </member>
-        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnStep.ProofDescription">
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnStep.ReturningType">
+            <summary>
+            The type of returning expected for buildon
+            </summary>
+            <example>File/External/Comment</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnStep.ReturningDescription">
             <summary>
             The description of the proof needed to validate the buildon
             </summary>
             <example>Vous devrez rendre...</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnStep.ReturningLink">
+            <summary>
+            A link to show to the builder
+            </summary>
+            <example>https://form.google.com/...</example>
         </member>
         <member name="P:BuildUp.API.Entities.Coach.CandidatingDate">
             <summary>
@@ -734,11 +768,23 @@
             </summary>
             <example>Dans cet étape vous allez...</example>
         </member>
-        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.ProofDescription">
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.ReturningType">
+            <summary>
+            The type of returning expected for buildon
+            </summary>
+            <example>File/External/Comment</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.ReturningDescription">
             <summary>
             The description of the proof needed to validate the buildon
             </summary>
             <example>Vous devrez rendre...</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.ReturningLink">
+            <summary>
+            A link to show to the builder
+            </summary>
+            <example>https://form.google.com/...</example>
         </member>
         <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.UserId">
             <summary>
@@ -912,6 +958,46 @@
             The user's role
             </summary>
             <example>Builder/Coach/Builder</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.ProfilePicture">
+            <summary>
+            Represent the profile picture
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.FirstName">
+            <summary>
+            The user's first name
+            </summary>
+            <example>Victor</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.LastName">
+            <summary>
+            The user's last name
+            </summary>
+            <example>DENIS</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.Birthdate">
+            <summary>
+            The user's birthdate
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.Email">
+            <summary>
+            The user's email
+            </summary>
+            <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.DiscordTag">
+            <summary>
+            The user's Discord tag
+            </summary>
+            <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.Password">
+            <summary>
+            A new password 
+            </summary>
         </member>
     </members>
 </doc>

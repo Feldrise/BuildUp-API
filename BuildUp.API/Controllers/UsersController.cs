@@ -1,4 +1,6 @@
-﻿using BuildUp.API.Services.Interfaces;
+﻿using BuildUp.API.Entities;
+using BuildUp.API.Models.Users;
+using BuildUp.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +24,7 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// Get the profile picture of the user
+        /// (Builder,Coach,Admin) Get the profile picture of the user
         /// </summary>
         /// <param name="id" example="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns></returns>
@@ -40,6 +42,37 @@ namespace BuildUp.API.Controllers
             }
 
             return Ok(image);
+        }
+
+        /// <summary>
+        /// (Builder,Coach,Admin) Update a user. Only admin can edit every users
+        /// </summary>
+        /// <param name="id" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <param name="userUpdateModel"></param>
+        /// <returns></returns>
+        /// <response code="400">Their is an error in the request</response>
+        /// <response code="403">You are not allowed to edit this user</response>
+        /// <response code="200">The user has been updated</response>
+        [HttpPut("{id:length(24)}/update")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody]UserUpdateModel userUpdateModel)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                if (!User.IsInRole(Role.Admin) && currentUserId != id)
+                {
+                    return Forbid("You can't edit that user");
+                }
+
+                await _userService.UpdateUserAsync(id, userUpdateModel);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't update the user: {e.Message}");
+            }
         }
     }
 }

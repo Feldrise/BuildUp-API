@@ -78,6 +78,20 @@ namespace BuildUp.API.Services
             return RegisterToDatabaseAsync(userRegister);
         }
 
+        public async Task UpdatePasswordAsync(string userId, string password)
+        {
+            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            var update = Builders<User>.Update
+                .Set(dbUser => dbUser.PasswordHash, Convert.ToBase64String(passwordHash))
+                .Set(dbUser => dbUser.PasswordSalt, passwordSalt);
+
+            await _users.UpdateOneAsync(databaseUser =>
+                databaseUser.Id == userId,
+                update
+            );
+        }
+
         private async Task<string> RegisterToDatabaseAsync(RegisterModel userRegister)
         {
             // Basic cheks
