@@ -24,8 +24,9 @@ namespace BuildUp.API.Services
 
         private readonly IFormsService _formsService;
         private readonly IProjectsService _projectsService;
+        private readonly IFilesService _filesService;
 
-        public BuildersService(IMongoSettings mongoSettings, IFormsService formsService, IProjectsService projectsService)
+        public BuildersService(IMongoSettings mongoSettings, IFormsService formsService, IProjectsService projectsService, IFilesService filesService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -36,6 +37,7 @@ namespace BuildUp.API.Services
 
             _formsService = formsService;
             _projectsService = projectsService;
+            _filesService = filesService;
         }
 
         public Task<Builder> GetBuilderFromAdminAsync(string userId)
@@ -298,22 +300,25 @@ namespace BuildUp.API.Services
 
         private async Task UpdateBuilder(string id, BuilderUpdateModel builderUpdateModel)
         {
-            await _builders.ReplaceOneAsync(databaseBuilder =>
-                databaseBuilder.Id == id,
-                new Builder()
-                {
-                    Id = id,
+            var update = Builders<Builder>.Update
+                .Set(dbBuilder => dbBuilder.CoachId, builderUpdateModel.CoachId)
+                .Set(dbBuilder => dbBuilder.Status, builderUpdateModel.Status)
+                .Set(dbBuilder => dbBuilder.Step, builderUpdateModel.Step)
+                .Set(dbBuilder => dbBuilder.Department, builderUpdateModel.Department)
+                .Set(dbBuilder => dbBuilder.Situation, builderUpdateModel.Situation)
+                .Set(dbBuilder => dbBuilder.Description, builderUpdateModel.Description);
 
-                    UserId = builderUpdateModel.UserId,
-                    CoachId = builderUpdateModel.CoachId,
+            string fileId = "";
 
-                    Status = builderUpdateModel.Status,
-                    Step = builderUpdateModel.Step,
+            if (builderUpdateModel.BuilderCard != null && builderUpdateModel.BuilderCard.Length >= 1)
+            {
+                fileId = await _filesService.UploadFile($"buildercard_{id}", builderUpdateModel.BuilderCard);
+                update = update.Set(dbBuilder => dbBuilder.BuilderCardId, fileId);
+            }
 
-                    Department = builderUpdateModel.Department,
-                    Situation = builderUpdateModel.Situation,
-                    Description = builderUpdateModel.Description
-                }
+            await _builders.UpdateOneAsync(databaseBuilder =>
+               databaseBuilder.Id == id,
+               update
             );
         }
 

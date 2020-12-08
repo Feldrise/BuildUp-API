@@ -25,6 +25,12 @@ namespace BuildUp.API.Models.Builders
         public string CoachId { get; set; }
 
         /// <summary>
+        /// the builder's card
+        /// </summary>
+        [BsonRepresentation(BsonType.ObjectId)]
+        public byte[] BuilderCard { get; set; }
+
+        /// <summary>
         /// The builder current status. Can be : Waiting Validated, Refused
         /// </summary>
         /// <example>Waiting/Validated/Refused</example>
