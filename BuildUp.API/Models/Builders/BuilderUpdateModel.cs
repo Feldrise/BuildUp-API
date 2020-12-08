@@ -23,6 +23,12 @@ namespace BuildUp.API.Models.Builders
         /// <example>5f1fed8458c8ab093c4f77bf</example>
         [BsonRepresentation(BsonType.ObjectId)]
         public string CoachId { get; set; }
+        /// <summary>
+        /// The builder's NTF referent's id
+        /// </summary>
+        /// <example>5f1fed8458c8ab093c4f77bf</example>
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string NtfReferentId { get; set; }
 
         /// <summary>
         /// the builder's card

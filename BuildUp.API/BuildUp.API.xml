@@ -245,7 +245,7 @@
         </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetUser(System.String)">
             <summary>
-            (Coach,Admin) Return the user corresponding to the coach
+            (Builder,Admin) Return the user corresponding to the coach
             </summary>
             <param name="coachId"></param>
             <returns></returns>
@@ -349,6 +349,35 @@
             <response code="401">You are not allowed to upload files</response>
             <response code="200">Return the file's id on the server</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.NtfReferentsController.GetAll">
+            <summary>
+            (Builder,Coach,Admin) Get all NTF referents
+            </summary>
+            <returns></returns>
+            <response code="401">You are not allowed to view referents</response>
+            <response code="200">Return a list of all referents</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.NtfReferentsController.GetOne(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get a single NTF referent
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view referent</response>
+            <response code="404">The referent doesn't exist</response>
+            <response code="200">Return the referent</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.NtfReferentsController.AddReferent(BuildUp.API.Models.NtfReferentManageModel)">
+            <summary>
+            (Admin) Add a NTF referent
+            </summary>
+            <param name="ntfReferentManageModel"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to add referent</response>
+            <response code="400">The request failed</response>
+            <response code="200">Return the id of the newly created referent</response>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:BuildUp.API.Controllers.NtfReferentsController.UpdateReferent(System.String,BuildUp.API.Models.NtfReferentManageModel)" -->
         <member name="M:BuildUp.API.Controllers.UsersController.GetProfilePicture(System.String)">
             <summary>
             (Builder,Coach,Admin) Get the profile picture of the user
@@ -390,6 +419,12 @@
         <member name="P:BuildUp.API.Entities.Builder.CoachId">
             <summary>
             The builder's coach id
+            </summary>
+            <example>5f1fed8458c8ab093c4f77bf</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Builder.NtfReferentId">
+            <summary>
+            The builder's NTF referent's id
             </summary>
             <example>5f1fed8458c8ab093c4f77bf</example>
         </member>
@@ -549,6 +584,24 @@
             </summary>
             <example>My super answer</example>
         </member>
+        <member name="P:BuildUp.API.Entities.NtfReferent.Name">
+            <summary>
+            The name of the NTF referent
+            </summary>
+            <example>Victor DENIS</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.NtfReferent.Email">
+            <summary>
+            The email of the NTF referent
+            </summary>
+            <example>contact@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.NtfReferent.DiscordTag">
+            <summary>
+            The Discord tag of NTF referent
+            </summary>
+            <example>Feldrise#8497</example>
+        </member>
         <member name="P:BuildUp.API.Entities.Project.BuilderId">
             <summary>
             The builder who own the project
@@ -706,6 +759,12 @@
         <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.CoachId">
             <summary>
             The builder's coach id
+            </summary>
+            <example>5f1fed8458c8ab093c4f77bf</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.NtfReferentId">
+            <summary>
+            The builder's NTF referent's id
             </summary>
             <example>5f1fed8458c8ab093c4f77bf</example>
         </member>
@@ -882,6 +941,24 @@
             The coach description
             </summary>
             <example>I'm an awesome coach</example>
+        </member>
+        <member name="P:BuildUp.API.Models.NtfReferentManageModel.Name">
+            <summary>
+            The name of the NTF referent
+            </summary>
+            <example>Victor DENIS</example>
+        </member>
+        <member name="P:BuildUp.API.Models.NtfReferentManageModel.Email">
+            <summary>
+            The email of the NTF referent
+            </summary>
+            <example>contact@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Models.NtfReferentManageModel.DiscordTag">
+            <summary>
+            The Discord tag of NTF referent
+            </summary>
+            <example>Feldrise#8497</example>
         </member>
         <member name="P:BuildUp.API.Models.ProjectSubmitModel.BuilderId">
             <summary>

@@ -311,6 +311,7 @@ namespace BuildUp.API.Services
         {
             var update = Builders<Builder>.Update
                 .Set(dbBuilder => dbBuilder.CoachId, builderUpdateModel.CoachId)
+                .Set(dbBuilder => dbBuilder.NtfReferentId, builderUpdateModel.NtfReferentId)
                 .Set(dbBuilder => dbBuilder.Status, builderUpdateModel.Status)
                 .Set(dbBuilder => dbBuilder.Step, builderUpdateModel.Step)
                 .Set(dbBuilder => dbBuilder.Department, builderUpdateModel.Department)

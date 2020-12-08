@@ -94,6 +94,7 @@ namespace BuildUp.API
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IBuildOnsService, BuildOnsService>();
             services.AddScoped<IUsersService, UsersService>();
+            services.AddScoped<INtfReferentsService, NtfReferentsService>();
 
             services.AddScoped<IFormsService, FormsService>();
             services.AddScoped<IFilesService, FilesService>();
