@@ -366,6 +366,11 @@
             </summary>
             <example><example>2020-08-15T14:40:04.1351158+01:00</example></example>
         </member>
+        <member name="P:BuildUp.API.Entities.Builder.BuilderCardId">
+            <summary>
+            The id of the builder's card
+            </summary>
+        </member>
         <member name="P:BuildUp.API.Entities.Builder.UserId">
             <summary>
             The builder's user id
@@ -693,6 +698,11 @@
             The builder's coach id
             </summary>
             <example>5f1fed8458c8ab093c4f77bf</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.BuilderCard">
+            <summary>
+            the builder's card
+            </summary>
         </member>
         <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.Status">
             <summary>

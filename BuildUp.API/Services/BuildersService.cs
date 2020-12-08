@@ -102,6 +102,15 @@ namespace BuildUp.API.Services
             )).FirstOrDefaultAsync();
         }
 
+        public async Task<byte[]> GetBuilderCardAsync(string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.BuilderCardId == null) { return null; }
+
+            return await _filesService.GetFile(builder.BuilderCardId);
+        }
+
         public async Task<Coach> GetCoachForBuilderFromAdminAsync(string builderId)
         {
             Builder builder = await GetBuilderFromBuilderId(builderId);
