@@ -62,6 +62,16 @@
             <response code="404">The user doesn't exist</response>
             <response code="200">Return user infos</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetBuilderCard(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get the builder's card
+            </summary>
+            <param name="builderId" example="5f1fe90a58c8ab093c4f772a"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view builder's card</response>
+            <response code="404">The builder's card was not found</response>
+            <response code="200">Return builder's card</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetCoachForBuilder(System.String)">
             <summary>
             (Builder,Admin) Get the coach of a builder

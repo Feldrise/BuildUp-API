@@ -70,10 +70,30 @@ namespace BuildUp.API.Services
 
         public async Task<User> GetUserFromBuilderAsync(string currentUserId, string coachId)
         {
+            Builder builder = await GetBuilderFromUserId(currentUserId);
+
+            if (builder == null) throw new Exception("The builder for the current user doesn't exist");
+            
+            if (builder.CoachId != coachId)
+            {
+                throw new Exception("You can't get user for this coach");
+            }
+
             Coach coach = await GetCoachFromCoachId(coachId);
 
             if (coach == null) throw new Exception("The coach doesn't exist");
-            
+
+            return await (await _users.FindAsync(databaseUser =>
+                databaseUser.Id == coach.UserId
+            )).FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetUserFromCoachAsync(string currentUserId, string coachId)
+        {
+            Coach coach = await GetCoachFromCoachId(coachId);
+
+            if (coach == null) throw new Exception("The coach doesn't exist");
+
             if (coach.UserId != currentUserId)
             {
                 throw new Exception("You can't get user for this coach");
@@ -225,6 +245,15 @@ namespace BuildUp.API.Services
                     Description = coachUpdateModel.Description
                 }
             );
+        }
+
+        private async Task<Builder> GetBuilderFromUserId(string userId)
+        {
+            var builder = await _builders.FindAsync(databaseBuilder =>
+                databaseBuilder.UserId == userId
+            );
+
+            return await builder.FirstOrDefaultAsync();
         }
 
         private async Task<Coach> GetCoachFromUserId(string userId)

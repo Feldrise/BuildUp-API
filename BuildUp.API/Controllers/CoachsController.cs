@@ -83,14 +83,14 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Coach,Admin) Return the user corresponding to the coach
+        /// (Builder,Admin) Return the user corresponding to the coach
         /// </summary>
         /// <param name="coachId"></param>
         /// <returns></returns>
         /// <response code="403">You are not allowed to view this user info</response>
         /// <response code="404">The user doesn't exist</response>
         /// <response code="200">Return user infos</response>
-        [Authorize(Roles = Role.Admin + "," + Role.Coach)]
+        [Authorize(Roles = Role.Admin + "," + Role.Builder)]
         [HttpGet("{coachId:length(24)}/user")]
         public async Task<ActionResult<User>> GetUser(string coachId)
         {
@@ -102,6 +102,10 @@ namespace BuildUp.API.Controllers
                 if (User.IsInRole(Role.Admin))
                 {
                     user = await _coachService.GetUserFromAdminAsync(coachId);
+                }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    user = await _coachService.GetUserFromCoachAsync(currentUserId, coachId);
                 }
                 else if (User.IsInRole(Role.Builder))
                 {
