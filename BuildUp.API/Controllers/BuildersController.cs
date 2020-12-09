@@ -11,6 +11,7 @@ using BuildUp.API.Entities;
 using BuildUp.API.Models;
 using BuildUp.API.Models.Builders;
 using BuildUp.API.Entities.Form;
+using BuildUp.API.Models.Projects;
 
 namespace BuildUp.API.Controllers
 {
@@ -407,6 +408,46 @@ namespace BuildUp.API.Controllers
 
             return Ok();
         }
+
+        /// <summary>
+        /// (Builder,Admin) Update a builder
+        /// </summary>
+        /// <param name="projectId" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <param name="projectUpdateModel"></param>
+        /// <returns></returns>
+        /// <response code="401">You are not allowed to update this project</response>
+        /// <response code="403">You are not allowed to update this project</response>
+        /// <response code="200">The project has been successfully updated</response>
+        [Authorize(Roles = Role.Admin + "," + Role.Builder)]
+        [HttpPut("{builderId:length(24)}/projects/{projectId:length(24)}/update")]
+        public async Task<IActionResult> UpdateProject(string builderId, string projectId, [FromBody] ProjectUpdateModel projectUpdateModel)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                if (User.IsInRole(Role.Admin))
+                {
+                    await _buildersService.UpdateProjectFromAdmin(projectId, projectUpdateModel);
+                }
+                else if (User.IsInRole(Role.Builder))
+                {
+                    await _buildersService.UpdateProjectFromBuilder(currentUserId, builderId, projectId, projectUpdateModel);
+                }
+                else
+                {
+                    return Forbid("You must be part of the Buildup program");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't update the project: {e.Message}");
+            }
+
+            return Ok();
+        }
+
 
         /// <summary>
         /// (Admin) Refuse a builder

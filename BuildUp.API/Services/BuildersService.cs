@@ -13,6 +13,7 @@ using BuildUp.API.Entities.Steps;
 using BuildUp.API.Entities.Status;
 using BuildUp.API.Models.Builders;
 using BuildUp.API.Models;
+using BuildUp.API.Models.Projects;
 
 namespace BuildUp.API.Services
 {
@@ -211,6 +212,25 @@ namespace BuildUp.API.Services
 
             return await _projectsService.GetProjectAsync(builderId);
         }
+
+        public async Task UpdateProjectFromAdmin(string projectId, ProjectUpdateModel projectUpdateModel)
+        {
+            await _projectsService.UpdateProjectAsync(projectId, projectUpdateModel);
+        }
+        public async Task UpdateProjectFromBuilder(string currentUserId, string builderId, string projectId, ProjectUpdateModel projectUpdateModel)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null)
+            {
+                throw new Exception("The builder doesn't exist, you may not be authorized to permorm actions");
+            }
+            
+            if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see the project", "currentUserId");
+
+            await _projectsService.UpdateProjectAsync(projectId, projectUpdateModel);
+        }
+
 
         public async Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel)
         {

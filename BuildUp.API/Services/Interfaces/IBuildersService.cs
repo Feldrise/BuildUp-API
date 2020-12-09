@@ -7,6 +7,7 @@ using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
 using BuildUp.API.Models;
 using BuildUp.API.Models.Builders;
+using BuildUp.API.Models.Projects;
 
 namespace BuildUp.API.Services.Interfaces
 {
@@ -32,6 +33,8 @@ namespace BuildUp.API.Services.Interfaces
         Task<Project> GetBuilderProjectFromCoachAsync(string currentUserId, string builderId);
         Task<Project> GetBuilderProjectFromBuilderAsync(string currentUserId, string builderId);
 
+        Task UpdateProjectFromAdmin(string projectId, ProjectUpdateModel projectUpdateModel);
+        Task UpdateProjectFromBuilder(string currentUserId, string builderId, string projectId, ProjectUpdateModel projectUpdateModel);
 
         Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel);
         Task<string> SubmitProjectAsync(ProjectSubmitModel projectSubmitModel);

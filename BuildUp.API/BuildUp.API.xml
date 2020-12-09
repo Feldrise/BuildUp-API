@@ -130,7 +130,7 @@
             <response code="400">The builder can't be registered</response>
             <response code="200">Return the registered builder id</response>
         </member>
-        <member name="M:BuildUp.API.Controllers.BuildersController.SubmitProject(System.String,BuildUp.API.Models.ProjectSubmitModel)">
+        <member name="M:BuildUp.API.Controllers.BuildersController.SubmitProject(System.String,BuildUp.API.Models.Projects.ProjectSubmitModel)">
             <summary>
             (*) Submit a project for a builder
             </summary>
@@ -160,6 +160,18 @@
             <response code="401">You are not allowed to update this builder</response>
             <response code="403">You are not allowed to update this builder</response>
             <response code="200">The builder has been successfully updated</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.UpdateProject(System.String,System.String,BuildUp.API.Models.Projects.ProjectUpdateModel)">
+            <summary>
+            (Builder,Admin) Update a builder
+            </summary>
+            <param name="projectId" example="5f1fed8458c8ab093c4f77bf"></param>
+            <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+            <param name="projectUpdateModel"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to update this project</response>
+            <response code="403">You are not allowed to update this project</response>
+            <response code="200">The project has been successfully updated</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.RefuseBuilder(System.String)">
             <summary>
@@ -614,6 +626,12 @@
             </summary>
             <example>Pluctis</example>
         </member>
+        <member name="P:BuildUp.API.Entities.Project.Categorie">
+            <summary>
+            The project's categorye
+            </summary>
+            <example>Agroalimentaire</example>
+        </member>
         <member name="P:BuildUp.API.Entities.Project.Description">
             <summary>
             The project's description
@@ -641,6 +659,12 @@
         <member name="P:BuildUp.API.Entities.Project.IsLucratif">
             <summary>
             Indicate if the project is lucratif or not
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Project.IsDeclared">
+            <summary>
+            Indicate if the project is declared or not
             </summary>
             <example>true</example>
         </member>
@@ -960,45 +984,105 @@
             </summary>
             <example>Feldrise#8497</example>
         </member>
-        <member name="P:BuildUp.API.Models.ProjectSubmitModel.BuilderId">
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.BuilderId">
             <summary>
             The builder who own the project
             </summary>
             <example>5f1fe90a58c8ab093c4f772a</example>
         </member>
-        <member name="P:BuildUp.API.Models.ProjectSubmitModel.Name">
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.Name">
             <summary>
             The project's name
             </summary>
             <example>Pluctis</example>
         </member>
-        <member name="P:BuildUp.API.Models.ProjectSubmitModel.Description">
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.Categorie">
+            <summary>
+            The project's categorye
+            </summary>
+            <example>Agroalimentaire</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.Description">
             <summary>
             The project's description
             </summary>
             <example>Pluctis is the tool to never let your plants die again</example>
         </member>
-        <member name="P:BuildUp.API.Models.ProjectSubmitModel.Keywords">
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.Keywords">
             <summary>
             Keywords that represent the project
             </summary>
             <example>Plantes, application, tool</example>
         </member>
-        <member name="P:BuildUp.API.Models.ProjectSubmitModel.Team">
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.Team">
             <summary>
             The team behind the project
             </summary>
             <example>I'm alone but supported by my friends!</example>
         </member>
-        <member name="P:BuildUp.API.Models.ProjectSubmitModel.LaunchDate">
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.LaunchDate">
             <summary>
             The project launch date
             </summary>
             <example>2020-04-20T14:40:04.1351158+01:00</example>
         </member>
-        <member name="P:BuildUp.API.Models.ProjectSubmitModel.IsLucratif">
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.IsLucratif">
             <summary>
             Indicate if the project is lucratif or not
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.IsDeclared">
+            <summary>
+            Indicate if the project is declared or not
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectUpdateModel.Name">
+            <summary>
+            The project's name
+            </summary>
+            <example>Pluctis</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectUpdateModel.Categorie">
+            <summary>
+            The project's categorye
+            </summary>
+            <example>Agroalimentaire</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectUpdateModel.Description">
+            <summary>
+            The project's description
+            </summary>
+            <example>Pluctis is the tool to never let your plants die again</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectUpdateModel.Keywords">
+            <summary>
+            Keywords that represent the project
+            </summary>
+            <example>Plantes, application, tool</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectUpdateModel.Team">
+            <summary>
+            The team behind the project
+            </summary>
+            <example>I'm alone but supported by my friends!</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectUpdateModel.LaunchDate">
+            <summary>
+            The project launch date
+            </summary>
+            <example>2020-04-20T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectUpdateModel.IsLucratif">
+            <summary>
+            Indicate if the project is lucratif or not
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Projects.ProjectUpdateModel.IsDeclared">
+            <summary>
+            Indicate if the project is declared or not
             </summary>
             <example>true</example>
         </member>

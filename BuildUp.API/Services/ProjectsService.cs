@@ -1,5 +1,6 @@
 ﻿using BuildUp.API.Entities;
 using BuildUp.API.Models;
+using BuildUp.API.Models.Projects;
 using BuildUp.API.Services.Interfaces;
 using BuildUp.API.Settings.Interfaces;
 using MongoDB.Driver;
@@ -36,12 +37,14 @@ namespace BuildUp.API.Services
                 BuilderId = projectSubmitModel.BuilderId,
 
                 Name = projectSubmitModel.Name,
+                Categorie = projectSubmitModel.Categorie,
                 Description = projectSubmitModel.Description,
                 Keywords = projectSubmitModel.Keywords,
                 Team = projectSubmitModel.Team,
 
                 LaunchDate = projectSubmitModel.LaunchDate,
                 IsLucratif = projectSubmitModel.IsLucratif,
+                IsDeclared = projectSubmitModel.IsDeclared,
 
                 CurrentBuildOn = null,
                 CurrentBuildOnStep = null
@@ -51,8 +54,24 @@ namespace BuildUp.API.Services
             await _projects.InsertOneAsync(project);
 
             return project.Id;
+        }
 
+        public async Task UpdateProjectAsync(string projectId, ProjectUpdateModel projectUpdateModel)
+        {
+            var update = Builders<Project>.Update
+                .Set(databaseProject => databaseProject.Name, projectUpdateModel.Name)
+                .Set(databaseProject => databaseProject.Categorie, projectUpdateModel.Categorie)
+                .Set(databaseProject => databaseProject.Description, projectUpdateModel.Description)
+                .Set(databaseProject => databaseProject.Keywords, projectUpdateModel.Keywords)
+                .Set(databaseProject => databaseProject.Team, projectUpdateModel.Team)
+                .Set(databaseProject => databaseProject.LaunchDate, projectUpdateModel.LaunchDate)
+                .Set(databaseProject => databaseProject.IsLucratif, projectUpdateModel.IsLucratif)
+                .Set(databaseProject => databaseProject.IsDeclared, projectUpdateModel.IsDeclared);
 
+            await _projects.UpdateOneAsync(databaseProject =>
+               databaseProject.Id == projectId,
+               update
+           );
         }
     }
 }

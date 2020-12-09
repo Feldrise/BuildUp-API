@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BuildUp.API.Models
+namespace BuildUp.API.Models.Projects
 {
     public class ProjectSubmitModel
     {
@@ -24,6 +24,11 @@ namespace BuildUp.API.Models
         /// <example>Pluctis</example>
         [Required]
         public string Name { get; set; }
+        /// <summary>
+        /// The project's categorye
+        /// </summary>
+        /// <example>Agroalimentaire</example>
+        public string Categorie { get; set; }
         /// <summary>
         /// The project's description
         /// </summary>
@@ -54,5 +59,10 @@ namespace BuildUp.API.Models
         /// </summary>
         /// <example>true</example>
         public bool IsLucratif { get; set; }
+        /// <summary>
+        /// Indicate if the project is declared or not
+        /// </summary>
+        /// <example>true</example>
+        public bool IsDeclared { get; set; }
     }
 }
