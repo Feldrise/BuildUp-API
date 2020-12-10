@@ -1,4 +1,5 @@
-﻿using BuildUp.API.Services.Interfaces;
+﻿using BuildUp.API.Models;
+using BuildUp.API.Services.Interfaces;
 using BuildUp.API.Settings.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -40,12 +41,26 @@ namespace BuildUp.API.Services
             return file.ToString();
         }
 
-        public Task<byte[]> GetFile(string fileId)
+        public async Task<FileModel> GetFile(string fileId)
         {
-            return _gridFS.DownloadAsBytesAsync(new ObjectId(fileId));
+            var filter = Builders<GridFSFileInfo<ObjectId>>.Filter.Eq(x => x.Id, new ObjectId(fileId));
+            var currentFile = await(await _gridFS.FindAsync(filter)).FirstOrDefaultAsync();
+
+            if (currentFile == null)
+            {
+                return null;
+            }
+
+            byte[] bytes = await _gridFS.DownloadAsBytesAsync(currentFile.Id);
+
+            return new FileModel()
+            {
+                Filename = currentFile.Filename,
+                Data = bytes
+            }; 
         }
 
-        public async Task<byte[]> GetFileByName(string filename) 
+        public async Task<FileModel> GetFileByName(string filename) 
         {
             var filter = Builders<GridFSFileInfo<ObjectId>>.Filter.Eq(x => x.Filename, filename);
             var currentFile = await(await _gridFS.FindAsync(filter)).FirstOrDefaultAsync();
@@ -55,7 +70,13 @@ namespace BuildUp.API.Services
                 return null;
             }
 
-            return await _gridFS.DownloadAsBytesAsync(currentFile.Id);
+            byte[] bytes = await _gridFS.DownloadAsBytesAsync(currentFile.Id);
+
+            return new FileModel()
+            {
+                Filename = currentFile.Filename,
+                Data = bytes
+            };
         }
     }
 }

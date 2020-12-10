@@ -1,4 +1,5 @@
 ﻿using BuildUp.API.Entities;
+using BuildUp.API.Models;
 using BuildUp.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,9 +31,9 @@ namespace BuildUp.API.Controllers
         /// <response code="401">You are not allowed to view files</response>
         /// <response code="200">Return the file</response>
         [HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<byte[]>> GetFile(string id)
+        public async Task<ActionResult<FileModel>> GetFile(string id)
         {
-            byte[] file = await _filesService.GetFile(id);
+            FileModel file = await _filesService.GetFile(id);
 
             return Ok(file);
         }
@@ -45,9 +46,9 @@ namespace BuildUp.API.Controllers
         /// <response code="401">You are not allowed to view files</response>
         /// <response code="200">Return the file</response>
         [HttpGet("name/{name}")]
-        public async Task<ActionResult<byte[]>> GetFileByName(string name)
+        public async Task<ActionResult<FileModel>> GetFileByName(string name)
         {
-            byte[] file = await _filesService.GetFileByName(name);
+            FileModel file = await _filesService.GetFileByName(name);
 
             if (file == null)
             {

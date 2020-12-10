@@ -34,7 +34,7 @@ namespace BuildUp.API.Services
 
             if (user == null || user.ProfilePictureId == null) { return null; }
 
-            return await _filesService.GetFile(user.ProfilePictureId);
+            return (await _filesService.GetFile(user.ProfilePictureId)).Data;
         }
 
         public async Task UpdateUserAsync(string userId, UserUpdateModel userUpdateModel)
