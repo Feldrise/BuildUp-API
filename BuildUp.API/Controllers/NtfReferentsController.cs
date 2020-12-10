@@ -88,10 +88,11 @@ namespace BuildUp.API.Controllers
         /// (Admin) Update a NTF referent
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="ntfReferentManageModel"></param>
         /// <returns></returns>
         /// <response code="401">You are not allowed to update referent</response>
         /// <response code="400">The request failed</response>
-        /// <response code="200">The referent has been updated/response>
+        /// <response code="200">The referent has been updated</response>
         [HttpPut("{id:length(24)}/update")]
         public async Task<ActionResult<NtfReferent>> UpdateReferent(string id, [FromBody] NtfReferentManageModel ntfReferentManageModel)
         {

@@ -30,6 +30,13 @@ namespace BuildUp.API.Services
             )).FirstOrDefaultAsync();
         }
 
+        public async Task<Project> GetProjectFromIdAsync(string projectId)
+        {
+            return await (await _projects.FindAsync(databaseProject =>
+                databaseProject.Id == projectId
+            )).FirstOrDefaultAsync();
+        }
+
         public async Task<string> SubmitProjectAsync(ProjectSubmitModel projectSubmitModel)
         {
             Project project = new Project()
@@ -67,6 +74,18 @@ namespace BuildUp.API.Services
                 .Set(databaseProject => databaseProject.LaunchDate, projectUpdateModel.LaunchDate)
                 .Set(databaseProject => databaseProject.IsLucratif, projectUpdateModel.IsLucratif)
                 .Set(databaseProject => databaseProject.IsDeclared, projectUpdateModel.IsDeclared);
+
+            await _projects.UpdateOneAsync(databaseProject =>
+               databaseProject.Id == projectId,
+               update
+           );
+        }
+
+        public async Task UpdateProjectBuildOnStep(string projectId, string newBuildOn, string newBuildOnStep)
+        {
+            var update = Builders<Project>.Update
+                .Set(databaseProject => databaseProject.CurrentBuildOn, newBuildOn)
+                .Set(databaseProject => databaseProject.CurrentBuildOnStep, newBuildOnStep);
 
             await _projects.UpdateOneAsync(databaseProject =>
                databaseProject.Id == projectId,

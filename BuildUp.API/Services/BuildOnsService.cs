@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BuildUp.API.Models;
 
 namespace BuildUp.API.Services
 {
@@ -127,6 +128,92 @@ namespace BuildUp.API.Services
             );
         }
 
+        public async Task RefuseReturningFromAdmin(string buildOnReturningId)
+        {
+            var update = Builders<BuildOnReturning>.Update
+                .Set(dbBuildOnReturnging => dbBuildOnReturnging.Status, BuildOnReturningStatus.Refused);
+
+            await _buildOnReturnings.UpdateOneAsync(databaseBuildOnReturning =>
+                databaseBuildOnReturning.Id == buildOnReturningId,
+                update
+            );
+        }
+
+        public async Task AcceptReturningFromAdmin(string projectId, string buildOnReturningId)
+        {
+            var project = await _projectsService.GetProjectFromIdAsync(projectId);
+
+            if (project == null) throw new Exception("The project doesn't exist");
+
+            // We update the returning object
+            var update = Builders<BuildOnReturning>.Update
+                .Set(dbBuildOnReturnging => dbBuildOnReturnging.Status, BuildOnReturningStatus.Validated);
+
+            await _buildOnReturnings.UpdateOneAsync(databaseBuildOnReturning =>
+                databaseBuildOnReturning.Id == buildOnReturningId,
+                update
+            );
+
+            // We need to udpate the project current build-on step
+            List<BuildOn> buildOns = await GetAllAsync();
+            string newBuildOn;
+            string newBuildOnStep;
+
+            if (project.CurrentBuildOn == null)
+            {
+                newBuildOn = buildOns.First().Id;
+                newBuildOnStep = (await GetAllStepsAsync(buildOns.First().Id)).First().Id;
+            } 
+            else
+            {
+                BuildOn currentBuildOn = await GetBuildOn(project.CurrentBuildOn);
+                BuildOnStep currentStep = await GetBuildOnStep(project.CurrentBuildOnStep);
+
+                List<BuildOnStep> buildOnSteps = await GetAllStepsAsync(currentBuildOn.Id);
+
+                if (currentStep.Index == buildOnSteps.Count - 1)
+                {
+                    if (currentBuildOn.Index == buildOns.Count - 1)
+                    {
+                        newBuildOn = null;
+                        newBuildOnStep = null;
+                    }
+                    else
+                    {
+                        newBuildOn = buildOns[currentBuildOn.Index + 1].Id;
+                        newBuildOnStep = (await GetAllStepsAsync(buildOns[currentBuildOn.Index + 1].Id)).First().Id;
+                    }
+                }
+                else
+                {
+                    newBuildOn = currentBuildOn.Id;
+                    newBuildOnStep = buildOnSteps[currentStep.Index + 1].Id;
+                }
+            }
+
+            await _projectsService.UpdateProjectBuildOnStep(projectId, newBuildOn, newBuildOnStep);
+        }
+
+        public async Task<FileModel> GetReturningFileFromAdmin(string buildOnReturningId)
+        {
+            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.Id == buildOnReturningId
+            )).FirstOrDefaultAsync();
+
+            if (buildOnReturning == null || buildOnReturning.FileId == null) { 
+                return null; 
+            }
+
+            return await _filesService.GetFile(buildOnReturning.FileId);
+        }
+
+        public async Task<List<BuildOnReturning>> GetReturningsFromAdmin(string projectId)
+        {
+            return await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.ProjectId == projectId
+            )).ToListAsync();
+        }
+
         public async Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel)
         {
             // First we need basics checks
@@ -157,6 +244,7 @@ namespace BuildUp.API.Services
                 BuildOnStepId = buildOnReturningSubmitModel.BuildOnStepId,
                 Type = buildOnReturningSubmitModel.Type,
                 Status = BuildOnReturningStatus.Waiting,
+                FileName = buildOnReturningSubmitModel.FileName,
                 FileId = fileId,
                 Comment = buildOnReturningSubmitModel.Comment
             };
@@ -238,7 +326,7 @@ namespace BuildUp.API.Services
                 .Set(dbBuildOnStep => dbBuildOnStep.Index, index)
                 .Set(dbBuildOnStep => dbBuildOnStep.Name, buildOnStepManageModel.Name)
                 .Set(dbBuildOnStep => dbBuildOnStep.Description, buildOnStepManageModel.Description)
-                .Set(dbBuildOnStep => dbBuildOnStep.ReturningType, buildOnStepManageModel.ReturningDescription)
+                .Set(dbBuildOnStep => dbBuildOnStep.ReturningType, buildOnStepManageModel.ReturningType)
                 .Set(dbBuildOnStep => dbBuildOnStep.ReturningDescription, buildOnStepManageModel.ReturningDescription)
                 .Set(dbBuildOnStep => dbBuildOnStep.ReturningLink, buildOnStepManageModel.ReturningLink);
 

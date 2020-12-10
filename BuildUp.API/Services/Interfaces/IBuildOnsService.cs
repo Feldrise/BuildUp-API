@@ -1,4 +1,5 @@
 ﻿using BuildUp.API.Entities.BuildOn;
+using BuildUp.API.Models;
 using BuildUp.API.Models.BuildOn;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,13 @@ namespace BuildUp.API.Services.Interfaces
         Task DeleteBuildOnStepAsync(string buildonStepId);
 
         // Proofs
+        Task<FileModel> GetReturningFileFromAdmin(string buildOnReturningId);
+
+        Task RefuseReturningFromAdmin(string buildOnReturningId);
+        Task AcceptReturningFromAdmin(string projectId, string buildOnReturningId);
+
+        Task<List<BuildOnReturning>> GetReturningsFromAdmin(string projectId);
+
         Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel);
     }
 }

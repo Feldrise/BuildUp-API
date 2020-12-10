@@ -42,6 +42,12 @@ namespace BuildUp.API.Entities.BuildOn
         /// <summary>
         /// The file id in the database
         /// </summary>
+        /// <example>hello.zip</example>
+        public string FileName { get; set; }
+
+        /// <summary>
+        /// The file id in the database
+        /// </summary>
         /// <example>5f1fe90a58c8ab093c4f772a</example>
         public string FileId { get; set; }
 

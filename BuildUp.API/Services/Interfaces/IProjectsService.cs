@@ -11,8 +11,10 @@ namespace BuildUp.API.Services.Interfaces
     public interface IProjectsService
     {
         Task<Project> GetProjectAsync(string builderId);
+        Task<Project> GetProjectFromIdAsync(string projectId);
 
         Task<string> SubmitProjectAsync(ProjectSubmitModel projectSubmitModel);
         Task UpdateProjectAsync(string projectId, ProjectUpdateModel projectUpdateModel);
+        Task UpdateProjectBuildOnStep(string projectId, string newBuildOn, string newBuildOnStep);
     }
 }

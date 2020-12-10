@@ -237,6 +237,49 @@
             <response code="401">You are not allowed to view buildon's step</response>
             <response code="200">Return synced buildons</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetReturnings(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get returnings for project
+            </summary>
+            <param name="projectId"></param>
+            <returns></returns>
+            <response code="400">The request is wrong</response>
+            <response code="403">You are not allowed to get returnings</response>
+            <response code="200">Return the returnings</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetReturningFile(System.String,System.String)">
+            <summary>
+            (Builder) Submit a returning
+            </summary>
+            <param name="projectId"></param>
+            <param name="returningId"></param>
+            <returns></returns>
+            <response code="400">The request is wrong</response>
+            <response code="403">You are not allowed to view returning file</response>
+            <response code="200">Return the returning file</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.AcceptReturning(System.String,System.String)">
+            <summary>
+            (Admin,Coach) Accept returning
+            </summary>
+            <param name="projectId"></param>
+            <param name="returningId"></param>
+            <returns></returns>
+            <response code="400">The request is wrong</response>
+            <response code="403">You are not allowed to accept returning</response>
+            <response code="200">The returning has been accepted</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.RefuseReturnging(System.String,System.String)">
+            <summary>
+            (Admin,Coach) Refuse returning
+            </summary>
+            <param name="projectId"></param>
+            <param name="returningId"></param>
+            <returns></returns>
+            <response code="400">The request is wrong</response>
+            <response code="403">You are not allowed to refuse returning</response>
+            <response code="200">The returning has been refused</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.SubmitReturning(System.String,BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel)">
             <summary>
             (Builder) Submit a returning
@@ -400,7 +443,17 @@
             <response code="400">The request failed</response>
             <response code="200">Return the id of the newly created referent</response>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildUp.API.Controllers.NtfReferentsController.UpdateReferent(System.String,BuildUp.API.Models.NtfReferentManageModel)" -->
+        <member name="M:BuildUp.API.Controllers.NtfReferentsController.UpdateReferent(System.String,BuildUp.API.Models.NtfReferentManageModel)">
+            <summary>
+            (Admin) Update a NTF referent
+            </summary>
+            <param name="id"></param>
+            <param name="ntfReferentManageModel"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to update referent</response>
+            <response code="400">The request failed</response>
+            <response code="200">The referent has been updated</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.UsersController.GetProfilePicture(System.String)">
             <summary>
             (Builder,Coach,Admin) Get the profile picture of the user
@@ -528,6 +581,12 @@
             The current proof status
             </summary>
             <example>Validated/Waiting/Refused</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnReturning.FileName">
+            <summary>
+            The file id in the database
+            </summary>
+            <example>hello.zip</example>
         </member>
         <member name="P:BuildUp.API.Entities.BuildOn.BuildOnReturning.FileId">
             <summary>
