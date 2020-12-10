@@ -126,5 +126,40 @@ namespace BuildUp.API.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// (Builder) Submit a returning
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <param name="buildOnReturningSubmitModel"></param>
+        /// <returns></returns>
+        /// <response code="400">The request is wrong</response>
+        /// <response code="403">You are not allowed to submit returnings</response>
+        /// <response code="200">Return the returning id</response>
+        [HttpPost("projects/{projectId:length(24)}/returning")]
+        [Authorize(Roles = Role.Builder)]
+        public async Task<ActionResult<string>> SubmitReturning(string projectId, [FromBody] BuildOnReturningSubmitModel buildOnReturningSubmitModel)
+        {
+            var currentUserId = User.Identity.Name;
+            string result;
+
+            try
+            {
+                if (User.IsInRole(Role.Builder))
+                {
+                    result = await _buildOnsService.SendReturningAsync(currentUserId, projectId, buildOnReturningSubmitModel);
+                }
+                else
+                {
+                    return Forbid("You must be a builder to submit returnings");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't submit the returning: {e.Message}");
+            }
+
+            return Ok(result);
+        }
     }
 }

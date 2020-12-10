@@ -1,4 +1,5 @@
 ﻿using BuildUp.API.Entities.BuildOn;
+using BuildUp.API.Entities;
 using BuildUp.API.Models.BuildOn;
 using BuildUp.API.Services.Interfaces;
 using BuildUp.API.Settings.Interfaces;
@@ -15,18 +16,24 @@ namespace BuildUp.API.Services
     {
         private readonly IMongoCollection<BuildOn> _buildOns;
         private readonly IMongoCollection<BuildOnStep> _buildOnSteps;
+        private readonly IMongoCollection<BuildOnReturning> _buildOnReturnings;
 
         private readonly IFilesService _filesService;
+        private readonly IBuildersService _buildersService;
+        private readonly IProjectsService _projectsService;
 
-        public BuildOnsService(IMongoSettings mongoSettings, IFilesService filesService)
+        public BuildOnsService(IMongoSettings mongoSettings, IFilesService filesService, IBuildersService buildersService, IProjectsService projectsService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
 
             _buildOns = database.GetCollection<BuildOn>("buildons");
             _buildOnSteps = database.GetCollection<BuildOnStep>("buildon_steps");
+            _buildOnReturnings = database.GetCollection<BuildOnReturning>("buildon_returnings");
 
             _filesService = filesService;
+            _buildersService = buildersService;
+            _projectsService = projectsService;
         }
 
         public async Task<List<BuildOn>> GetAllAsync()
@@ -46,7 +53,7 @@ namespace BuildUp.API.Services
 
             if (buildOn == null || buildOn.ImageId == null) { return null;  }
 
-            return await _filesService.GetFile(buildOn.ImageId);
+            return (await _filesService.GetFile(buildOn.ImageId)).Data;
         }
         public async Task<byte[]> GetImageForBuildOnStepAsync(string buildOnStepId)
         {
@@ -54,7 +61,7 @@ namespace BuildUp.API.Services
 
             if (buildOnStep == null || buildOnStep.ImageId == null) { return null; }
 
-            return await _filesService.GetFile(buildOnStep.ImageId);
+            return (await _filesService.GetFile(buildOnStep.ImageId)).Data;
         }
 
         public async Task<List<BuildOn>> UpdateBuildOnsAsync(List<BuildOnManageModel> buildOnManageModels)
@@ -118,6 +125,45 @@ namespace BuildUp.API.Services
             await _buildOnSteps.DeleteOneAsync(databaseBuildOnStep =>
                 databaseBuildOnStep.Id == buildonStepId
             );
+        }
+
+        public async Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel)
+        {
+            // First we need basics checks
+            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
+
+            if (builder == null)
+            {
+                throw new Exception("You are not a builder");
+            }
+
+            var project = await _projectsService.GetProjectAsync(builder.Id);
+
+            if (project == null || project.Id != projectId)
+            {
+                throw new Exception("The project doesn't belong to you");
+            }
+
+            string fileId = null;
+            if (buildOnReturningSubmitModel.File != null && buildOnReturningSubmitModel.File.Length >= 1)
+            {
+                var filename = $"{projectId}_{buildOnReturningSubmitModel.FileName}";
+                fileId = await _filesService.UploadFile(filename, buildOnReturningSubmitModel.File, false);
+            }
+
+            BuildOnReturning returning = new BuildOnReturning()
+            {
+                ProjectId = projectId,
+                BuildOnStepId = buildOnReturningSubmitModel.BuildOnStepId,
+                Type = buildOnReturningSubmitModel.Type,
+                Status = BuildOnReturningStatus.Waiting,
+                FileId = fileId,
+                Comment = buildOnReturningSubmitModel.Comment
+            };
+
+            await _buildOnReturnings.InsertOneAsync(returning);
+
+            return returning.Id;
         }
 
         private async Task<BuildOn> CreateBuildOnAsync(int index, BuildOnManageModel buildOnManageModel)

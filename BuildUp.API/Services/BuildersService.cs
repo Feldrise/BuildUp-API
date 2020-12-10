@@ -109,7 +109,7 @@ namespace BuildUp.API.Services
 
             if (builder == null || builder.BuilderCardId == null) { return null; }
 
-            return await _filesService.GetFile(builder.BuilderCardId);
+            return (await _filesService.GetFile(builder.BuilderCardId)).Data;
         }
 
         public async Task<Coach> GetCoachForBuilderFromAdminAsync(string builderId)

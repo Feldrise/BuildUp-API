@@ -22,5 +22,8 @@ namespace BuildUp.API.Services.Interfaces
 
         Task<List<BuildOnStep>> UpdateBuildOnStepsAsync(string buildOnId, List<BuildOnStepManageModel> buildOnStepManageModels);
         Task DeleteBuildOnStepAsync(string buildonStepId);
+
+        // Proofs
+        Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel);
     }
 }

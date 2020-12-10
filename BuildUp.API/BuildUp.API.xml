@@ -237,6 +237,17 @@
             <response code="401">You are not allowed to view buildon's step</response>
             <response code="200">Return synced buildons</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.SubmitReturning(System.String,BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel)">
+            <summary>
+            (Builder) Submit a returning
+            </summary>
+            <param name="projectId"></param>
+            <param name="buildOnReturningSubmitModel"></param>
+            <returns></returns>
+            <response code="400">The request is wrong</response>
+            <response code="403">You are not allowed to submit returnings</response>
+            <response code="200">Return the returning id</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetAllCoach">
             <summary>
             (Admin) Get all coachs
@@ -493,6 +504,42 @@
             The buildon description
             </summary>
             <example>Dans ce buildon vous allez...</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnReturning.ProjectId">
+            <summary>
+            The project who send the proof
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnReturning.BuildOnStepId">
+            <summary>
+            The build-on step the returning correspond to
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnReturning.Type">
+            <summary>
+            The returning type
+            </summary>
+            <example>File/External/Comment</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnReturning.Status">
+            <summary>
+            The current proof status
+            </summary>
+            <example>Validated/Waiting/Refused</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnReturning.FileId">
+            <summary>
+            The file id in the database
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.BuildOn.BuildOnReturning.Comment">
+            <summary>
+            The comment associated with the returning
+            </summary>
+            <example>J'ai fini l'étape !</example>
         </member>
         <member name="P:BuildUp.API.Entities.BuildOn.BuildOnStep.ImageId">
             <summary>
@@ -848,6 +895,36 @@
             The buildon description
             </summary>
             <example>Dans ce buildon vous allez...</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel.BuildOnStepId">
+            <summary>
+            The build-on step the returning correspond to
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel.Type">
+            <summary>
+            The returning type
+            </summary>
+            <example>File/External/Comment</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel.FileName">
+            <summary>
+            The current proof status
+            </summary>
+            <example>my_file.zip</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel.File">
+            <summary>
+            The bytes of the file to upload to the
+            server
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel.Comment">
+            <summary>
+            The comment associated with the returning
+            </summary>
+            <example>J'ai fini l'étape !</example>
         </member>
         <member name="P:BuildUp.API.Models.BuildOn.BuildOnStepManageModel.Id">
             <summary>
