@@ -269,6 +269,17 @@
             <response code="403">You are not allowed to accept returning</response>
             <response code="200">The returning has been accepted</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.ValidateBuildOnStep(System.String,System.String)">
+            <summary>
+            (Admin,Coach) Accept returning
+            </summary>
+            <param name="projectId"></param>
+            <param name="buildOnStepId"></param>
+            <returns></returns>
+            <response code="400">The request is wrong</response>
+            <response code="403">You are not allowed to accept build-on steps</response>
+            <response code="200">The build-on step has been accepted</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.RefuseReturnging(System.String,System.String)">
             <summary>
             (Admin,Coach) Refuse returning

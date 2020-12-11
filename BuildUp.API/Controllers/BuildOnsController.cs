@@ -229,7 +229,41 @@ namespace BuildUp.API.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Can't accept the returning file: {e.Message}");
+                return BadRequest($"Can't accept the returning: {e.Message}");
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// (Admin,Coach) Accept returning
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <param name="buildOnStepId"></param>
+        /// <returns></returns>
+        /// <response code="400">The request is wrong</response>
+        /// <response code="403">You are not allowed to accept build-on steps</response>
+        /// <response code="200">The build-on step has been accepted</response>
+        [HttpPut("projects/{projectId:length(24)}/validate/{buildOnStepId:length(24)}")]
+        [Authorize(Roles = Role.Admin + "," + Role.Coach)]
+        public async Task<IActionResult> ValidateBuildOnStep(string projectId, string buildOnStepId)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                if (User.IsInRole(Role.Admin))
+                {
+                    await _buildOnsService.ValidateBuildOnStepFromAdmin(projectId, buildOnStepId);
+                }
+                else
+                {
+                    return Forbid("You must be a admin or a coach to accept build-ons step");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't accept the build-on step: {e.Message}");
             }
 
             return Ok();

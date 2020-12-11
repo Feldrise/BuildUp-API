@@ -154,45 +154,18 @@ namespace BuildUp.API.Services
                 update
             );
 
-            // We need to udpate the project current build-on step
-            List<BuildOn> buildOns = await GetAllAsync();
-            string newBuildOn;
-            string newBuildOnStep;
-
-            if (project.CurrentBuildOn == null)
-            {
-                newBuildOn = buildOns.First().Id;
-                newBuildOnStep = (await GetAllStepsAsync(buildOns.First().Id)).First().Id;
-            } 
-            else
-            {
-                BuildOn currentBuildOn = await GetBuildOn(project.CurrentBuildOn);
-                BuildOnStep currentStep = await GetBuildOnStep(project.CurrentBuildOnStep);
-
-                List<BuildOnStep> buildOnSteps = await GetAllStepsAsync(currentBuildOn.Id);
-
-                if (currentStep.Index == buildOnSteps.Count - 1)
-                {
-                    if (currentBuildOn.Index == buildOns.Count - 1)
-                    {
-                        newBuildOn = null;
-                        newBuildOnStep = null;
-                    }
-                    else
-                    {
-                        newBuildOn = buildOns[currentBuildOn.Index + 1].Id;
-                        newBuildOnStep = (await GetAllStepsAsync(buildOns[currentBuildOn.Index + 1].Id)).First().Id;
-                    }
-                }
-                else
-                {
-                    newBuildOn = currentBuildOn.Id;
-                    newBuildOnStep = buildOnSteps[currentStep.Index + 1].Id;
-                }
-            }
-
-            await _projectsService.UpdateProjectBuildOnStep(projectId, newBuildOn, newBuildOnStep);
+            await IncrementProjectBuildOnStep(project);
         }
+
+        public async Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnReturningId)
+        {
+            var project = await _projectsService.GetProjectFromIdAsync(projectId);
+
+            if (project == null) throw new Exception("The project doesn't exist");
+
+            await IncrementProjectBuildOnStep(project);
+        }
+
 
         public async Task<FileModel> GetReturningFileFromAdmin(string buildOnReturningId)
         {
@@ -252,6 +225,47 @@ namespace BuildUp.API.Services
             await _buildOnReturnings.InsertOneAsync(returning);
 
             return returning.Id;
+        }
+
+        private async Task IncrementProjectBuildOnStep(Project project)
+        {
+            List<BuildOn> buildOns = await GetAllAsync();
+            string newBuildOn;
+            string newBuildOnStep;
+
+            if (project.CurrentBuildOn == null)
+            {
+                newBuildOn = buildOns.First().Id;
+                newBuildOnStep = (await GetAllStepsAsync(buildOns.First().Id)).First().Id;
+            }
+            else
+            {
+                BuildOn currentBuildOn = await GetBuildOn(project.CurrentBuildOn);
+                BuildOnStep currentStep = await GetBuildOnStep(project.CurrentBuildOnStep);
+
+                List<BuildOnStep> buildOnSteps = await GetAllStepsAsync(currentBuildOn.Id);
+
+                if (currentStep.Index == buildOnSteps.Count - 1)
+                {
+                    if (currentBuildOn.Index == buildOns.Count - 1)
+                    {
+                        newBuildOn = null;
+                        newBuildOnStep = null;
+                    }
+                    else
+                    {
+                        newBuildOn = buildOns[currentBuildOn.Index + 1].Id;
+                        newBuildOnStep = (await GetAllStepsAsync(buildOns[currentBuildOn.Index + 1].Id)).First().Id;
+                    }
+                }
+                else
+                {
+                    newBuildOn = currentBuildOn.Id;
+                    newBuildOnStep = buildOnSteps[currentStep.Index + 1].Id;
+                }
+            }
+
+            await _projectsService.UpdateProjectBuildOnStep(project.Id, newBuildOn, newBuildOnStep);
         }
 
         private async Task<BuildOn> CreateBuildOnAsync(int index, BuildOnManageModel buildOnManageModel)

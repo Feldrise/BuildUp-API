@@ -29,6 +29,8 @@ namespace BuildUp.API.Services.Interfaces
 
         Task RefuseReturningFromAdmin(string buildOnReturningId);
         Task AcceptReturningFromAdmin(string projectId, string buildOnReturningId);
+        Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnStepId);
+
 
         Task<List<BuildOnReturning>> GetReturningsFromAdmin(string projectId);
 
