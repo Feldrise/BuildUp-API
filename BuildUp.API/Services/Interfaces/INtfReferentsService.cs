@@ -14,5 +14,6 @@ namespace BuildUp.API.Services.Interfaces
 
         Task<string> AddOneAsync(NtfReferentManageModel ntfReferentManageModel);
         Task UpdateOneAsync(string id, NtfReferentManageModel ntfReferentManageModel);
+        Task DeleteReferentAsync(string id);
     }
 }

@@ -465,6 +465,7 @@
             <response code="400">The request failed</response>
             <response code="200">The referent has been updated</response>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:BuildUp.API.Controllers.NtfReferentsController.DeleteReferent(System.String)" -->
         <member name="M:BuildUp.API.Controllers.UsersController.GetProfilePicture(System.String)">
             <summary>
             (Builder,Coach,Admin) Get the profile picture of the user
@@ -713,11 +714,17 @@
             </summary>
             <example>My super answer</example>
         </member>
-        <member name="P:BuildUp.API.Entities.NtfReferent.Name">
+        <member name="P:BuildUp.API.Entities.NtfReferent.FirstName">
             <summary>
-            The name of the NTF referent
+            The first name of the NTF referent
             </summary>
-            <example>Victor DENIS</example>
+            <example>Victor</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.NtfReferent.LastName">
+            <summary>
+            The last name of the NTF referent
+            </summary>
+            <example>DENIS</example>
         </member>
         <member name="P:BuildUp.API.Entities.NtfReferent.Email">
             <summary>
@@ -1113,11 +1120,17 @@
             </summary>
             <example>I'm an awesome coach</example>
         </member>
-        <member name="P:BuildUp.API.Models.NtfReferentManageModel.Name">
+        <member name="P:BuildUp.API.Models.NtfReferentManageModel.FirstName">
             <summary>
-            The name of the NTF referent
+            The first name of the NTF referent
             </summary>
-            <example>Victor DENIS</example>
+            <example>Victor</example>
+        </member>
+        <member name="P:BuildUp.API.Models.NtfReferentManageModel.LastName">
+            <summary>
+            The last name of the NTF referent
+            </summary>
+            <example>DENIS</example>
         </member>
         <member name="P:BuildUp.API.Models.NtfReferentManageModel.Email">
             <summary>

@@ -94,6 +94,7 @@ namespace BuildUp.API.Controllers
         /// <response code="400">The request failed</response>
         /// <response code="200">The referent has been updated</response>
         [HttpPut("{id:length(24)}/update")]
+        [Authorize(Roles = Role.Admin)]
         public async Task<ActionResult<NtfReferent>> UpdateReferent(string id, [FromBody] NtfReferentManageModel ntfReferentManageModel)
         {
             try
@@ -103,6 +104,29 @@ namespace BuildUp.API.Controllers
             catch (Exception e)
             {
                 return BadRequest($"Can't update the referent: {e.Message}");
+            }
+
+            return Ok();
+        }
+
+        // <summary>
+        /// (Admin) delete a NTF referent
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <response code="401">You are not allowed to delete referent</response>
+        /// <response code="400">The request failed</response>
+        /// <response code="200">The referent has been deleted</response>
+        [HttpDelete("{id:length(24)}/delete")]
+        public async Task<ActionResult<NtfReferent>> DeleteReferent(string id)
+        {
+            try
+            {
+                await _ntfReferentsService.DeleteReferentAsync(id);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't delete the referent: {e.Message}");
             }
 
             return Ok();

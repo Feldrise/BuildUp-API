@@ -9,11 +9,17 @@ namespace BuildUp.API.Models
     public class NtfReferentManageModel
     {
         /// <summary>
-        /// The name of the NTF referent
+        /// The first name of the NTF referent
         /// </summary>
-        /// <example>Victor DENIS</example>
+        /// <example>Victor</example>
         [Required]
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        /// <summary>
+        /// The last name of the NTF referent
+        /// </summary>
+        /// <example>DENIS</example>
+        [Required]
+        public string LastName { get; set; }
         /// <summary>
         /// The email of the NTF referent
         /// </summary>

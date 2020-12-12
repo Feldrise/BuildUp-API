@@ -40,7 +40,8 @@ namespace BuildUp.API.Services
         {
             NtfReferent ntfReferent = new NtfReferent()
             {
-                Name = ntfReferentManageModel.Name,
+                FirstName = ntfReferentManageModel.FirstName,
+                LastName = ntfReferentManageModel.LastName,
                 Email = ntfReferentManageModel.Email,
                 DiscordTag = ntfReferentManageModel.DiscordTag
             };
@@ -53,13 +54,21 @@ namespace BuildUp.API.Services
         public async Task UpdateOneAsync(string id, NtfReferentManageModel ntfReferentManageModel)
         {
             var update = Builders<NtfReferent>.Update
-                .Set(dbNtdReferent => dbNtdReferent.Name, ntfReferentManageModel.Name)
+                .Set(dbNtdReferent => dbNtdReferent.FirstName, ntfReferentManageModel.FirstName)
+                .Set(dbNtdReferent => dbNtdReferent.LastName, ntfReferentManageModel.LastName)
                 .Set(dbNtdReferent => dbNtdReferent.Email, ntfReferentManageModel.Email)
                 .Set(dbNtdReferent => dbNtdReferent.DiscordTag, ntfReferentManageModel.DiscordTag);
 
             await _ntfReferents.UpdateOneAsync(databaseNtfReferent =>
                databaseNtfReferent.Id == id,
                update
+            );
+        }
+
+        public async Task DeleteReferentAsync(string id)
+        {
+            await _ntfReferents.DeleteOneAsync(databaseReferent =>
+                databaseReferent.Id == id
             );
         }
     }

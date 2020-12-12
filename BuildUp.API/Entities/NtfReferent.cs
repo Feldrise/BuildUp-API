@@ -14,10 +14,15 @@ namespace BuildUp.API.Entities
         public string Id { get; set; }
 
         /// <summary>
-        /// The name of the NTF referent
+        /// The first name of the NTF referent
         /// </summary>
-        /// <example>Victor DENIS</example>
-        public string Name { get; set; }
+        /// <example>Victor</example>
+        public string FirstName { get; set; }
+        /// <summary>
+        /// The last name of the NTF referent
+        /// </summary>
+        /// <example>DENIS</example>
+        public string LastName { get; set; }
         /// <summary>
         /// The email of the NTF referent
         /// </summary>

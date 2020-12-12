@@ -43,7 +43,7 @@ namespace BuildUp.API.Services
                 true,
                 new FindOptions<BuildOn>()
                 {
-                    Sort = Builders<BuildOn>.Sort.Ascending("index")
+                    Sort = Builders<BuildOn>.Sort.Ascending("Index")
                 }
             )).ToListAsync();
         }
@@ -97,7 +97,7 @@ namespace BuildUp.API.Services
                 databaseBuildOnStep.BuildOnId == buildonId,
                 new FindOptions<BuildOnStep>()
                 {
-                    Sort = Builders<BuildOnStep>.Sort.Ascending("index")
+                    Sort = Builders<BuildOnStep>.Sort.Ascending("Index")
                 }
             )).ToListAsync();
         }
@@ -157,11 +157,22 @@ namespace BuildUp.API.Services
             await IncrementProjectBuildOnStep(project);
         }
 
-        public async Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnReturningId)
+        public async Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnStepId)
         {
             var project = await _projectsService.GetProjectFromIdAsync(projectId);
 
             if (project == null) throw new Exception("The project doesn't exist");
+
+            BuildOnReturning returning = new BuildOnReturning()
+            {
+                ProjectId = projectId,
+                BuildOnStepId = buildOnStepId,
+                Type = BuildOnReturningType.Comment,
+                Status = BuildOnReturningStatus.Validated,
+                Comment = "Vous avez validé cette étape sans preuve"
+            };
+
+            await _buildOnReturnings.InsertOneAsync(returning);
 
             await IncrementProjectBuildOnStep(project);
         }
@@ -235,8 +246,10 @@ namespace BuildUp.API.Services
 
             if (project.CurrentBuildOn == null)
             {
+                // TODO: if their is less than one Build-on step in the first Build-on it will
+                // just crash..
                 newBuildOn = buildOns.First().Id;
-                newBuildOnStep = (await GetAllStepsAsync(buildOns.First().Id)).First().Id;
+                newBuildOnStep = (await GetAllStepsAsync(buildOns.First().Id))[1].Id;
             }
             else
             {
