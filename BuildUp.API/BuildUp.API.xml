@@ -493,6 +493,12 @@
             </summary>
             <example><example>2020-08-15T14:40:04.1351158+01:00</example></example>
         </member>
+        <member name="P:BuildUp.API.Entities.Builder.ProgramEndDate">
+            <summary>
+            The date of the end of the program for the builder
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
+        </member>
         <member name="P:BuildUp.API.Entities.Builder.BuilderCardId">
             <summary>
             The id of the builder's card
@@ -950,6 +956,12 @@
             The builder description
             </summary>
             <example>I'm an awesome builder</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.ProgramEndDate">
+            <summary>
+            The date of the end of the program for the builder
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
         </member>
         <member name="P:BuildUp.API.Models.BuildOn.BuildOnManageModel.Id">
             <summary>

@@ -2,3 +2,18 @@
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjVmYzRkYzZlNmUzYjdlNTI1ZWFjMGQ4ZCIsInJvbGUiOiJBZG1pbiIsIm5iZiI6MTYwNjczNzM4MSwiZXhwIjoxNjA4NDY1MzgxLCJpYXQiOjE2MDY3MzczODF9._E9dA2N3gflrLP3Rq-ruRmBR6Z34KV89u02KduMC218
 
 [Guillaume (Admin) : G800R7Tsrr]
+
+[Marc (Admin) : 8X4Me5Msi9]
+
+[Charly (Admin) : mmdk523DEH]
+
+[Marion (Admin) : EfuZ368czT]
+
+[Thibault (Admin) : p363wZs22N]
+ 
+[Elisa (Coach) : u8oh61oM4N]
+
+[Yuna (Builder) : o6GtdmCkUz]
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjVmZDQ5ZDExNmYxZjdmOGVmYjBkOGVmZSIsInJvbGUiOiJCdWlsZGVyIiwibmJmIjoxNjA3Nzc0NTUxLCJleHAiOjE2MDk1MDI1NTEsImlhdCI6MTYwNzc3NDU1MX0.94m5458Af3ERuarywjNToTJexsMgeus0-MtRSEHTUxI
+
+[Anael (Builder) : VZnfRRFKKs]

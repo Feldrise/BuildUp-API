@@ -202,7 +202,7 @@ namespace BuildUp.API.Services
         public async Task<List<Coach>> GetActiveCoachsAsync()
         {
             var activeCoachs = await (await _coachs.FindAsync(databaseCoach =>
-                databaseCoach.Step == CoachSteps.Active
+                databaseCoach.Status == CoachStatus.Validated
             )).ToListAsync();
 
             return activeCoachs;

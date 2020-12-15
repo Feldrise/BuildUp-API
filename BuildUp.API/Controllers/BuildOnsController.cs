@@ -170,7 +170,7 @@ namespace BuildUp.API.Controllers
         /// <response code="400">The request is wrong</response>
         /// <response code="403">You are not allowed to view returning file</response>
         /// <response code="200">Return the returning file</response>
-        [HttpGet("projects/{projectId:length(24)}/returning/{returningId}/file")]
+        [HttpGet("projects/{projectId:length(24)}/returnings/{returningId}/file")]
         [Authorize(Roles = Role.Admin + "," + Role.Coach)]
         public async Task<ActionResult<FileModel>> GetReturningFile(string projectId, string returningId)
         {

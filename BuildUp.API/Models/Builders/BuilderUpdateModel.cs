@@ -68,5 +68,11 @@ namespace BuildUp.API.Models.Builders
         /// <example>I'm an awesome builder</example>
         [Required]
         public string Description { get; set; }
+
+        /// <summary>
+        /// The date of the end of the program for the builder
+        /// </summary>
+        /// <example>2001-08-15T14:40:04.1351158+01:00</example>
+        public DateTime ProgramEndDate { get; set; }
     }
 }

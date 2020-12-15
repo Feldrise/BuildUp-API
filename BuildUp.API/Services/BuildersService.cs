@@ -302,7 +302,7 @@ namespace BuildUp.API.Services
         public async Task<List<Builder>> GetActiveBuildersAsync()
         {
             var activeBuilders = await (await _builders.FindAsync(databaseBuilder =>
-                databaseBuilder.Step == BuilderSteps.Active
+                databaseBuilder.Status == BuilderStatus.Validated
             )).ToListAsync();
 
             return activeBuilders;
@@ -344,6 +344,15 @@ namespace BuildUp.API.Services
             {
                 fileId = await _filesService.UploadFile($"buildercard_{id}", builderUpdateModel.BuilderCard);
                 update = update.Set(dbBuilder => dbBuilder.BuilderCardId, fileId);
+            }
+
+            if (builderUpdateModel.ProgramEndDate != DateTime.MinValue)
+            {
+                update = update.Set(dbBuilder => dbBuilder.ProgramEndDate, builderUpdateModel.ProgramEndDate);
+            }
+            else
+            {
+                update = update.Set(dbBuilder => dbBuilder.ProgramEndDate, DateTime.Now.AddMonths(3));
             }
 
             await _builders.UpdateOneAsync(databaseBuilder =>
