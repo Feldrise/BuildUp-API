@@ -60,7 +60,7 @@ namespace BuildUp.API
             services.Configure<MongoSettings>(Configuration.GetSection(nameof(MongoSettings)));
             services.Configure<BuildupSettings>(Configuration.GetSection(nameof(BuildupSettings)));
             services.Configure<OvhMailCredentials>(Configuration.GetSection(nameof(OvhMailCredentials)));
-            
+
             services.AddSingleton<IMongoSettings>(sp => sp.GetRequiredService<IOptions<MongoSettings>>().Value);
             services.AddSingleton<IBuildupSettings>(sp => sp.GetRequiredService<IOptions<BuildupSettings>>().Value);
             services.AddSingleton<IMailCredentials>(sp => sp.GetRequiredService<IOptions<OvhMailCredentials>>().Value);
@@ -95,6 +95,7 @@ namespace BuildUp.API
             services.AddScoped<IBuildOnsService, BuildOnsService>();
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<INtfReferentsService, NtfReferentsService>();
+            services.AddScoped<IPdfService, PdfService>();
 
             services.AddScoped<IFormsService, FormsService>();
             services.AddScoped<IFilesService, FilesService>();
