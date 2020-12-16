@@ -9,6 +9,8 @@ namespace BuildUp.API.Entities.BuildOn
     {
         public const string Validated = "Validated";
         public const string Waiting = "Waiting";
+        public const string WaitingAdmin = "WaitingAdmin";
+        public const string WaitingCoach = "WaitingCoach";
         public const string Refused = "Refused";
     }
 }

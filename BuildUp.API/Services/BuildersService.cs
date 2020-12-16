@@ -48,7 +48,7 @@ namespace BuildUp.API.Services
 
         public async Task<Builder> GetBuilderFromCoachAsync(string currentUserId, string userId)
         {
-            Coach coach = await GetCoach(currentUserId);
+            Coach coach = await GetCoachFromUserId(currentUserId);
 
             if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
 
@@ -81,6 +81,24 @@ namespace BuildUp.API.Services
             Builder builder = await GetBuilderFromBuilderId(builderId);
 
             if (builder == null) throw new Exception("The builder doesn't exist");
+
+            return await (await _users.FindAsync(databaseUser =>
+                databaseUser.Id == builder.UserId
+            )).FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetUserFromCoachAsync(string currentUserId, string builderId)
+        {
+            Coach coach = await GetCoachFromUserId(currentUserId);
+
+            if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
+
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.CoachId != coach.Id)
+            {
+                throw new Exception("You can't get user for this builder");
+            }
 
             return await (await _users.FindAsync(databaseUser =>
                 databaseUser.Id == builder.UserId
@@ -121,7 +139,7 @@ namespace BuildUp.API.Services
                 return null;
             }
 
-            return await GetCoach(builder.CoachId);
+            return await GetCoachFromId(builder.CoachId);
         }
 
         public async Task<Coach> GetCoachForBuilderFromBuilderAsync(string currentUserId, string builderId)
@@ -133,7 +151,7 @@ namespace BuildUp.API.Services
                 throw new Exception("This builder can view this coach");
             }
 
-            return await GetCoach(builder.CoachId);
+            return await GetCoachFromId(builder.CoachId);
         }
 
         public async Task<List<BuildupFormQA>> GetBuilderFormFromAdminAsync(string builderId)
@@ -150,7 +168,7 @@ namespace BuildUp.API.Services
 
         public async Task<List<BuildupFormQA>> GetBuilderFormFromCoachAsync(string currentUserId, string builderId)
         {
-            Coach coach = await GetCoach(currentUserId);
+            Coach coach = await GetCoachFromUserId(currentUserId);
 
             if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
 
@@ -185,7 +203,7 @@ namespace BuildUp.API.Services
 
         public async Task<Project> GetBuilderProjectFromCoachAsync(string currentUserId, string builderId)
         {
-            Coach coach = await GetCoach(currentUserId);
+            Coach coach = await GetCoachFromUserId(currentUserId);
 
             if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
 
@@ -379,10 +397,19 @@ namespace BuildUp.API.Services
             return await builder.FirstOrDefaultAsync();
         }
 
-        private async Task<Coach> GetCoach(string userId)
+        private async Task<Coach> GetCoachFromUserId(string userId)
         {
             var coach = await _coachs.FindAsync(databaseCoach =>
                 databaseCoach.UserId == userId
+            );
+
+            return await coach.FirstOrDefaultAsync();
+        }
+
+        private async Task<Coach> GetCoachFromId(string id)
+        {
+            var coach = await _coachs.FindAsync(databaseCoach =>
+                databaseCoach.Id == id
             );
 
             return await coach.FirstOrDefaultAsync();

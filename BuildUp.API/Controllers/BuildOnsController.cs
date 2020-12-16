@@ -179,7 +179,6 @@ namespace BuildUp.API.Controllers
         /// <response code="403">You are not allowed to view returning file</response>
         /// <response code="200">Return the returning file</response>
         [HttpGet("projects/{projectId:length(24)}/returnings/{returningId}/file")]
-        [Authorize(Roles = Role.Admin + "," + Role.Coach)]
         public async Task<ActionResult<FileModel>> GetReturningFile(string projectId, string returningId)
         {
             var currentUserId = User.Identity.Name;
@@ -187,7 +186,15 @@ namespace BuildUp.API.Controllers
 
             try
             {
-                if (User.IsInRole(Role.Admin))
+                if (User.IsInRole(Role.Builder))
+                {
+                    result = await _buildOnsService.GetReturningFileFromBuilder(currentUserId, returningId);
+                }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    result = await _buildOnsService.GetReturningFileFromCoach(currentUserId, returningId);
+                }
+                else if (User.IsInRole(Role.Admin))
                 {
                     result = await _buildOnsService.GetReturningFileFromAdmin(returningId);
                 }
@@ -230,6 +237,10 @@ namespace BuildUp.API.Controllers
                 {
                     await _buildOnsService.AcceptReturningFromAdmin(projectId, returningId);
                 }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    await _buildOnsService.AcceptReturningFromCoach(currentUserId, projectId, returningId);
+                }
                 else
                 {
                     return Forbid("You must be a admin or a coach to accept returnings");
@@ -264,6 +275,10 @@ namespace BuildUp.API.Controllers
                 {
                     await _buildOnsService.ValidateBuildOnStepFromAdmin(projectId, buildOnStepId);
                 }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    await _buildOnsService.ValidateBuildOnStepFromCoach(currentUserId, projectId, buildOnStepId);
+                }
                 else
                 {
                     return Forbid("You must be a admin or a coach to accept build-ons step");
@@ -297,6 +312,10 @@ namespace BuildUp.API.Controllers
                 if (User.IsInRole(Role.Admin))
                 {
                     await _buildOnsService.RefuseReturningFromAdmin(returningId);
+                }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    await _buildOnsService.RefuseReturningFromCoach(currentUserId, returningId);
                 }
                 else
                 {

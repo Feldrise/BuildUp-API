@@ -26,10 +26,16 @@ namespace BuildUp.API.Services.Interfaces
 
         // Proofs
         Task<FileModel> GetReturningFileFromAdmin(string buildOnReturningId);
+        Task<FileModel> GetReturningFileFromCoach(string currentUserId, string buildOnReturningId);
+        Task<FileModel> GetReturningFileFromBuilder(string currentUserId, string buildOnReturningId);
 
         Task RefuseReturningFromAdmin(string buildOnReturningId);
+        Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId);
         Task AcceptReturningFromAdmin(string projectId, string buildOnReturningId);
+        Task AcceptReturningFromCoach(string currentUserId, string projectId, string buildOnReturningId);
+
         Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnStepId);
+        Task ValidateBuildOnStepFromCoach(string currentUserId, string projectId, string buildOnStepId);
 
 
         Task<List<BuildOnReturning>> GetReturningsFromAdmin(string projectId);

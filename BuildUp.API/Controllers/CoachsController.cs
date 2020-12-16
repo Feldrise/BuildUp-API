@@ -138,7 +138,7 @@ namespace BuildUp.API.Controllers
         /// <response code="403">You are not allowed to view this coach's builders</response>
         /// <response code="404">The coach's builders doesn't exist</response>
         /// <response code="200">Return coach's builders</response>
-        [Authorize(Roles = Role.Admin + "," + Role.Builder)]
+        [Authorize(Roles = Role.Admin + "," + Role.Coach)]
         [HttpGet("{coachId:length(24)}/builders")]
         public async Task<ActionResult<List<Builder>>> GetBuildersForCoach(string coachId)
         {

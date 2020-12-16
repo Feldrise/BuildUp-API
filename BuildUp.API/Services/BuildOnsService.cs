@@ -141,22 +141,111 @@ namespace BuildUp.API.Services
             );
         }
 
+        public async Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId)
+        {
+            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.Id == buildOnReturningId
+            )).FirstOrDefaultAsync();
+
+            if (buildOnReturning == null || buildOnReturning.FileId == null)
+            {
+                throw new Exception("It seems that the returning doesn't exist");
+            }
+
+            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
+
+            if (coach == null ||
+                project == null)
+            {
+                throw new Exception("It seems that the coach or the project doesn't exist");
+            }
+
+            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
+
+            if (coach.Id != builderCoach?.Id)
+            {
+                throw new Exception("You don't have the right to refuse this returning");
+            }
+
+            buildOnReturning.Status = BuildOnReturningStatus.Refused;
+
+            await _buildOnReturnings.ReplaceOneAsync(databaseReturning =>
+                databaseReturning.Id == buildOnReturning.Id,
+                buildOnReturning
+            );
+        }
+
         public async Task AcceptReturningFromAdmin(string projectId, string buildOnReturningId)
         {
             var project = await _projectsService.GetProjectFromIdAsync(projectId);
 
             if (project == null) throw new Exception("The project doesn't exist");
 
-            // We update the returning object
-            var update = Builders<BuildOnReturning>.Update
-                .Set(dbBuildOnReturnging => dbBuildOnReturnging.Status, BuildOnReturningStatus.Validated);
+            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseBuildOnReturning =>
+                databaseBuildOnReturning.Id == buildOnReturningId
+            )).FirstOrDefaultAsync();
 
-            await _buildOnReturnings.UpdateOneAsync(databaseBuildOnReturning =>
-                databaseBuildOnReturning.Id == buildOnReturningId,
-                update
+            if (buildOnReturning == null) throw new Exception("The build-on returning doesn't exist");
+
+            if (buildOnReturning.Status == BuildOnReturningStatus.Waiting)
+            {
+                buildOnReturning.Status = BuildOnReturningStatus.WaitingCoach;
+            }
+            else
+            {
+                buildOnReturning.Status = BuildOnReturningStatus.Validated;
+                await IncrementProjectBuildOnStep(project);
+            }
+
+            await _buildOnReturnings.ReplaceOneAsync(databaseReturning =>
+                databaseReturning.Id == buildOnReturning.Id,
+                buildOnReturning
             );
 
-            await IncrementProjectBuildOnStep(project);
+        }
+
+        public async Task AcceptReturningFromCoach(string currentUserId, string projectId, string buildOnReturningId)
+        {
+            var project = await _projectsService.GetProjectFromIdAsync(projectId);
+
+            if (project == null) throw new Exception("The project doesn't exist");
+
+            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseBuildOnReturning =>
+                databaseBuildOnReturning.Id == buildOnReturningId
+            )).FirstOrDefaultAsync();
+
+            if (buildOnReturning == null) throw new Exception("The build-on returning doesn't exist");
+
+            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
+
+            if (coach == null)
+            {
+                throw new Exception("It seems that the coach doesn't exist");
+            }
+
+            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
+
+            if (coach.Id != builderCoach?.Id)
+            {
+                throw new Exception("You don't have the right to accept this returning");
+            }
+
+            if (buildOnReturning.Status == BuildOnReturningStatus.Waiting)
+            {
+                buildOnReturning.Status = BuildOnReturningStatus.WaitingAdmin;
+            }
+            else
+            {
+                buildOnReturning.Status = BuildOnReturningStatus.Validated;
+                await IncrementProjectBuildOnStep(project);
+            }
+
+            await _buildOnReturnings.ReplaceOneAsync(databaseReturning =>
+                databaseReturning.Id == buildOnReturning.Id,
+                buildOnReturning
+            );
+
         }
 
         public async Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnStepId)
@@ -170,8 +259,42 @@ namespace BuildUp.API.Services
                 ProjectId = projectId,
                 BuildOnStepId = buildOnStepId,
                 Type = BuildOnReturningType.Comment,
-                Status = BuildOnReturningStatus.Validated,
-                Comment = "Vous avez validé cette étape sans preuve"
+                Status = BuildOnReturningStatus.WaitingCoach,
+                Comment = "Cette étape a été validé sans preuve"
+            };
+
+            await _buildOnReturnings.InsertOneAsync(returning);
+
+            await IncrementProjectBuildOnStep(project);
+        }
+
+        public async Task ValidateBuildOnStepFromCoach(string currentUserId, string projectId, string buildOnStepId)
+        {
+            var project = await _projectsService.GetProjectFromIdAsync(projectId);
+
+            if (project == null) throw new Exception("The project doesn't exist");
+
+            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
+
+            if (coach == null)
+            {
+                throw new Exception("It seems that the coach doesn't exist");
+            }
+
+            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
+
+            if (coach.Id != builderCoach?.Id)
+            {
+                throw new Exception("You don't have the right to accept this step");
+            }
+
+            BuildOnReturning returning = new BuildOnReturning()
+            {
+                ProjectId = projectId,
+                BuildOnStepId = buildOnStepId,
+                Type = BuildOnReturningType.Comment,
+                Status = BuildOnReturningStatus.WaitingAdmin,
+                Comment = "Cette étape a été validé sans preuve"
             };
 
             await _buildOnReturnings.InsertOneAsync(returning);
@@ -188,6 +311,60 @@ namespace BuildUp.API.Services
 
             if (buildOnReturning == null || buildOnReturning.FileId == null) { 
                 return null; 
+            }
+
+            return await _filesService.GetFile(buildOnReturning.FileId);
+        }
+
+        public async Task<FileModel> GetReturningFileFromCoach(string currentUserId, string buildOnReturningId)
+        {
+            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.Id == buildOnReturningId
+            )).FirstOrDefaultAsync();
+
+            if (buildOnReturning == null || buildOnReturning.FileId == null)
+            {
+                return null;
+            }
+
+            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
+
+            if (coach == null ||
+                project == null)
+            {
+                throw new Exception("It seems that the coach or the project doesn't exist");
+            }
+
+            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
+
+            if (coach.Id != builderCoach?.Id)
+            {
+                throw new Exception("You don't have the right to view this returning's file");
+            }
+
+            return await _filesService.GetFile(buildOnReturning.FileId);
+        }
+
+        public async Task<FileModel> GetReturningFileFromBuilder(string currentUserId, string buildOnReturningId)
+        {
+            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.Id == buildOnReturningId
+            )).FirstOrDefaultAsync();
+
+            if (buildOnReturning == null || buildOnReturning.FileId == null)
+            {
+                return null;
+            }
+
+            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
+
+            if (builder == null ||
+                project == null ||
+                builder.Id != project.BuilderId)
+            {
+                throw new Exception("You don't have the right to view this returning file");
             }
 
             return await _filesService.GetFile(buildOnReturning.FileId);

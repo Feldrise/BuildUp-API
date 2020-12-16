@@ -20,6 +20,7 @@ namespace BuildUp.API.Services.Interfaces
         Task<byte[]> GetBuilderCardAsync(string builderId);
 
         Task<User> GetUserFromAdminAsync(string builderId);
+        Task<User> GetUserFromCoachAsync(string currentUserId, string builderId);
         Task<User> GetUserFromBuilderAsync(string currentUserId, string builderId);
 
         Task<Coach> GetCoachForBuilderFromAdminAsync(string builderId);

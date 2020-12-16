@@ -82,7 +82,7 @@ namespace BuildUp.API.Controllers
         /// <response code="403">You are not allowed to view this user info</response>
         /// <response code="404">The user doesn't exist</response>
         /// <response code="200">Return user infos</response>
-        [Authorize(Roles = Role.Admin + "," + Role.Builder)]
+        [Authorize(Roles = Role.Admin + "," + Role.Coach + "," + Role.Builder)]
         [HttpGet("{builderId:length(24)}/user")]
         public async Task<ActionResult<User>> GetUser(string builderId)
         {
@@ -94,6 +94,10 @@ namespace BuildUp.API.Controllers
                 if (User.IsInRole(Role.Admin))
                 {
                     user = await _buildersService.GetUserFromAdminAsync(builderId);
+                }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    user = await _buildersService.GetUserFromCoachAsync(currentUserId, builderId);
                 }
                 else if (User.IsInRole(Role.Builder))
                 {
