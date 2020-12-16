@@ -148,9 +148,17 @@ namespace BuildUp.API.Controllers
                 {
                     result = await _buildOnsService.GetReturningsFromAdmin(projectId);
                 }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    result = await _buildOnsService.GetReturningFromCoach(currentUserId, projectId);
+                }
+                else if (User.IsInRole(Role.Builder))
+                {
+                    result = await _buildOnsService.GetReturningFromBuilder(currentUserId, projectId);
+                }
                 else
                 {
-                    return BadRequest("Not implemented yes");
+                    return BadRequest("You must be part of the Build-Up program");
                 }
             }
             catch (Exception e)

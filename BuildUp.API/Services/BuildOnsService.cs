@@ -21,9 +21,10 @@ namespace BuildUp.API.Services
 
         private readonly IFilesService _filesService;
         private readonly IBuildersService _buildersService;
+        private readonly ICoachsService _coachsService;
         private readonly IProjectsService _projectsService;
 
-        public BuildOnsService(IMongoSettings mongoSettings, IFilesService filesService, IBuildersService buildersService, IProjectsService projectsService)
+        public BuildOnsService(IMongoSettings mongoSettings, IFilesService filesService, IBuildersService buildersService, ICoachsService coachsService, IProjectsService projectsService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -34,6 +35,7 @@ namespace BuildUp.API.Services
 
             _filesService = filesService;
             _buildersService = buildersService;
+            _coachsService = coachsService;
             _projectsService = projectsService;
         }
 
@@ -197,6 +199,46 @@ namespace BuildUp.API.Services
                 databaseReturning.ProjectId == projectId
             )).ToListAsync();
         }
+
+        public async Task<List<BuildOnReturning>> GetReturningFromBuilder(string currentUserId, string projectId)
+        {
+            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(projectId);
+
+            if (builder == null ||
+                project == null ||
+                builder.Id != project.BuilderId)
+            {
+                throw new Exception("You don't have the right to view this builder returning");
+            }
+
+            return await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.ProjectId == projectId
+            )).ToListAsync();
+        }
+        public async Task<List<BuildOnReturning>> GetReturningFromCoach(string currentUserId, string projectId)
+        {
+            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(projectId);
+
+            if (coach == null ||
+                project == null)
+            {
+                throw new Exception("It seems that the coach or the project doesn't exist");
+            }
+
+            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
+
+            if (coach.Id != builderCoach.Id)
+            {
+                throw new Exception("You don't have the right to view this builder returning");
+            }
+
+            return await(await _buildOnReturnings.FindAsync(databaseReturning =>
+               databaseReturning.ProjectId == projectId
+            )).ToListAsync();
+        }
+
 
         public async Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel)
         {

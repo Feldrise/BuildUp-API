@@ -33,6 +33,8 @@ namespace BuildUp.API.Services.Interfaces
 
 
         Task<List<BuildOnReturning>> GetReturningsFromAdmin(string projectId);
+        Task<List<BuildOnReturning>> GetReturningFromBuilder(string currentUserId, string projectId);
+        Task<List<BuildOnReturning>> GetReturningFromCoach(string currentUserId, string projectId);
 
         Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel);
     }
