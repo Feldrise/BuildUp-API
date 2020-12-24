@@ -33,7 +33,6 @@ namespace BuildUp.API.Models.Builders
         /// <summary>
         /// the builder's card
         /// </summary>
-        [BsonRepresentation(BsonType.ObjectId)]
         public byte[] BuilderCard { get; set; }
 
         /// <summary>

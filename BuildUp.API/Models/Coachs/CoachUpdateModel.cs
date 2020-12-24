@@ -19,6 +19,11 @@ namespace BuildUp.API.Models.Coachs
         public string UserId { get; set; }
 
         /// <summary>
+        /// the coach's card
+        /// </summary>
+        public byte[] CoachCard { get; set; }
+
+        /// <summary>
         /// The coach current status. Can be : Waiting Validated, Refused
         /// </summary>
         /// <example>Waiting/Validated/Refused</example>

@@ -341,6 +341,16 @@
             <response code="404">The coach's builders doesn't exist</response>
             <response code="200">Return coach's builders</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetBuilderCard(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get the coach's card
+            </summary>
+            <param name="coachId" example="5f1fe90a58c8ab093c4f772a"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to view coach's card</response>
+            <response code="404">The coach's card was not found</response>
+            <response code="200">Return coach's card</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetCoachFormQAs(System.String)">
             <summary>
             (Coach,Admin) Get coach's form answers
@@ -671,6 +681,11 @@
             The date whene the coach canidated
             </summary>
             <example><example>2020-08-15T14:40:04.1351158+01:00</example></example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.CoachCardId">
+            <summary>
+            The id of the coach's card
+            </summary>
         </member>
         <member name="P:BuildUp.API.Entities.Coach.UserId">
             <summary>
@@ -1161,6 +1176,11 @@
             The coach's user id
             </summary>
             <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.CoachUpdateModel.CoachCard">
+            <summary>
+            the coach's card
+            </summary>
         </member>
         <member name="P:BuildUp.API.Models.Coachs.CoachUpdateModel.Status">
             <summary>

@@ -169,6 +169,27 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// (Builder,Coach,Admin) Get the coach's card
+        /// </summary>
+        /// <param name="coachId" example="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns></returns>
+        /// <response code="401">You are not allowed to view coach's card</response>
+        /// <response code="404">The coach's card was not found</response>
+        /// <response code="200">Return coach's card</response>
+        [HttpGet("{coachId:length(24)}/card")]
+        public async Task<ActionResult<byte[]>> GetBuilderCard(string coachId)
+        {
+            var image = await _coachService.GetCoachCardAsync(coachId);
+
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(image);
+        }
+
+        /// <summary>
         /// (Coach,Admin) Get coach's form answers
         /// </summary>
         /// <param name="coachId"></param>

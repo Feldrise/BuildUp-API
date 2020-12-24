@@ -20,8 +20,9 @@ namespace BuildUp.API.Services
         private readonly IMongoCollection<Builder> _builders;
 
         private readonly IFormsService _formsService;
+        private readonly IFilesService _filesService;
 
-        public CoachsService(IMongoSettings mongoSettings, IFormsService formsService)
+        public CoachsService(IMongoSettings mongoSettings, IFormsService formsService, IFilesService filesService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -31,6 +32,7 @@ namespace BuildUp.API.Services
             _builders = database.GetCollection<Builder>("builders");
 
             _formsService = formsService;
+            _filesService = filesService;
         }
 
         public Task<Coach> GetCoachFromAdminAsync(string userId)
@@ -56,6 +58,16 @@ namespace BuildUp.API.Services
         {
             return await (await _coachs.FindAsync(databaseBuilder => true)).ToListAsync();
         }
+
+        public async Task<byte[]> GetCoachCardAsync(string coachId)
+        {
+            Coach coach = await GetCoachFromCoachId(coachId);
+
+            if (coach == null || coach.CoachCardId == null) { return null; }
+
+            return (await _filesService.GetFile(coach.CoachCardId)).Data;
+        }
+
 
         public async Task<User> GetUserFromAdminAsync(string coachId)
         {
@@ -229,21 +241,24 @@ namespace BuildUp.API.Services
 
         private async Task UpdateCoach(string id, CoachUpdateModel coachUpdateModel)
         {
-            await _coachs.ReplaceOneAsync(databaseCoach =>
-                databaseCoach.Id == id,
-                new Coach()
-                {
-                    Id = id,
+            var update = Builders<Coach>.Update
+               .Set(dbCoach => dbCoach.Status, coachUpdateModel.Status)
+               .Set(dbCoach => dbCoach.Step, coachUpdateModel.Step)
+               .Set(dbCoach => dbCoach.Department, coachUpdateModel.Department)
+               .Set(dbCoach => dbCoach.Situation, coachUpdateModel.Situation)
+               .Set(dbCoach => dbCoach.Description, coachUpdateModel.Description);
 
-                    UserId = coachUpdateModel.UserId,
+            string fileId = "";
 
-                    Status = coachUpdateModel.Status,
-                    Step = coachUpdateModel.Step,
+            if (coachUpdateModel.CoachCard != null && coachUpdateModel.CoachCard.Length >= 1)
+            {
+                fileId = await _filesService.UploadFile($"coachcar_{id}", coachUpdateModel.CoachCard);
+                update = update.Set(dbCoach => dbCoach.CoachCardId, fileId);
+            }
 
-                    Department = coachUpdateModel.Department,
-                    Situation = coachUpdateModel.Situation,
-                    Description = coachUpdateModel.Description
-                }
+            await _coachs.UpdateOneAsync(databaseCoach =>
+               databaseCoach.Id == id,
+               update
             );
         }
 

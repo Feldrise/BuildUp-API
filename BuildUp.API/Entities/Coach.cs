@@ -18,7 +18,14 @@ namespace BuildUp.API.Entities
         /// </summary>
         /// <example><example>2020-08-15T14:40:04.1351158+01:00</example></example>
         public DateTime CandidatingDate { get; set; }
-        
+
+
+        /// <summary>
+        /// The id of the coach's card
+        /// </summary>
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string CoachCardId { get; set; }
+
         /// <summary>
         /// The coach's user id
         /// </summary>
