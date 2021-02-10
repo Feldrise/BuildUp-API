@@ -1,5 +1,6 @@
 ﻿using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
+using BuildUp.API.Entities.Pdf;
 using BuildUp.API.Entities.Status;
 using BuildUp.API.Entities.Steps;
 using BuildUp.API.Models.Coachs;
@@ -21,8 +22,9 @@ namespace BuildUp.API.Services
 
         private readonly IFormsService _formsService;
         private readonly IFilesService _filesService;
+        private readonly IPdfService _pdfService;
 
-        public CoachsService(IMongoSettings mongoSettings, IFormsService formsService, IFilesService filesService)
+        public CoachsService(IMongoSettings mongoSettings, IFormsService formsService, IFilesService filesService, IPdfService pdfService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -33,6 +35,7 @@ namespace BuildUp.API.Services
 
             _formsService = formsService;
             _filesService = filesService;
+            _pdfService = pdfService;
         }
 
         public Task<Coach> GetCoachFromAdminAsync(string userId)
@@ -173,6 +176,63 @@ namespace BuildUp.API.Services
 
         }
 
+        public async Task<bool> SignFicheIntegrationAsync(string currentUserId, string coachId)
+        {
+            Coach coach = await GetCoachFromCoachId(coachId);
+
+            if (coach == null || coach.UserId != currentUserId)
+            {
+                throw new Exception("You don't have the permission to sign");
+            }
+
+            User user = await (await _users.FindAsync(databaseUser =>
+                databaseUser.Id == coach.UserId
+            )).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                throw new Exception("The user doesn't exist...");
+            }
+
+            PdfIntegrationCoach pdfIntegrationCoach = new PdfIntegrationCoach()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Birthdate = user.Birthdate,
+                BirthPlace = user.BirthPlace,
+
+                Email = user.Email,
+                Phone = user.Phone,
+
+                City = user.City,
+                PostalCode = user.PostalCode,
+                Address = user.Address,
+
+                Situation = coach.Situation,
+
+                Keywords = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quelles sont les mots clés qui vous définissent ?"),
+                Experience = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels sont vos expériences ?"),
+                Accroche = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quel est votre phrase d'accroche ?"),
+                IdealBuilder = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quel serait le Builder idéal pour vous ?"),
+                Objectifs = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels objectifs souhaitez-vous que votre Builder atteignent au bout des 3 mois ?")
+            };
+
+            if (_pdfService.SignCoachIntegration(coachId, pdfIntegrationCoach))
+            {
+                var update = Builders<Coach>.Update
+                    .Set(dbCoach => dbCoach.HasSignedFicheIntegration, true);
+
+                await _coachs.UpdateOneAsync(databaseCoach =>
+                   databaseCoach.Id == coachId,
+                   update
+                );
+
+                return true;
+            }
+
+            return false;
+        }
+
         public async Task UpdateCoachFromAdminAsync(string coachId, CoachUpdateModel coachUpdateModel)
         {
             await UpdateCoach(coachId, coachUpdateModel);
@@ -229,7 +289,6 @@ namespace BuildUp.API.Services
                 Status = CoachStatus.Candidating,
                 Step = CoachSteps.Preselected,
 
-                Department = coachRegisterModel.Department,
                 Situation = coachRegisterModel.Situation,
                 Description = coachRegisterModel.Description
             };
@@ -244,7 +303,6 @@ namespace BuildUp.API.Services
             var update = Builders<Coach>.Update
                .Set(dbCoach => dbCoach.Status, coachUpdateModel.Status)
                .Set(dbCoach => dbCoach.Step, coachUpdateModel.Step)
-               .Set(dbCoach => dbCoach.Department, coachUpdateModel.Department)
                .Set(dbCoach => dbCoach.Situation, coachUpdateModel.Situation)
                .Set(dbCoach => dbCoach.Description, coachUpdateModel.Description);
 

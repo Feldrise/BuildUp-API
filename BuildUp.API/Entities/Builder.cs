@@ -61,12 +61,6 @@ namespace BuildUp.API.Entities
         public string Step { get; set; }
 
         /// <summary>
-        /// The builder's department
-        /// </summary>
-        /// <example>35</example>
-        public int Department { get; set; }
-
-        /// <summary>
         /// The builder current situation
         /// </summary>
         /// <example>Student</example>

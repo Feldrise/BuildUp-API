@@ -109,7 +109,7 @@ namespace BuildUp.API.Controllers
             return Ok();
         }
 
-        // <summary>
+        /// <summary>
         /// (Admin) delete a NTF referent
         /// </summary>
         /// <param name="id"></param>

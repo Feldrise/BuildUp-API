@@ -335,7 +335,6 @@ namespace BuildUp.API.Services
                 Status = BuilderStatus.Candidating,
                 Step = BuilderSteps.Preselected,
 
-                Department = builderRegisterModel.Department,
                 Situation = builderRegisterModel.Situation,
                 Description = builderRegisterModel.Description
             };
@@ -352,7 +351,6 @@ namespace BuildUp.API.Services
                 .Set(dbBuilder => dbBuilder.NtfReferentId, builderUpdateModel.NtfReferentId)
                 .Set(dbBuilder => dbBuilder.Status, builderUpdateModel.Status)
                 .Set(dbBuilder => dbBuilder.Step, builderUpdateModel.Step)
-                .Set(dbBuilder => dbBuilder.Department, builderUpdateModel.Department)
                 .Set(dbBuilder => dbBuilder.Situation, builderUpdateModel.Situation)
                 .Set(dbBuilder => dbBuilder.Description, builderUpdateModel.Description);
 

@@ -26,6 +26,11 @@ namespace BuildUp.API.Models.Users
         /// <example>2001-08-15T14:40:04.1351158+01:00</example>
         [Required]
         public DateTime Birthdate { get; set; }
+        /// <summary>
+        /// The user's birth place
+        /// </summary>
+        /// <example>Rennes</example>
+        public string BirthPlace { get; set; }
 
         /// <summary>
         /// The uers's email
@@ -33,6 +38,11 @@ namespace BuildUp.API.Models.Users
         /// <example>admin@feldrise.com</example>
         [Required]
         public string Email { get; set; }
+        /// <summary>
+        /// The user's phone
+        /// </summary>
+        /// <example>+33652809335</example>
+        public string Phone { get; set; }
         /// <summary>
         /// The user's Discord tag
         /// </summary>
@@ -45,6 +55,32 @@ namespace BuildUp.API.Models.Users
         /// <example>Feldrise</example>
         [Required]
         public string Username { get; set; }
+
+
+        /// <summary>
+        /// The user's department
+        /// </summary>
+        /// <example>35</example>
+        [Required]
+        public int Department { get; set; }
+        /// <summary>
+        /// The user's city
+        /// </summary>
+        /// <example>La Chapelle-Thouarault</example>
+        [Required]
+        public string City { get; set; }
+        /// <summary>
+        /// The user's postal code
+        /// </summary>
+        /// <example>35590</example>
+        [Required]
+        public int PostalCode { get; set; }
+        /// <summary>
+        /// The user's address
+        /// </summary>
+        /// <example>17 Rue de La Rimaudière</example>
+        [Required]
+        public string Address { get; set; }
 
         /// <summary>
         /// The user's role

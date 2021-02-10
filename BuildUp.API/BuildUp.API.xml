@@ -387,6 +387,16 @@
             <response code="400">The coach can't be registered</response>
             <response code="200">Return the registered coach id</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.SignIntegration(System.String)">
+            <summary>
+            (Coach) Sign the coach integration paper
+            </summary>
+            <param name="coachId" example="5f1fed8458c8ab093c4f77bf"></param>
+            <returns>If the PDF was successfully generated</returns>
+            <response code="401">You are not allowed to sign</response>
+            <response code="403">You are not allowed to sign</response>
+            <response code="200">The paper was successfully signed</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.UpdateCoach(System.String,BuildUp.API.Models.Coachs.CoachUpdateModel)">
             <summary>
             (Coach,Admin) Update a coach
@@ -475,7 +485,16 @@
             <response code="400">The request failed</response>
             <response code="200">The referent has been updated</response>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildUp.API.Controllers.NtfReferentsController.DeleteReferent(System.String)" -->
+        <member name="M:BuildUp.API.Controllers.NtfReferentsController.DeleteReferent(System.String)">
+            <summary>
+            (Admin) delete a NTF referent
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <response code="401">You are not allowed to delete referent</response>
+            <response code="400">The request failed</response>
+            <response code="200">The referent has been deleted</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.UsersController.GetProfilePicture(System.String)">
             <summary>
             (Builder,Coach,Admin) Get the profile picture of the user
@@ -543,12 +562,6 @@
             The builder current step. Can be : Preselected, AdminMeeting, CoachMeeting, Active, Finished, Abandoned
             </summary>
             <example>Preselected/AdminMeeting/CoachMeeting/Active/Finished/Abandoned</example>
-        </member>
-        <member name="P:BuildUp.API.Entities.Builder.Department">
-            <summary>
-            The builder's department
-            </summary>
-            <example>35</example>
         </member>
         <member name="P:BuildUp.API.Entities.Builder.Situation">
             <summary>
@@ -705,12 +718,6 @@
             </summary>
             <example>Preselected/Meeting/Active/Stopped</example>
         </member>
-        <member name="P:BuildUp.API.Entities.Coach.Department">
-            <summary>
-            The coach's department
-            </summary>
-            <example>35</example>
-        </member>
         <member name="P:BuildUp.API.Entities.Coach.Situation">
             <summary>
             The coach current situation
@@ -722,6 +729,12 @@
             The coach description
             </summary>
             <example>I'm an awesome coach</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Coach.HasSignedFicheIntegration">
+            <summary>
+            True if the coach has signed the integration paper
+            </summary>
+            <example>false</example>
         </member>
         <member name="P:BuildUp.API.Entities.Form.BuildupFormQA.Question">
             <summary>
@@ -819,6 +832,92 @@
             </summary>
             <example>15/12/2020</example>
         </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.FirstName">
+            <summary>
+            The coach's first name
+            </summary>
+            <example>Elisa</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.LastName">
+            <summary>
+            The coach's last name 
+            </summary>
+            <example>AUFFRAY</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Birthdate">
+            <summary>
+            The coach's birth date
+            </summary>
+            <example>2001-06-20T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.BirthPlace">
+            <summary>
+            The user's birth place
+            </summary>
+            <example>Quimper</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Email">
+            <summary>
+            The user's email
+            </summary>
+            <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Phone">
+            <summary>
+            The user's phone
+            </summary>
+            <example>+33652809335</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.City">
+            <summary>
+            The user's city
+            </summary>
+            <example>La Chapelle-Thouarault</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.PostalCode">
+            <summary>
+            The user's postal code
+            </summary>
+            <example>35590</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Address">
+            <summary>
+            The user's address
+            </summary>
+            <example>17 Rue de La Rimaudière</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Situation">
+            <summary>
+            The coach current situation
+            </summary>
+            <example>Etudiant</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Keywords">
+            <summary>
+            Answer : Quelles sont les mots clés qui vous décrivent ?
+            </summary>
+            <example>Intelligente, passionnée</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Experience">
+            <summary>
+            Answer : Quel est votre experience ?
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Accroche">
+            <summary>
+            Answer : Donnez une phrase d'accroche pour vous
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.IdealBuilder">
+            <summary>
+            Answer : Quel serait le Builder idéal pour vous ?
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Objectifs">
+            <summary>
+            Answer : Quels objectifs souhaitez-vous que votre Builder atteignent au bout des 3 mois ?
+            </summary>
+        </member>
         <member name="P:BuildUp.API.Entities.Project.BuilderId">
             <summary>
             The builder who own the project
@@ -909,11 +1008,23 @@
             </summary>
             <example>2001-08-15T14:40:04.1351158+01:00</example>
         </member>
+        <member name="P:BuildUp.API.Entities.User.BirthPlace">
+            <summary>
+            The user's birth place
+            </summary>
+            <example>Rennes</example>
+        </member>
         <member name="P:BuildUp.API.Entities.User.Email">
             <summary>
             The user's email
             </summary>
             <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.Phone">
+            <summary>
+            The user's phone
+            </summary>
+            <example>+33652809335</example>
         </member>
         <member name="P:BuildUp.API.Entities.User.DiscordTag">
             <summary>
@@ -926,6 +1037,30 @@
             The user's username
             </summary>
             <example>Feldrise</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.Department">
+            <summary>
+            The user's department
+            </summary>
+            <example>35</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.City">
+            <summary>
+            The user's city
+            </summary>
+            <example>La Chapelle-Thouarault</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.PostalCode">
+            <summary>
+            The user's postal code
+            </summary>
+            <example>35590</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.Address">
+            <summary>
+            The user's address
+            </summary>
+            <example>17 Rue de La Rimaudière</example>
         </member>
         <member name="P:BuildUp.API.Entities.User.Role">
             <summary>
@@ -943,12 +1078,6 @@
             The builder's user id
             </summary>
             <example>5f1fe90a58c8ab093c4f772a</example>
-        </member>
-        <member name="P:BuildUp.API.Models.Builders.BuilderRegisterModel.Department">
-            <summary>
-            The builder's department
-            </summary>
-            <example>35</example>
         </member>
         <member name="P:BuildUp.API.Models.Builders.BuilderRegisterModel.Situation">
             <summary>
@@ -1013,12 +1142,6 @@
             The builder current step. Can be : Preselected, AdminMeeting, CoachMeeting, Active, Finished, Abandoned
             </summary>
             <example>Preselected/AdminMeeting/CoachMeeting/Active/Finished/Abandoned</example>
-        </member>
-        <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.Department">
-            <summary>
-            The builder's department
-            </summary>
-            <example>35</example>
         </member>
         <member name="P:BuildUp.API.Models.Builders.BuilderUpdateModel.Situation">
             <summary>
@@ -1136,12 +1259,6 @@
             </summary>
             <example>5f1fe90a58c8ab093c4f772a</example>
         </member>
-        <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.Department">
-            <summary>
-            The coach's department
-            </summary>
-            <example>35</example>
-        </member>
         <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.Situation">
             <summary>
             The coach current situation
@@ -1193,12 +1310,6 @@
             The coach current step. Can be : Preselected, Meeting, Active, Stopped
             </summary>
             <example>Preselected/Meeting/Active/Stopped</example>
-        </member>
-        <member name="P:BuildUp.API.Models.Coachs.CoachUpdateModel.Department">
-            <summary>
-            The coach's department
-            </summary>
-            <example>35</example>
         </member>
         <member name="P:BuildUp.API.Models.Coachs.CoachUpdateModel.Situation">
             <summary>
@@ -1368,11 +1479,23 @@
             </summary>
             <example>2001-08-15T14:40:04.1351158+01:00</example>
         </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.BirthPlace">
+            <summary>
+            The user's birth place
+            </summary>
+            <example>Rennes</example>
+        </member>
         <member name="P:BuildUp.API.Models.Users.RegisterModel.Email">
             <summary>
             The uers's email
             </summary>
             <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.Phone">
+            <summary>
+            The user's phone
+            </summary>
+            <example>+33652809335</example>
         </member>
         <member name="P:BuildUp.API.Models.Users.RegisterModel.DiscordTag">
             <summary>
@@ -1385,6 +1508,30 @@
             The user's username
             </summary>
             <example>Feldrise</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.Department">
+            <summary>
+            The user's department
+            </summary>
+            <example>35</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.City">
+            <summary>
+            The user's city
+            </summary>
+            <example>La Chapelle-Thouarault</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.PostalCode">
+            <summary>
+            The user's postal code
+            </summary>
+            <example>35590</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.RegisterModel.Address">
+            <summary>
+            The user's address
+            </summary>
+            <example>17 Rue de La Rimaudière</example>
         </member>
         <member name="P:BuildUp.API.Models.Users.RegisterModel.Role">
             <summary>
@@ -1415,17 +1562,53 @@
             </summary>
             <example>2001-08-15T14:40:04.1351158+01:00</example>
         </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.BirthPlace">
+            <summary>
+            The user's birth place
+            </summary>
+            <example>Rennes</example>
+        </member>
         <member name="P:BuildUp.API.Models.Users.UserUpdateModel.Email">
             <summary>
             The user's email
             </summary>
             <example>admin@feldrise.com</example>
         </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.Phone">
+            <summary>
+            The user's phone
+            </summary>
+            <example>+33652809335</example>
+        </member>
         <member name="P:BuildUp.API.Models.Users.UserUpdateModel.DiscordTag">
             <summary>
             The user's Discord tag
             </summary>
             <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.Department">
+            <summary>
+            The user's department
+            </summary>
+            <example>35</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.City">
+            <summary>
+            The user's city
+            </summary>
+            <example>La Chapelle-Thouarault</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.PostalCode">
+            <summary>
+            The user's postal code
+            </summary>
+            <example>35590</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Users.UserUpdateModel.Address">
+            <summary>
+            The user's address
+            </summary>
+            <example>17 Rue de La Rimaudière</example>
         </member>
         <member name="P:BuildUp.API.Models.Users.UserUpdateModel.Password">
             <summary>

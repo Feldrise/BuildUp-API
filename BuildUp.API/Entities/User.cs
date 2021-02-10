@@ -36,12 +36,23 @@ namespace BuildUp.API.Entities
         /// </summary>
         /// <example>2001-08-15T14:40:04.1351158+01:00</example>
         public DateTime Birthdate { get; set; }
+        /// <summary>
+        /// The user's birth place
+        /// </summary>
+        /// <example>Rennes</example>
+        public string BirthPlace { get; set; }
 
         /// <summary>
         /// The user's email
         /// </summary>
         /// <example>admin@feldrise.com</example>
         public string Email { get; set; }
+        /// <summary>
+        /// The user's phone
+        /// </summary>
+        /// <example>+33652809335</example>
+        public string Phone { get; set; }
+
         /// <summary>
         /// The user's Discord tag
         /// </summary>
@@ -52,6 +63,28 @@ namespace BuildUp.API.Entities
         /// </summary>
         /// <example>Feldrise</example>
         public string Username { get; set; }
+
+
+        /// <summary>
+        /// The user's department
+        /// </summary>
+        /// <example>35</example>
+        public int Department { get; set; }
+        /// <summary>
+        /// The user's city
+        /// </summary>
+        /// <example>La Chapelle-Thouarault</example>
+        public string City { get; set; }
+        /// <summary>
+        /// The user's postal code
+        /// </summary>
+        /// <example>35590</example>
+        public int PostalCode { get; set; }
+        /// <summary>
+        /// The user's address
+        /// </summary>
+        /// <example>17 Rue de La Rimaudière</example>
+        public string Address { get; set; }
 
         [JsonIgnore]
         public string PasswordHash { get; set; }

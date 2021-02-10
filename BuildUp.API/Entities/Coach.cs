@@ -45,12 +45,6 @@ namespace BuildUp.API.Entities
         public string Step { get; set; }
 
         /// <summary>
-        /// The coach's department
-        /// </summary>
-        /// <example>35</example>
-        public int Department { get; set; }
-
-        /// <summary>
         /// The coach current situation
         /// </summary>
         /// <example>Entrepreneur</example>
@@ -60,5 +54,11 @@ namespace BuildUp.API.Entities
         /// </summary>
         /// <example>I'm an awesome coach</example>
         public string Description { get; set; }
+
+        /// <summary>
+        /// True if the coach has signed the integration paper
+        /// </summary>
+        /// <example>false</example>
+        public bool HasSignedFicheIntegration { get; set; }
     }
 }

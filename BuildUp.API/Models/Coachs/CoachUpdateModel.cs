@@ -37,13 +37,6 @@ namespace BuildUp.API.Models.Coachs
         public string Step { get; set; }
 
         /// <summary>
-        /// The coach's department
-        /// </summary>
-        /// <example>35</example>
-        [Required]
-        public int Department { get; set; }
-
-        /// <summary>
         /// The coach current situation
         /// </summary>
         /// <example>Entrepreneur</example>

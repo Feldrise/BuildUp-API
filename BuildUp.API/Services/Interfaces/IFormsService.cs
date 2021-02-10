@@ -10,5 +10,7 @@ namespace BuildUp.API.Services.Interfaces
     {
         Task RegisterFormToDatabseAsync(string userId, List<BuildupFormQA> qas);
         Task<List<BuildupFormQA>> GetFormQAsAsync(string userId);
+
+        Task<string> GetAnswerForQuestionAsync(string userId, string question);
     }
 }

@@ -57,8 +57,14 @@ namespace BuildUp.API.Services
                 .Set(dbUser => dbUser.FirstName, userUpdateModel.FirstName)
                 .Set(dbUser => dbUser.LastName, userUpdateModel.LastName)
                 .Set(dbUser => dbUser.Birthdate, userUpdateModel.Birthdate)
+                .Set(dbUser => dbUser.BirthPlace, userUpdateModel.BirthPlace)
                 .Set(dbUser => dbUser.Email, userUpdateModel.Email)
-                .Set(dbUser => dbUser.DiscordTag, userUpdateModel.DiscordTag);
+                .Set(dbUser => dbUser.Phone, userUpdateModel.Phone)
+                .Set(dbUser => dbUser.DiscordTag, userUpdateModel.DiscordTag)
+                .Set(dbUser => dbUser.Department, userUpdateModel.Department)
+                .Set(dbUser => dbUser.City, userUpdateModel.City)
+                .Set(dbUser => dbUser.PostalCode, userUpdateModel.PostalCode)
+                .Set(dbUser => dbUser.Address, userUpdateModel.Address);
 
             string fileId = "";
 

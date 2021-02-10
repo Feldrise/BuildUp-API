@@ -3,34 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BuildUp.API.Models.Users
+namespace BuildUp.API.Entities.Pdf
 {
-    public class UserUpdateModel
+    public class PdfIntegrationCoach
     {
         /// <summary>
-        /// Represent the profile picture
+        /// The coach's first name
         /// </summary>
-        public byte[] ProfilePicture { get; set; }
-
-        /// <summary>
-        /// The user's first name
-        /// </summary>
-        /// <example>Victor</example>
+        /// <example>Elisa</example>
         public string FirstName { get; set; }
         /// <summary>
-        /// The user's last name
+        /// The coach's last name 
         /// </summary>
-        /// <example>DENIS</example>
+        /// <example>AUFFRAY</example>
         public string LastName { get; set; }
         /// <summary>
-        /// The user's birthdate
+        /// The coach's birth date
         /// </summary>
-        /// <example>2001-08-15T14:40:04.1351158+01:00</example>
+        /// <example>2001-06-20T14:40:04.1351158+01:00</example>
         public DateTime Birthdate { get; set; }
         /// <summary>
         /// The user's birth place
         /// </summary>
-        /// <example>Rennes</example>
+        /// <example>Quimper</example>
         public string BirthPlace { get; set; }
 
         /// <summary>
@@ -43,18 +38,7 @@ namespace BuildUp.API.Models.Users
         /// </summary>
         /// <example>+33652809335</example>
         public string Phone { get; set; }
-        /// <summary>
-        /// The user's Discord tag
-        /// </summary>
-        /// <example>Feldrise#8497</example>
-        public string DiscordTag { get; set; }
 
-
-        /// <summary>
-        /// The user's department
-        /// </summary>
-        /// <example>35</example>
-        public int Department { get; set; }
         /// <summary>
         /// The user's city
         /// </summary>
@@ -71,9 +55,34 @@ namespace BuildUp.API.Models.Users
         /// <example>17 Rue de La Rimaudière</example>
         public string Address { get; set; }
 
+
         /// <summary>
-        /// A new password 
+        /// The coach current situation
         /// </summary>
-        public string Password { get; set; }
+        /// <example>Etudiant</example>
+        public string Situation { get; set; }
+
+        /// <summary>
+        /// Answer : Quelles sont les mots clés qui vous décrivent ?
+        /// </summary>
+        /// <example>Intelligente, passionnée</example>
+        public string Keywords { get; set; }
+        /// <summary>
+        /// Answer : Quel est votre experience ?
+        /// </summary>
+        public string Experience { get; set; }
+        /// <summary>
+        /// Answer : Donnez une phrase d'accroche pour vous
+        /// </summary>
+        public string Accroche { get; set; }
+        /// <summary>
+        /// Answer : Quel serait le Builder idéal pour vous ?
+        /// </summary>
+        public string IdealBuilder { get; set; }
+        /// <summary>
+        /// Answer : Quels objectifs souhaitez-vous que votre Builder atteignent au bout des 3 mois ?
+        /// </summary>
+        public string Objectifs { get; set; }
+
     }
 }

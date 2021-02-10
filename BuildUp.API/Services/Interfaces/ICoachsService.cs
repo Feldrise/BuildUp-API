@@ -29,6 +29,8 @@ namespace BuildUp.API.Services.Interfaces
 
         Task<string> RegisterCoachAsync(CoachRegisterModel builderRegisterModel);
 
+        Task<bool> SignFicheIntegrationAsync(string currentUserId, string coachId);
+
         Task UpdateCoachFromAdminAsync(string coachId, CoachUpdateModel coachUpdateModel);
         Task UpdateCoachFromCoachAsync(string currentUserId, string coachId, CoachUpdateModel coachUpdateModel);
 

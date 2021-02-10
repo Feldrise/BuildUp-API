@@ -9,7 +9,8 @@ namespace BuildUp.API.Services.Interfaces
     public interface IPdfService
     {
         byte[] GenerateAttestationMineur(PdfAttestationMineur values);
-
+        bool SignCoachIntegration(string coachId, PdfIntegrationCoach values);
+        
         string TestPdfFields(String pdfName);
     }
 }

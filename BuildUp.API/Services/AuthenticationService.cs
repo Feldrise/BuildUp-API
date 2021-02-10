@@ -109,10 +109,17 @@ namespace BuildUp.API.Services
                 FirstName = userRegister.FirstName,
                 LastName = userRegister.LastName,
                 Birthdate = userRegister.Birthdate,
+                BirthPlace = userRegister.BirthPlace,
 
                 Email = userRegister.Email,
+                Phone = userRegister.Phone,
                 DiscordTag = userRegister.DiscordTag,
                 Username = userRegister.Username,
+
+                Department = userRegister.Department,
+                City = userRegister.City,
+                PostalCode = userRegister.PostalCode,
+                Address = userRegister.Address,
 
                 PasswordHash = Convert.ToBase64String(passwordHash),
                 PasswordSalt = passwordSalt,

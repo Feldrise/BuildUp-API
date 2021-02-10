@@ -59,6 +59,20 @@ namespace BuildUp.API.Services
             return formQAs;
         }
 
+        public async Task<string> GetAnswerForQuestionAsync(string userId, string question)
+        {
+            BuildupForm form = await GetFormAsync(userId);
+
+            if (form == null) return null;
+
+            BuildupFormQA formQA = await (await _formsQAs.FindAsync(databaseFormQA =>
+                databaseFormQA.FormId == form.Id &&
+                databaseFormQA.Question == question
+            )).FirstOrDefaultAsync();
+
+            return formQA?.Answer;
+        }
+
         private async Task<BuildupForm> GetFormAsync(string userId)
         {
             return await (await _forms.FindAsync(databaseForm =>

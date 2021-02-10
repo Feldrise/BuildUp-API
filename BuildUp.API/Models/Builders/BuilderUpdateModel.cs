@@ -49,13 +49,6 @@ namespace BuildUp.API.Models.Builders
         public string Step { get; set; }
 
         /// <summary>
-        /// The builder's department
-        /// </summary>
-        /// <example>35</example>
-        [Required]
-        public int Department { get; set; }
-
-        /// <summary>
         /// The builder current situation
         /// </summary>
         /// <example>Student</example>
