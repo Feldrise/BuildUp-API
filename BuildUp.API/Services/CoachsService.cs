@@ -280,6 +280,48 @@ namespace BuildUp.API.Services
             return activeCoachs;
         }
 
+        public async Task<List<AvailableCoachModel>> GetAvailableCoachAsync()
+        {
+            var activeCoachs = await (await _coachs.FindAsync(databaseCoach =>
+                databaseCoach.Status == CoachStatus.Validated
+            )).ToListAsync();
+
+            List<AvailableCoachModel> availableCoachModels = new List<AvailableCoachModel>();
+
+            foreach (Coach activeCoach in activeCoachs)
+            {
+                User user = await GetUserFromAdminAsync(activeCoach.Id);
+
+                if (user == null)
+                {
+                    throw new Exception("The coach seems to be linked to no user...");
+                }
+
+                AvailableCoachModel model = new AvailableCoachModel()
+                {
+                    Id = activeCoach.Id,
+
+                    UserId = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+
+                    Email = user.Email,
+                    DiscordTag = user.DiscordTag,
+
+                    Description = activeCoach.Description,
+
+                    Competences = await _formsService.GetAnswerForQuestionAsync(user.Id, "Quelles sont vos compétences ?"),
+                    Perspectives = await _formsService.GetAnswerForQuestionAsync(user.Id, "Quelles sont, selon vous, les principales perspectives pour qu’un projet fonctionne ?"),
+                    CoachDefinition = await _formsService.GetAnswerForQuestionAsync(user.Id, "Comment définissez-vous le rôle de Coach ?")
+                };
+
+                availableCoachModels.Add(model);
+            }
+
+            return availableCoachModels;
+
+        }
+
         private async Task<string> RegisterToDatabase(CoachRegisterModel coachRegisterModel)
         {
             Coach databaseCoach = new Coach()

@@ -378,6 +378,14 @@
             <response code="401">You are not allowed to view active coachs</response>
             <response code="200">return a list of active coachs</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetAvailableCoachs">
+            <summary>
+            (Builder,Admin) Get available coachs
+            </summary>
+            <returns>A list of available coachs</returns>
+            <response code="401">You are not allowed to view available coachs</response>
+            <response code="200">return a list of available coachs</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.RegisterCoach(BuildUp.API.Models.Coachs.CoachRegisterModel)">
             <summary>
             (*) Register the coach
@@ -832,6 +840,119 @@
             </summary>
             <example>15/12/2020</example>
         </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.FirstName">
+            <summary>
+            The builder's first name
+            </summary>
+            <example>Anael</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.LastName">
+            <summary>
+            The builder's last name 
+            </summary>
+            <example>MEGRET</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Birthdate">
+            <summary>
+            The builder's birth date
+            </summary>
+            <example>2001-04-31T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.BirthPlace">
+            <summary>
+            The user's birth place
+            </summary>
+            <example>Rennes</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Email">
+            <summary>
+            The user's email
+            </summary>
+            <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Phone">
+            <summary>
+            The user's phone
+            </summary>
+            <example>+33652809335</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.City">
+            <summary>
+            The user's city
+            </summary>
+            <example>Rennes</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.PostalCode">
+            <summary>
+            The user's postal code
+            </summary>
+            <example>35000</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Address">
+            <summary>
+            The user's address
+            </summary>
+            <example>17 Rue de La Rimaudière</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Situation">
+            <summary>
+            The builder current situation
+            </summary>
+            <example>Etudiant</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Keywords">
+            <summary>
+            Answer : Quelles sont les mots clés qui vous décrivent ?
+            </summary>
+            <example>Intelligente, passionnée</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Accroche">
+            <summary>
+            Answer : Donnez une phrase d'accroche pour vous
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.ProjectDomaine">
+            <summary>
+            The project's domain
+            </summary>
+            <example>Plantes, application mobile, Instagram</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.ProjectName">
+            <summary>
+            The project's name
+            </summary>
+            <example>Pluctis</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.ProjectLaunchDate">
+            <summary>
+            When the project was started
+            </summary>
+            <example>2020-03-01T10:00:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.ProjectDescription">
+            <summary>
+            The project's description
+            </summary>
+            <example>Pluctis est un super projet visant a vous faire garder vos plantes en vie en...</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.ProjectTeam">
+            <summary>
+            The project's team
+            </summary>
+            <example>Lucas, Louna, Iulia, Emma, Ethan, Noemie, moi</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Expectation">
+            <summary>
+            Answer : Quelles sont vos attentes par rapport au programme ?
+            </summary>
+            <example>Qu'il m'apprenne a faire du café</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Objectifs">
+            <summary>
+            Answer : Quels objectifs souhaitez-vous atteindre au bout des 3 mois de programme ?
+            </summary>
+            <example>Avoir fait couler Google</example>
+        </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.FirstName">
             <summary>
             The coach's first name
@@ -1252,6 +1373,57 @@
             A link to show to the builder
             </summary>
             <example>https://form.google.com/...</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.UserId">
+            <summary>
+            The user ID
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.FirstName">
+            <summary>
+            The user's first name
+            </summary>
+            <example>Victor</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.LastName">
+            <summary>
+            The user's last name
+            </summary>
+            <example>DENIS</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Email">
+            <summary>
+            The user's email
+            </summary>
+            <example>admin@feldrise.com</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.DiscordTag">
+            <summary>
+            The user's Discord tag
+            </summary>
+            <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Description">
+            <summary>
+            The coach description
+            </summary>
+            <example>I'm an awesome coach</example>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Competences">
+            <summary>
+            Answer : Quelles sont vos compétences ?
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Perspectives">
+            <summary>
+            Answer : Quelles sont, selon vous, les principales perspectives pour qu’un projet fonctionne ?
+            </summary>
+        </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.CoachDefinition">
+            <summary>
+            Answer : Comment définissez-vous le rôle de Coach ?
+            </summary>
         </member>
         <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.UserId">
             <summary>

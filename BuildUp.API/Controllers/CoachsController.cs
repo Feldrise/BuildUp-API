@@ -241,7 +241,7 @@ namespace BuildUp.API.Controllers
         /// <response code="200">return a list of candidating coachs</response>
         [Authorize(Roles = Role.Admin)]
         [HttpGet("candidating")]
-        public async Task<ActionResult<List<Builder>>> GetCandidatingCoachs()
+        public async Task<ActionResult<List<Coach>>> GetCandidatingCoachs()
         {
             var result = await _coachService.GetCandidatingCoachsAsync();
 
@@ -256,9 +256,24 @@ namespace BuildUp.API.Controllers
         /// <response code="200">return a list of active coachs</response>
         [Authorize(Roles = Role.Admin)]
         [HttpGet("active")]
-        public async Task<ActionResult<List<Builder>>> GetActiveCoachs()
+        public async Task<ActionResult<List<Coach>>> GetActiveCoachs()
         {
             var result = await _coachService.GetActiveCoachsAsync();
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// (Builder,Admin) Get available coachs
+        /// </summary>
+        /// <returns>A list of available coachs</returns>
+        /// <response code="401">You are not allowed to view available coachs</response>
+        /// <response code="200">return a list of available coachs</response>
+        [Authorize(Roles = Role.Builder + "," + Role.Admin)]
+        [HttpGet("available")]
+        public async Task<ActionResult<List<AvailableCoachModel>>> GetAvailableCoachs()
+        {
+            var result = await _coachService.GetAvailableCoachAsync();
 
             return Ok(result);
         }

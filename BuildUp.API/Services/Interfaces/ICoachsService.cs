@@ -38,5 +38,6 @@ namespace BuildUp.API.Services.Interfaces
 
         Task<List<Coach>> GetCandidatingCoachsAsync();
         Task<List<Coach>> GetActiveCoachsAsync();
+        Task<List<AvailableCoachModel>> GetAvailableCoachAsync();
     }
 }
