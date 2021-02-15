@@ -63,7 +63,7 @@ namespace BuildUp.API.Entities.Pdf
         public string Situation { get; set; }
 
         /// <summary>
-        /// Answer : Quelles sont les mots clés qui vous décrivent ?
+        /// Answer : Vos proches vous présentent comme quelqu’un :
         /// </summary>
         /// <example>Intelligente, passionnée</example>
         public string Keywords { get; set; }
@@ -100,7 +100,7 @@ namespace BuildUp.API.Entities.Pdf
         public string ProjectTeam { get; set; }
 
         /// <summary>
-        /// Answer : Quelles sont vos attentes par rapport au programme ?
+        /// Answer : Pourquoi souhaitez-vous intégrer le programme Build Up ?
         /// </summary>
         /// <example>Qu'il m'apprenne a faire du café</example>
         public string Expectation { get; set; }

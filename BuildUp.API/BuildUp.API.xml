@@ -918,7 +918,7 @@
         </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Keywords">
             <summary>
-            Answer : Quelles sont les mots clés qui vous décrivent ?
+            Answer : Vos proches vous présentent comme quelqu’un :
             </summary>
             <example>Intelligente, passionnée</example>
         </member>
@@ -959,7 +959,7 @@
         </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Expectation">
             <summary>
-            Answer : Quelles sont vos attentes par rapport au programme ?
+            Answer : Pourquoi souhaitez-vous intégrer le programme Build Up ?
             </summary>
             <example>Qu'il m'apprenne a faire du café</example>
         </member>

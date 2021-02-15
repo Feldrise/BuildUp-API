@@ -312,9 +312,9 @@ namespace BuildUp.API.Services
 
                 Situation = builder.Situation,
 
-                Keywords = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quelles sont les mots clés qui vous définissent ?"),
-                Accroche = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quel est votre phrase d'accroche ?"),
-                Expectation = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quelles sont vos attentes par rapport au programme ?"),
+                Keywords = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Vos proches vous présentent comme quelqu’un :"),
+                Accroche = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Donnez une phrase d'accroche pour vous"),
+                Expectation = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Pourquoi souhaitez-vous intégrer le programme Build Up ?"),
                 Objectifs = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels objectifs souhaitez-vous atteindre au bout des 3 mois de programme ?"),
 
                 ProjectDomaine = project.Categorie,
