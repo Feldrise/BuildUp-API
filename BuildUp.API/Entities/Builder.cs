@@ -70,5 +70,11 @@ namespace BuildUp.API.Entities
         /// </summary>
         /// <example>I'm an awesome builder</example>
         public string Description { get; set; }
+
+        /// <summary>
+        /// True if the builder has signed the integration paper
+        /// </summary>
+        /// <example>false</example>
+        public bool HasSignedFicheIntegration { get; set; }
     }
 }

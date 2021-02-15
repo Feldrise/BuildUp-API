@@ -102,6 +102,57 @@ namespace BuildUp.API.Services
             return true;
         }
 
+        public bool SignBuilderIntegration(string builderId, PdfIntegrationBuilder values)
+        {
+            var filePath = Path.Combine(_env.ContentRootPath, $"PDF/integration_builder_fillable.pdf");
+            var savePath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/builders/{builderId}.pdf");
+
+            //var filePath = "/PDF/integration_coach_fillable.pdf";
+            //var savePath = "/PDF/saved/toSave.pdf";
+
+            PdfDocument pdf = new PdfDocument(new PdfReader(filePath), new PdfWriter(savePath));
+            PdfAcroForm form = PdfAcroForm.GetAcroForm(pdf, false);
+
+            var fields = form.GetFormFields();
+
+            foreach (PdfFormField field in fields.Values)
+            {
+                field.SetFontSize(12);
+            }
+
+            fields["Nom"].SetValue(values.LastName);
+            fields["Prénom"].SetValue(values.FirstName);
+            fields["Where"].SetValue(values.BirthPlace);
+            fields["Birthdate"].SetValue(values.Birthdate.ToString());
+            fields["mail"].SetValue(values.Email);
+            fields["adresse"].SetValue(values.Address);
+            fields["phone"].SetValue(values.Phone);
+            fields["Code_postal"].SetValue(values.PostalCode.ToString());
+            fields["ville"].SetValue(values.City);
+            fields["situation"].SetValue(values.Situation);
+            fields["keywords"].SetValue(values.Keywords);
+            fields["accroche"].SetValue(values.Accroche);
+            fields["domaines"].SetValue(values.ProjectDomaine);
+            fields["nom_projet"].SetValue(values.ProjectName);
+            fields["date_lancement"].SetValue(values.ProjectLaunchDate.ToString());
+            fields["description"].SetValue(values.ProjectDescription);
+            fields["team_members"].SetValue(values.ProjectTeam);
+            fields["Attentes"].SetValue(values.Expectation);
+            fields["Objectifs"].SetValue(values.Objectifs);
+            fields["full_name"].SetValue($"{values.FirstName} {values.LastName}");
+            fields["date_naissance"].SetValue(values.Birthdate.ToString());
+            fields["lieu_residence"].SetValue($"{values.Address}, {values.PostalCode} {values.City}");
+            fields["lieu_naissance"].SetValue(values.BirthPlace);
+            fields["lieu_signe"].SetValue(values.City);
+            fields["date_signe"].SetValue(DateTime.Now.ToString());
+
+            PdfAcroForm.GetAcroForm(pdf, false).FlattenFields();
+
+            pdf.Close();
+
+            return true;
+        }
+
         public string TestPdfFields(string pdfName)
         {
             var filePath = Path.Combine(_env.ContentRootPath, $"PDF/{pdfName}.pdf");

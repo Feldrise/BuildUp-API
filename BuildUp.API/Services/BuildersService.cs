@@ -14,6 +14,7 @@ using BuildUp.API.Entities.Status;
 using BuildUp.API.Models.Builders;
 using BuildUp.API.Models;
 using BuildUp.API.Models.Projects;
+using BuildUp.API.Entities.Pdf;
 
 namespace BuildUp.API.Services
 {
@@ -26,8 +27,9 @@ namespace BuildUp.API.Services
         private readonly IFormsService _formsService;
         private readonly IProjectsService _projectsService;
         private readonly IFilesService _filesService;
+        private readonly IPdfService _pdfService;
 
-        public BuildersService(IMongoSettings mongoSettings, IFormsService formsService, IProjectsService projectsService, IFilesService filesService)
+        public BuildersService(IMongoSettings mongoSettings, IFormsService formsService, IProjectsService projectsService, IFilesService filesService, IPdfService pdfService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -39,6 +41,7 @@ namespace BuildUp.API.Services
             _formsService = formsService;
             _projectsService = projectsService;
             _filesService = filesService;
+            _pdfService = pdfService;
         }
 
         public Task<Builder> GetBuilderFromAdminAsync(string userId)
@@ -266,6 +269,75 @@ namespace BuildUp.API.Services
         public Task<string> SubmitProjectAsync(ProjectSubmitModel projectSubmitModel)
         {
             return _projectsService.SubmitProjectAsync(projectSubmitModel);
+        }
+
+        public async Task<bool> SignFicheIntegrationAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.UserId != currentUserId)
+            {
+                throw new Exception("You don't have the permission to sign");
+            }
+
+            User user = await (await _users.FindAsync(databaseUser =>
+                databaseUser.Id == builder.UserId
+            )).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                throw new Exception("The user doesn't exist...");
+            }
+
+            Project project = await _projectsService.GetProjectAsync(builderId);
+
+            if (project == null)
+            {
+                throw new Exception("The builder doesn't have project...");
+            }
+
+            PdfIntegrationBuilder pdfIntegrationBuilder = new PdfIntegrationBuilder()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Birthdate = user.Birthdate,
+                BirthPlace = user.BirthPlace,
+
+                Email = user.Email,
+                Phone = user.Phone,
+
+                City = user.City,
+                PostalCode = user.PostalCode,
+                Address = user.Address,
+
+                Situation = builder.Situation,
+
+                Keywords = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quelles sont les mots clés qui vous définissent ?"),
+                Accroche = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quel est votre phrase d'accroche ?"),
+                Expectation = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quelles sont vos attentes par rapport au programme ?"),
+                Objectifs = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels objectifs souhaitez-vous atteindre au bout des 3 mois de programme ?"),
+
+                ProjectDomaine = project.Categorie,
+                ProjectName = project.Name,
+                ProjectLaunchDate = project.LaunchDate,
+                ProjectDescription = project.Description,
+                ProjectTeam = project.Team
+            };
+
+            if (_pdfService.SignBuilderIntegration(builderId, pdfIntegrationBuilder))
+            {
+                var update = Builders<Builder>.Update
+                    .Set(dbBuilder => dbBuilder.HasSignedFicheIntegration, true);
+
+                await _builders.UpdateOneAsync(databaseBuilder =>
+                   databaseBuilder.Id == builderId,
+                   update
+                );
+
+                return true;
+            }
+
+            return false;
         }
 
         public async Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel)

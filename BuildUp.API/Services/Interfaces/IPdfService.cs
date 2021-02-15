@@ -10,7 +10,8 @@ namespace BuildUp.API.Services.Interfaces
     {
         byte[] GenerateAttestationMineur(PdfAttestationMineur values);
         bool SignCoachIntegration(string coachId, PdfIntegrationCoach values);
-        
+        bool SignBuilderIntegration(string builderId, PdfIntegrationBuilder values);
+
         string TestPdfFields(String pdfName);
     }
 }

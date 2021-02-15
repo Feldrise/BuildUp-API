@@ -359,14 +359,14 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Admin) Assigna coach to a builder
+        /// (Admin,Builder) Assigna coach to a builder
         /// </summary>
         /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <param name="coachAssignmentModel"></param>
         /// <returns></returns>
         /// <response code="401">You are not allowed to view active builders</response>
         /// <response code="200">The coach has been successfully assigned</response>
-        [Authorize(Roles = Role.Admin)]
+        [Authorize(Roles = Role.Admin + "," + Role.Builder)]
         [HttpPost("{builderId:length(24)}/assign")]
         public async Task<IActionResult> AssignCoach(string builderId, [FromBody]CoachAssignmentModel coachAssignmentModel)
         {
@@ -374,6 +374,38 @@ namespace BuildUp.API.Controllers
 
             return Ok();
         }
+
+        /// <summary>
+        /// (Builder) Sign the builder integration paper
+        /// </summary>
+        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <returns>If the PDF was successfully generated</returns>
+        /// <response code="401">You are not allowed to sign</response>
+        /// <response code="403">You are not allowed to sign</response>
+        /// <response code="200">The paper was successfully signed</response>
+        [Authorize(Roles = Role.Builder)]
+        [HttpPut("{builderId:length(24)}/sign_integration")]
+        public async Task<IActionResult> SignIntegration(string builderId)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                var sucess = await _buildersService.SignFicheIntegrationAsync(currentUserId, builderId);
+
+                if (sucess)
+                {
+                    return Ok(true);
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return BadRequest("The PDF can't be generated");
+        }
+
 
         /// <summary>
         /// (Builder,Admin) Update a builder

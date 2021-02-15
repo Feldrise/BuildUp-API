@@ -308,6 +308,7 @@ namespace BuildUp.API.Services
                     Email = user.Email,
                     DiscordTag = user.DiscordTag,
 
+                    Situation = activeCoach.Situation,
                     Description = activeCoach.Description,
 
                     Competences = await _formsService.GetAnswerForQuestionAsync(user.Id, "Quelles sont vos compétences ?"),

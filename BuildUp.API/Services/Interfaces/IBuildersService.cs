@@ -39,7 +39,8 @@ namespace BuildUp.API.Services.Interfaces
 
         Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel);
         Task<string> SubmitProjectAsync(ProjectSubmitModel projectSubmitModel);
-        
+        Task<bool> SignFicheIntegrationAsync(string currentUserId, string builderId);
+
         Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel);
 
         Task UpdateBuilderFromBuilderAsync(string currentUserId, string builderId, BuilderUpdateModel builderUpdateModel);

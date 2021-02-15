@@ -11,6 +11,7 @@ namespace BuildUp.API.Entities.Steps
         public const string AdminMeeting = "AdminMeeting";
         public const string AdminMeetingDone = "AdminMeetingDone";
         public const string CoachMeeting = "CoachMeeting";
+        public const string CoachValidated = "CoachValidated";
         public const string Active = "Active";
         public const string Finished = "Finished";
         public const string Abandoned = "Abandoned";

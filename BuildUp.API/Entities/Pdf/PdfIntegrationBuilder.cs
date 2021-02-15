@@ -86,7 +86,7 @@ namespace BuildUp.API.Entities.Pdf
         /// When the project was started
         /// </summary>
         /// <example>2020-03-01T10:00:04.1351158+01:00</example>
-        public string ProjectLaunchDate { get; set; }
+        public DateTime ProjectLaunchDate { get; set; }
 
         /// <summary>
         /// The project's description

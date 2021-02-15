@@ -43,6 +43,11 @@ namespace BuildUp.API.Models.Coachs
         public string DiscordTag { get; set; }
 
         /// <summary>
+        /// The coach current situation
+        /// </summary>
+        /// <example>Entrepreneur</example>
+        public string Situation { get; set; }
+        /// <summary>
         /// The coach description
         /// </summary>
         /// <example>I'm an awesome coach</example>
