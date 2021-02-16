@@ -1,5 +1,6 @@
 ﻿using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
+using BuildUp.API.Entities.Notification.CoachRequest;
 using BuildUp.API.Models.Coachs;
 using System;
 using System.Collections.Generic;
@@ -39,5 +40,9 @@ namespace BuildUp.API.Services.Interfaces
         Task<List<Coach>> GetCandidatingCoachsAsync();
         Task<List<Coach>> GetActiveCoachsAsync();
         Task<List<AvailableCoachModel>> GetAvailableCoachAsync();
+
+        Task<List<CoachRequest>> GetCoachRequestsAsync(string currentUserId, string coachId);
+        Task AcceptCoachRequestAsync(string currentUserId, string coachId, string requestId);
+        Task RefuseCoachRequestAsync(string currentUserId, string coachId, string requestId);
     }
 }

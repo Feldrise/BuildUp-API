@@ -15,6 +15,7 @@ using BuildUp.API.Models.Builders;
 using BuildUp.API.Models;
 using BuildUp.API.Models.Projects;
 using BuildUp.API.Entities.Pdf;
+using BuildUp.API.Entities.Notification.CoachRequest;
 
 namespace BuildUp.API.Services
 {
@@ -23,13 +24,15 @@ namespace BuildUp.API.Services
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<Builder> _builders;
         private readonly IMongoCollection<Coach> _coachs;
+        private readonly IMongoCollection<CoachRequest> _coachRequests;
 
         private readonly IFormsService _formsService;
         private readonly IProjectsService _projectsService;
         private readonly IFilesService _filesService;
         private readonly IPdfService _pdfService;
+        private readonly INotificationService _notificationService;
 
-        public BuildersService(IMongoSettings mongoSettings, IFormsService formsService, IProjectsService projectsService, IFilesService filesService, IPdfService pdfService)
+        public BuildersService(IMongoSettings mongoSettings, IFormsService formsService, IProjectsService projectsService, IFilesService filesService, IPdfService pdfService, INotificationService notificationService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -37,11 +40,13 @@ namespace BuildUp.API.Services
             _users = database.GetCollection<User>("users");
             _builders = database.GetCollection<Builder>("builders");
             _coachs = database.GetCollection<Coach>("coachs");
+            _coachRequests = database.GetCollection<CoachRequest>("coach_requests");
 
             _formsService = formsService;
             _projectsService = projectsService;
             _filesService = filesService;
             _pdfService = pdfService;
+            _notificationService = notificationService;
         }
 
         public Task<Builder> GetBuilderFromAdminAsync(string userId)
@@ -342,7 +347,26 @@ namespace BuildUp.API.Services
 
         public async Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel)
         {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null)
+            {
+                throw new Exception("This builder doesn't exist");
+            }
+
+            User user = await GetUserFromAdminAsync(builderId);
+
+            if (user == null)
+            {
+                throw new Exception("Their is no user for builder...");
+            }
+
             await UpdateBuilder(builderId, builderUpdateModel);
+
+            if (builder.Step == BuilderSteps.Preselected && builderUpdateModel.Step == BuilderSteps.AdminMeeting)
+            {
+                await _notificationService.NotifyPreselectionBuilder(user.Email, $"{user.FirstName} {user.LastName}");
+            }
         }
         
         public async Task UpdateBuilderFromBuilderAsync(string currentUserId, string builderId, BuilderUpdateModel builderUpdateModel)
@@ -378,6 +402,13 @@ namespace BuildUp.API.Services
                 databaseBuilder.Id == builderId, 
                 update
             );
+
+            await _coachRequests.InsertOneAsync(new CoachRequest()
+            {
+                BuilderId = builderId,
+                CoachId = coachId,
+                Status = CoachRequestStatus.Waiting
+            });
         }
 
         public async Task<List<Builder>> GetCandidatingBuildersAsync()

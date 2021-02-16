@@ -9,5 +9,6 @@ namespace BuildUp.API.Services.Interfaces
     public interface INotificationService
     {
         Task NotifieAccountCreationAsync(RegisterModel registerModel, string password);
+        Task NotifyPreselectionBuilder(string email, string fullName);
     }
 }

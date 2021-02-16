@@ -1,5 +1,6 @@
 ﻿using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
+using BuildUp.API.Entities.Notification.CoachRequest;
 using BuildUp.API.Entities.Pdf;
 using BuildUp.API.Entities.Status;
 using BuildUp.API.Entities.Steps;
@@ -19,6 +20,7 @@ namespace BuildUp.API.Services
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<Coach> _coachs;
         private readonly IMongoCollection<Builder> _builders;
+        private readonly IMongoCollection<CoachRequest> _coachRequests;
 
         private readonly IFormsService _formsService;
         private readonly IFilesService _filesService;
@@ -32,6 +34,7 @@ namespace BuildUp.API.Services
             _users = database.GetCollection<User>("users");
             _coachs = database.GetCollection<Coach>("coachs");
             _builders = database.GetCollection<Builder>("builders");
+            _coachRequests = database.GetCollection<CoachRequest>("coach_requests");
 
             _formsService = formsService;
             _filesService = filesService;
@@ -323,6 +326,76 @@ namespace BuildUp.API.Services
 
         }
 
+        public async Task<List<CoachRequest>> GetCoachRequestsAsync(string currentUserId, string coachId)
+        {
+            return await (await _coachRequests.FindAsync(databaseRequest =>
+                databaseRequest.CoachId == coachId &&
+                databaseRequest.Status == CoachRequestStatus.Waiting
+            )).ToListAsync();
+        }
+
+        public async Task AcceptCoachRequestAsync(string currentUserId, string coachId, string requestId)
+        {
+            CoachRequest request = await GetCoachRequest(requestId);
+
+            if (request == null)
+            {
+                throw new Exception("The request seems to not exist anymore");
+            }
+
+            if (request.CoachId != coachId)
+            {
+                throw new Exception("You are not the coach for this request");
+            }
+
+            var update = Builders<CoachRequest>.Update
+               .Set(dbRequest => dbRequest.Status, CoachRequestStatus.Accepted);
+
+            await _coachRequests.UpdateOneAsync(databaseRequest =>
+               databaseRequest.Id == requestId,
+               update
+            );
+
+            var builderUpdate = Builders<Builder>.Update
+               .Set(dbBuilder => dbBuilder.Step, BuilderSteps.Signing);
+
+            await _builders.UpdateOneAsync(databaseBuilder =>
+               databaseBuilder.Id == request.BuilderId,
+               builderUpdate
+            );
+        }
+
+        public async Task RefuseCoachRequestAsync(string currentUserId, string coachId, string requestId)
+        {
+            CoachRequest request = await GetCoachRequest(requestId);
+
+            if (request == null)
+            {
+                throw new Exception("The request seems to not exist anymore");
+            }
+
+            if (request.CoachId != coachId)
+            {
+                throw new Exception("You are not the coach for this request");
+            }
+
+            var update = Builders<CoachRequest>.Update
+               .Set(dbRequest => dbRequest.Status, CoachRequestStatus.Refused);
+
+            await _coachRequests.UpdateOneAsync(databaseRequest =>
+               databaseRequest.Id == requestId,
+               update
+            );
+
+            var builderUpdate = Builders<Builder>.Update
+               .Set(dbBuilder => dbBuilder.CoachId, null);
+
+            await _builders.UpdateOneAsync(databaseBuilder =>
+               databaseBuilder.Id == request.BuilderId,
+               builderUpdate
+            );
+        }
+
         private async Task<string> RegisterToDatabase(CoachRegisterModel coachRegisterModel)
         {
             Coach databaseCoach = new Coach()
@@ -388,6 +461,15 @@ namespace BuildUp.API.Services
             );
 
             return await coach.FirstOrDefaultAsync();
+        }
+
+        private async Task<CoachRequest> GetCoachRequest(string requestId)
+        {
+            var request = await _coachRequests.FindAsync(databaseRequest =>
+                databaseRequest.Id == requestId
+            );
+
+            return await request.FirstOrDefaultAsync();
         }
 
         private bool CoachExist(string userId)

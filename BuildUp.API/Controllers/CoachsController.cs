@@ -1,5 +1,6 @@
 ﻿using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
+using BuildUp.API.Entities.Notification.CoachRequest;
 using BuildUp.API.Models.Coachs;
 using BuildUp.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -234,6 +235,40 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// (Coach) Get requests for a coach
+        /// </summary>
+        /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns>The requests</returns>
+        /// <response code="401">You are not allowed to view requests</response>s
+        /// <response code="403">You are not allowed to view requests</response>
+        /// <response code="200">Return the requests</response>
+        [Authorize(Roles = Role.Coach)]
+        [HttpGet("{coachId:length(24)}/coach_requests")]
+        public async Task<ActionResult<List<CoachRequest>>> GetCoachRequests(string coachId)
+        {
+            var currentUserId = User.Identity.Name;
+            List<CoachRequest> requests;
+
+            try
+            {
+                if (User.IsInRole(Role.Coach))
+                {
+                    requests = await _coachService.GetCoachRequestsAsync(currentUserId, coachId);
+                }
+                else
+                {
+                    return Forbid("You must be a coach");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't get the requests: {e.Message}");
+            }
+
+            return Ok(requests);
+        }
+
+        /// <summary>
         /// (Admin) Get candidating coachs
         /// </summary>
         /// <returns>A list of candidating coachs</returns>
@@ -383,6 +418,74 @@ namespace BuildUp.API.Controllers
         public async Task<IActionResult> RefuseCoach(string coachId)
         {
             await _coachService.RefuseCoachAsync(coachId);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// (Coach) Accept a coach request
+        /// </summary>
+        /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <param name="requestId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <response code="400">Their was an error accepting the request</response> 
+        /// <response code="401">You are not allowed to accept the requests</response>s
+        /// <response code="403">You are not allowed to accept the requests</response>
+        /// <response code="200">The request has been accepted</response>
+        [Authorize(Roles = Role.Coach)]
+        [HttpPut("{coachId:length(24)}/coach_requests/{requestId:length(24)}/accept")]
+        public async Task<IActionResult> AcctepCoachRequest(string coachId, string requestId)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                if (User.IsInRole(Role.Coach))
+                {
+                    await _coachService.AcceptCoachRequestAsync(currentUserId, coachId, requestId);
+                }
+                else
+                {
+                    return Forbid("You must be a coach");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't accept the requests: {e.Message}");
+            }
+
+            return Ok();
+        }
+
+        // <summary>
+        /// (Coach) Refuse a coach request
+        /// </summary>
+        /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <param name="requestId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <response code="400">Their was an error refusing the request</response> 
+        /// <response code="401">You are not allowed to refuse the requests</response>s
+        /// <response code="403">You are not allowed to refuse the requests</response>
+        /// <response code="200">The request has been refused</response>
+        [Authorize(Roles = Role.Coach)]
+        [HttpPut("{coachId:length(24)}/coach_requests/{requestId:length(24)}/refuse")]
+        public async Task<IActionResult> RefuseCoachRequest(string coachId, string requestId)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                if (User.IsInRole(Role.Coach))
+                {
+                    await _coachService.RefuseCoachRequestAsync(currentUserId, coachId, requestId);
+                }
+                else
+                {
+                    return Forbid("You must be a coach");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't refuse the requests: {e.Message}");
+            }
 
             return Ok();
         }

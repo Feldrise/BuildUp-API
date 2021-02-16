@@ -372,6 +372,16 @@
             <response code="404">The coach's form doesn't exist</response>
             <response code="200">Return coach's form</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetCoachRequests(System.String)">
+            <summary>
+            (Coach) Get requests for a coach
+            </summary>
+            <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns>The requests</returns>
+            <response code="401">You are not allowed to view requests</response>s
+            <response code="403">You are not allowed to view requests</response>
+            <response code="200">Return the requests</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetCandidatingCoachs">
             <summary>
             (Admin) Get candidating coachs
@@ -435,6 +445,18 @@
             <response code="401">You are not allowed to refuse this coach</response>
             <response code="200">The coach has been successfully refused</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.AcctepCoachRequest(System.String,System.String)">
+            <summary>
+            (Coach) Accept a coach request
+            </summary>
+            <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <param name="requestId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <response code="400">Their was an error accepting the request</response> 
+            <response code="401">You are not allowed to accept the requests</response>s
+            <response code="403">You are not allowed to accept the requests</response>
+            <response code="200">The request has been accepted</response>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:BuildUp.API.Controllers.CoachsController.RefuseCoachRequest(System.String,System.String)" -->
         <member name="M:BuildUp.API.Controllers.FilesController.GetFile(System.String)">
             <summary>
             (Admin) Get a file from its id
@@ -771,6 +793,12 @@
             The answer to the question
             </summary>
             <example>My super answer</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Notification.CoachRequest.CoachRequest.Status">
+            <summary>
+            The current proof status
+            </summary>
+            <example>Validated/Waiting/Refused</example>
         </member>
         <member name="P:BuildUp.API.Entities.NtfReferent.FirstName">
             <summary>

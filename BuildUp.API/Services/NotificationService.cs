@@ -8,6 +8,8 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
+using BuildUp.API.Entities;
+
 namespace BuildUp.API.Services
 {
     public class NotificationService : INotificationService
@@ -34,6 +36,25 @@ namespace BuildUp.API.Services
                 subject,
                 message,
                 registerModel.Email
+            );
+        }
+
+        public async Task NotifyPreselectionBuilder(string email, string fullName)
+        {
+            string subject = "Programme Build Up - Préselection";
+
+            string message = "";
+            message += $"Bonjour {fullName},\n\n";
+            message += "Nous sommes ravie de t’annoncer que tu as été préselectionné pour participer au programme de coaching personnalisé Build Up 🎉. Je souhaiterais maintenant te convier à un entretien pour apprendre à te connaître et surtout mieux appréhender ta personnalité.\n\n";
+            message += "Nous souhaitons voir tout simplement si le programme peut vraiment t’être utile et t’apporter les meilleures solutions possibles. Je te propose de consulter mes disponibilités à ce lien : calendly.com/marc-thomas5608/entretien-sel-builder et de sélectionner le créneau qui te convient.\n\n";
+            message += "Tu n’auras plus qu’à te présenter le jour J avec un microphone fonctionnel. C’est un entretien détente, il n’y à rien à préparer. On pourrait reprendre la phrase fétiche de Mcdo, mais “viens comme tu es !” 😉.\n\n";
+            message += "À très vite et si tu as des questions entre temps ou que tu souhaites changer de créneau, n’hésite pas à me contacter via ce mail ou directement sur Discord (discord.new-talents.fr).\n\n";
+            message += "Amicalement";
+
+            await SendMailAsync(
+                subject,
+                message,
+                email
             );
         }
 
