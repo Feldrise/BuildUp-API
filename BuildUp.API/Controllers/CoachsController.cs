@@ -1,5 +1,6 @@
 ﻿using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
+using BuildUp.API.Entities.Notification;
 using BuildUp.API.Entities.Notification.CoachRequest;
 using BuildUp.API.Models.Coachs;
 using BuildUp.API.Services.Interfaces;
@@ -19,10 +20,12 @@ namespace BuildUp.API.Controllers
     public class CoachsController : ControllerBase
     {
         private readonly ICoachsService _coachService;
+        private readonly INotificationService _notificationService;
 
-        public CoachsController(ICoachsService coachService)
+        public CoachsController(ICoachsService coachService, INotificationService notificationService)
         {
             _coachService = coachService;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -269,6 +272,40 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// (Coach) Get notification for a coach
+        /// </summary>
+        /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns>The requests</returns>
+        /// <response code="401">You are not allowed to view notifications</response>s
+        /// <response code="403">You are not allowed to view notifications</response>
+        /// <response code="200">Return the notifications</response>
+        [Authorize(Roles = Role.Coach)]
+        [HttpGet("{coachId:length(24)}/notifications")]
+        public async Task<ActionResult<List<CoachNotification>>> GetNotifications(string coachId)
+        {
+            var currentUserId = User.Identity.Name;
+            List<CoachNotification> notifications;
+
+            try
+            {
+                if (User.IsInRole(Role.Coach))
+                {
+                    notifications = await _notificationService.GetCoachNotificationsAsync(coachId);
+                }
+                else
+                {
+                    return Forbid("You must be a coach");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't get the notifications: {e.Message}");
+            }
+
+            return Ok(notifications);
+        }
+
+        /// <summary>
         /// (Admin) Get candidating coachs
         /// </summary>
         /// <returns>A list of candidating coachs</returns>
@@ -485,6 +522,40 @@ namespace BuildUp.API.Controllers
             catch (Exception e)
             {
                 return BadRequest($"Can't refuse the requests: {e.Message}");
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// (Coach) Mark a notification as read
+        /// </summary>
+        /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <param name="notificationId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <response code="400">Their was an error reading the notification</response> 
+        /// <response code="401">You are not allowed to mark this notification as read</response>s
+        /// <response code="403">You are not allowed to mark this notification as read</response>
+        /// <response code="200">The request has been accepted</response>
+        [Authorize(Roles = Role.Coach)]
+        [HttpPut("{coachId:length(24)}/notifications/{notificationId:length(24)}/read")]
+        public async Task<IActionResult> ReadNotification(string coachId, string notificationId)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                if (User.IsInRole(Role.Coach))
+                {
+                    await _notificationService.MakeCoachNotificationReadAsync(coachId, notificationId);
+                }
+                else
+                {
+                    return Forbid("You must be a coach");
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't accept the requests: {e.Message}");
             }
 
             return Ok();

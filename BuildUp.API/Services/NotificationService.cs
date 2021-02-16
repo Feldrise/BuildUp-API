@@ -9,6 +9,8 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 
 using BuildUp.API.Entities;
+using BuildUp.API.Entities.Notification;
+using MongoDB.Driver;
 
 namespace BuildUp.API.Services
 {
@@ -16,9 +18,16 @@ namespace BuildUp.API.Services
     {
         private readonly IMailCredentials _mailCredentials;
 
-        public NotificationService(IMailCredentials mailCredentials)
+        private readonly IMongoCollection<CoachNotification> _coachNotifications;
+
+        public NotificationService(IMongoSettings mongoSettings, IMailCredentials mailCredentials)
         {
             _mailCredentials = mailCredentials;
+
+            var mongoClient = new MongoClient(mongoSettings.ConnectionString);
+            var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
+
+            _coachNotifications = database.GetCollection<CoachNotification>("coach_notifications");
         }
 
         public async Task NotifieAccountCreationAsync(RegisterModel registerModel, string password)
@@ -58,6 +67,37 @@ namespace BuildUp.API.Services
             );
         }
 
+        public async Task<List<CoachNotification>> GetCoachNotificationsAsync(string coachId)
+        {
+            return await (await _coachNotifications.FindAsync(databaseRequest =>
+                databaseRequest.CoachId == coachId &&
+                !databaseRequest.Seen
+            )).ToListAsync();
+        }
+
+        public async Task MakeCoachNotificationReadAsync(string coachId, string notificationId)
+        {
+            CoachNotification notification = await GetCoachNotification(notificationId);
+
+            if (notification == null)
+            {
+                throw new Exception("The notification seems to not exist anymore");
+            }
+
+            if (notification.CoachId != coachId)
+            {
+                throw new Exception("You are not the coach for this notifiction");
+            }
+
+            var update = Builders<CoachNotification>.Update
+                .Set(databaseNotification => databaseNotification.Seen, true);
+
+            await _coachNotifications.UpdateOneAsync(databaseNotification =>
+                databaseNotification.Id == notificationId,
+                update
+            );
+        }
+
         private async Task SendMailAsync(string subject, string body, string to)
         {
             using var client = new SmtpClient(_mailCredentials.Server, _mailCredentials.Port)
@@ -78,5 +118,15 @@ namespace BuildUp.API.Services
 
             await client.SendMailAsync(mailMessage);
         }
+
+        private async Task<CoachNotification> GetCoachNotification(string notificationId)
+        {
+            var request = await _coachNotifications.FindAsync(databaseNotification =>
+                databaseNotification.Id == notificationId
+            );
+
+            return await request.FirstOrDefaultAsync();
+        }
+
     }
 }

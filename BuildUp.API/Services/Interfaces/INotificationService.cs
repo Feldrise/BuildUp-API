@@ -1,4 +1,5 @@
-﻿using BuildUp.API.Models.Users;
+﻿using BuildUp.API.Entities.Notification;
+using BuildUp.API.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,8 @@ namespace BuildUp.API.Services.Interfaces
     {
         Task NotifieAccountCreationAsync(RegisterModel registerModel, string password);
         Task NotifyPreselectionBuilder(string email, string fullName);
+
+        Task<List<CoachNotification>> GetCoachNotificationsAsync(string coachId);
+        Task MakeCoachNotificationReadAsync(string coachId, string notificationId);
     }
 }

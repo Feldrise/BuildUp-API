@@ -382,6 +382,16 @@
             <response code="403">You are not allowed to view requests</response>
             <response code="200">Return the requests</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetNotifications(System.String)">
+            <summary>
+            (Coach) Get notification for a coach
+            </summary>
+            <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns>The requests</returns>
+            <response code="401">You are not allowed to view notifications</response>s
+            <response code="403">You are not allowed to view notifications</response>
+            <response code="200">Return the notifications</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetCandidatingCoachs">
             <summary>
             (Admin) Get candidating coachs
@@ -457,6 +467,17 @@
             <response code="200">The request has been accepted</response>
         </member>
         <!-- Badly formed XML comment ignored for member "M:BuildUp.API.Controllers.CoachsController.RefuseCoachRequest(System.String,System.String)" -->
+        <member name="M:BuildUp.API.Controllers.CoachsController.ReadNotification(System.String,System.String)">
+            <summary>
+            (Coach) Mark a notification as read
+            </summary>
+            <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <param name="notificationId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <response code="400">Their was an error reading the notification</response> 
+            <response code="401">You are not allowed to mark this notification as read</response>s
+            <response code="403">You are not allowed to mark this notification as read</response>
+            <response code="200">The request has been accepted</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.FilesController.GetFile(System.String)">
             <summary>
             (Admin) Get a file from its id
@@ -793,6 +814,18 @@
             The answer to the question
             </summary>
             <example>My super answer</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Notification.CoachNotification.Content">
+            <summary>
+            The content of the notification
+            </summary>
+            <example>This is a notification</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Notification.CoachNotification.Seen">
+            <summary>
+            Indicate if the notification has been seen
+            </summary>
+            <example>false</example>
         </member>
         <member name="P:BuildUp.API.Entities.Notification.CoachRequest.CoachRequest.Status">
             <summary>

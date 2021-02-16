@@ -1,5 +1,6 @@
 ﻿using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
+using BuildUp.API.Entities.Notification;
 using BuildUp.API.Entities.Notification.CoachRequest;
 using BuildUp.API.Models.Coachs;
 using System;
