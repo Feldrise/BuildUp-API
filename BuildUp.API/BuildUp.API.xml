@@ -99,11 +99,22 @@
             (Builder,Coach,Admin) Get builder's project
             </summary>
             <param name="builderId"></param>
-            <returns>The builder's form answer</returns>
+            <returns>The builder's project</returns>
             <response code="401">You are not allowed to view this builder's project</response>s
             <response code="403">You are not allowed to view this builder's project</response>
             <response code="404">The builder's project doesn't exist</response>
             <response code="200">Return builder's project</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetMeetingReports(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get builder's meeting reports
+            </summary>
+            <param name="builderId"></param>
+            <returns>The builder's meeting reports</returns>
+            <response code="400">Unexpected error while getting the builder meeting reports</response>
+            <response code="401">You are not allowed to view this builder's meeting reports</response>s
+            <response code="403">You are not allowed to view this builder's meeting reports</response>
+            <response code="200">Return meeting reports's project</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.GetCandidatingBuilders">
             <summary>
@@ -139,6 +150,16 @@
             <returns></returns>
             <response code="400">The project can't be submit</response>
             <response code="200">Return the submited project's id</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.CreateMeetingReport(System.String,BuildUp.API.Models.MeetingReports.CreateMeetingReportModel)">
+            <summary>
+            (Coach) Submit a new meeting report
+            </summary>
+            <param name="builderId" example="5f1fe90a58c8ab093c4f772a"></param>
+            <param name="createMeetingReportModel"></param>
+            <returns></returns>
+            <response code="400">The meeting report can't be created</response>
+            <response code="200">Return the created meeting report id</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.AssignCoach(System.String,BuildUp.API.Models.CoachAssignmentModel)">
             <summary>
@@ -814,6 +835,54 @@
             The answer to the question
             </summary>
             <example>My super answer</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.MeetingReport.BuilderId">
+            <summary>
+            The builder ID
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.MeetingReport.CoachId">
+            <summary>
+            The coach ID
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.MeetingReport.Date">
+            <summary>
+            The date when the repport was written
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.MeetingReport.NextMeetingDate">
+            <summary>
+            The date planned for the next meeting
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.MeetingReport.Objectif">
+            <summary>
+            What were the objectives for the meeting
+            </summary>
+            <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.MeetingReport.Evolution">
+            <summary>
+            Whate are the progress constated during the meeting
+            </summary>
+            <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.MeetingReport.WhatsNext">
+            <summary>
+            What is planned for the next meeting
+            </summary>
+            <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.MeetingReport.Comments">
+            <summary>
+            Some comments made by the coach
+            </summary>
+            <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
         </member>
         <member name="P:BuildUp.API.Entities.Notification.CoachNotification.Content">
             <summary>
@@ -1577,6 +1646,48 @@
             The coach description
             </summary>
             <example>I'm an awesome coach</example>
+        </member>
+        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.BuilderId">
+            <summary>
+            The builder ID
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.CoachId">
+            <summary>
+            The coach ID
+            </summary>
+            <example>5f1fe90a58c8ab093c4f772a</example>
+        </member>
+        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.NextMeetingDate">
+            <summary>
+            The date planned for the next meeting
+            </summary>
+            <example>2001-08-15T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.Objectif">
+            <summary>
+            What were the objectives for the meeting
+            </summary>
+            <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
+        </member>
+        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.Evolution">
+            <summary>
+            Whate are the progress constated during the meeting
+            </summary>
+            <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
+        </member>
+        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.WhatsNext">
+            <summary>
+            What is planned for the next meeting
+            </summary>
+            <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
+        </member>
+        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.Comments">
+            <summary>
+            Some comments made by the coach
+            </summary>
+            <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
         </member>
         <member name="P:BuildUp.API.Models.NtfReferentManageModel.FirstName">
             <summary>

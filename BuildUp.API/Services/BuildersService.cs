@@ -16,6 +16,7 @@ using BuildUp.API.Models;
 using BuildUp.API.Models.Projects;
 using BuildUp.API.Entities.Pdf;
 using BuildUp.API.Entities.Notification.CoachRequest;
+using BuildUp.API.Models.MeetingReports;
 
 namespace BuildUp.API.Services
 {
@@ -25,6 +26,7 @@ namespace BuildUp.API.Services
         private readonly IMongoCollection<Builder> _builders;
         private readonly IMongoCollection<Coach> _coachs;
         private readonly IMongoCollection<CoachRequest> _coachRequests;
+        private readonly IMongoCollection<MeetingReport> _meetingRepors;
 
         private readonly IFormsService _formsService;
         private readonly IProjectsService _projectsService;
@@ -41,6 +43,7 @@ namespace BuildUp.API.Services
             _builders = database.GetCollection<Builder>("builders");
             _coachs = database.GetCollection<Coach>("coachs");
             _coachRequests = database.GetCollection<CoachRequest>("coach_requests");
+            _meetingRepors = database.GetCollection<MeetingReport>("meeting_reports");
 
             _formsService = formsService;
             _projectsService = projectsService;
@@ -427,6 +430,96 @@ namespace BuildUp.API.Services
             )).ToListAsync();
 
             return activeBuilders;
+        }
+
+        public async Task<string> CreateMeetingReportAsync(string currentUserId, CreateMeetingReportModel toCreate)
+        {
+            Coach coach = await GetCoachFromUserId(currentUserId);
+
+            if (coach == null)
+            {
+                throw new Exception("The user is not a coach in the database...");
+            }
+
+            Builder builder = await GetBuilderFromBuilderId(toCreate.BuilderId);
+
+            if (builder == null)
+            {
+                throw new Exception("The builder for the meeting report doesn't exist...");
+            }
+
+            if (builder.CoachId != coach.Id)
+            {
+                throw new Exception("You are not the coach of the builder");
+            }
+
+            MeetingReport meetingReport = new MeetingReport()
+            {
+                BuilderId = toCreate.BuilderId,
+                CoachId = toCreate.CoachId,
+
+                Date = DateTime.Now,
+                NextMeetingDate = toCreate.NextMeetingDate,
+
+                Objectif = toCreate.Objectif,
+                Evolution = toCreate.Evolution,
+                WhatsNext = toCreate.WhatsNext,
+                Comments = toCreate.Comments
+            };
+
+            await _meetingRepors.InsertOneAsync(meetingReport);
+
+            return meetingReport.Id;
+        }
+
+        public async Task<List<MeetingReport>> GetMeetingReportsFromAdminAsync(string builderId)
+        {
+            var meetingReports = await _meetingRepors.FindAsync(databaseMeeting =>
+                databaseMeeting.BuilderId == builderId
+            );
+
+            return await meetingReports.ToListAsync();
+        }
+
+        public async Task<List<MeetingReport>> GetMeetingReportsFromCoachAsync(string currentUserId, string builderId)
+        {
+            Coach coach = await GetCoachFromUserId(currentUserId);
+
+            if (coach == null)
+            {
+                throw new Exception("The user is not a coach in the database...");
+            }
+
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null)
+            {
+                throw new Exception("The builder doesn't exist...");
+            }
+
+            if (builder.CoachId != coach.Id)
+            {
+                throw new Exception("You are not the coach of the builder");
+            }
+
+            return await GetMeetingReportsFromAdminAsync(builderId);
+        }
+
+        public async Task<List<MeetingReport>> GetMeetingReportsFromBuilderAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromUserId(currentUserId);
+
+            if (builder == null)
+            {
+                throw new Exception("The builder seems to not exist");
+            }
+
+            if (builder.Id != builderId)
+            {
+                throw new UnauthorizedAccessException("You can't view meetings report for this builder");
+            }
+
+            return await GetMeetingReportsFromAdminAsync(builderId);
         }
 
         private async Task<string> RegisterToDatabase(BuilderRegisterModel builderRegisterModel)

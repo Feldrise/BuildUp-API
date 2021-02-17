@@ -7,6 +7,7 @@ using BuildUp.API.Entities;
 using BuildUp.API.Entities.Form;
 using BuildUp.API.Models;
 using BuildUp.API.Models.Builders;
+using BuildUp.API.Models.MeetingReports;
 using BuildUp.API.Models.Projects;
 
 namespace BuildUp.API.Services.Interfaces
@@ -50,5 +51,10 @@ namespace BuildUp.API.Services.Interfaces
 
         Task<List<Builder>> GetCandidatingBuildersAsync();
         Task<List<Builder>> GetActiveBuildersAsync();
+
+        Task<string> CreateMeetingReportAsync(string currentUserId, CreateMeetingReportModel toCreate);
+        Task<List<MeetingReport>> GetMeetingReportsFromAdminAsync(string builderId);
+        Task<List<MeetingReport>> GetMeetingReportsFromCoachAsync(string currentUserId, string builderId);
+        Task<List<MeetingReport>> GetMeetingReportsFromBuilderAsync(string currentUserId, string builderId);
     }
 }

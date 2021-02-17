@@ -12,6 +12,7 @@ using BuildUp.API.Models;
 using BuildUp.API.Models.Builders;
 using BuildUp.API.Entities.Form;
 using BuildUp.API.Models.Projects;
+using BuildUp.API.Models.MeetingReports;
 
 namespace BuildUp.API.Controllers
 {
@@ -238,7 +239,7 @@ namespace BuildUp.API.Controllers
         /// (Builder,Coach,Admin) Get builder's project
         /// </summary>
         /// <param name="builderId"></param>
-        /// <returns>The builder's form answer</returns>
+        /// <returns>The builder's project</returns>
         /// <response code="401">You are not allowed to view this builder's project</response>s
         /// <response code="403">You are not allowed to view this builder's project</response>
         /// <response code="404">The builder's project doesn't exist</response>
@@ -277,6 +278,53 @@ namespace BuildUp.API.Controllers
             if (result == null)
             {
                 return NotFound();
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// (Builder,Coach,Admin) Get builder's meeting reports
+        /// </summary>
+        /// <param name="builderId"></param>
+        /// <returns>The builder's meeting reports</returns>
+        /// <response code="400">Unexpected error while getting the builder meeting reports</response>
+        /// <response code="401">You are not allowed to view this builder's meeting reports</response>s
+        /// <response code="403">You are not allowed to view this builder's meeting reports</response>
+        /// <response code="200">Return meeting reports's project</response>
+        [Authorize]
+        [HttpGet("{builderId:length(24)}/meeting_reports")]
+        public async Task<ActionResult<List<MeetingReport>>> GetMeetingReports(string builderId)
+        {
+            var currentUserId = User.Identity.Name;
+            List<MeetingReport> result;
+
+            try
+            {
+                if (User.IsInRole(Role.Admin))
+                {
+                    result = await _buildersService.GetMeetingReportsFromAdminAsync(builderId);
+                }
+                else if (User.IsInRole(Role.Coach))
+                {
+                    result = await _buildersService.GetMeetingReportsFromCoachAsync(currentUserId, builderId);
+                }
+                else if (User.IsInRole(Role.Builder))
+                {
+                    result = await _buildersService.GetMeetingReportsFromBuilderAsync(currentUserId, builderId);
+                }
+                else
+                {
+                    return Unauthorized("You must be part of the Buildup program");
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Unauthorized($"You don't have the right to do that: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't get the builder's meeting reports: {e.Message}");
             }
 
             return Ok(result);
@@ -354,6 +402,30 @@ namespace BuildUp.API.Controllers
             }
 
             await _buildersService.SubmitProjectAsync(projectSubmitModel);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// (Coach) Submit a new meeting report
+        /// </summary>
+        /// <param name="builderId" example="5f1fe90a58c8ab093c4f772a"></param>
+        /// <param name="createMeetingReportModel"></param>
+        /// <returns></returns>
+        /// <response code="400">The meeting report can't be created</response>
+        /// <response code="200">Return the created meeting report id</response>
+        [Authorize(Roles = Role.Coach)]
+        [HttpPost("{builderId:length(24)}/meeting_reports")]
+        public async Task<ActionResult<string>> CreateMeetingReport(string builderId, [FromBody] CreateMeetingReportModel createMeetingReportModel)
+        {
+            var currentUserId = User.Identity.Name;
+
+            if (builderId != createMeetingReportModel.BuilderId)
+            {
+                return BadRequest("The submitted meeting report doesn't have the same builder ID as the current builder");
+            }
+
+            await _buildersService.CreateMeetingReportAsync(currentUserId, createMeetingReportModel);
 
             return Ok();
         }
