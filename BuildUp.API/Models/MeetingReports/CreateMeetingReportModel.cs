@@ -11,22 +11,6 @@ namespace BuildUp.API.Models.MeetingReports
     public class CreateMeetingReportModel
     {
         /// <summary>
-        /// The builder ID
-        /// </summary>
-        /// <example>5f1fe90a58c8ab093c4f772a</example>
-        [BsonRepresentation(BsonType.ObjectId)]
-        [Required]
-        public string BuilderId { get; set; }
-
-        /// <summary>
-        /// The coach ID
-        /// </summary>
-        /// <example>5f1fe90a58c8ab093c4f772a</example>
-        [BsonRepresentation(BsonType.ObjectId)]
-        [Required]
-        public string CoachId { get; set; }
-
-        /// <summary>
         /// The date planned for the next meeting
         /// </summary>
         /// <example>2001-08-15T14:40:04.1351158+01:00</example>

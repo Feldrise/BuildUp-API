@@ -432,7 +432,7 @@ namespace BuildUp.API.Services
             return activeBuilders;
         }
 
-        public async Task<string> CreateMeetingReportAsync(string currentUserId, CreateMeetingReportModel toCreate)
+        public async Task<string> CreateMeetingReportAsync(string currentUserId, string builderId, CreateMeetingReportModel toCreate)
         {
             Coach coach = await GetCoachFromUserId(currentUserId);
 
@@ -441,7 +441,7 @@ namespace BuildUp.API.Services
                 throw new Exception("The user is not a coach in the database...");
             }
 
-            Builder builder = await GetBuilderFromBuilderId(toCreate.BuilderId);
+            Builder builder = await GetBuilderFromBuilderId(builderId);
 
             if (builder == null)
             {
@@ -450,13 +450,13 @@ namespace BuildUp.API.Services
 
             if (builder.CoachId != coach.Id)
             {
-                throw new Exception("You are not the coach of the builder");
+                throw new UnauthorizedAccessException("You are not the coach of the builder");
             }
 
             MeetingReport meetingReport = new MeetingReport()
             {
-                BuilderId = toCreate.BuilderId,
-                CoachId = toCreate.CoachId,
+                BuilderId = builderId,
+                CoachId = coach.Id,
 
                 Date = DateTime.Now,
                 NextMeetingDate = toCreate.NextMeetingDate,

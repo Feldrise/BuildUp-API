@@ -159,6 +159,8 @@
             <param name="createMeetingReportModel"></param>
             <returns></returns>
             <response code="400">The meeting report can't be created</response>
+            <response code="401">You are not authorized to create the meeting report</response>
+            <response code="403">You are not authorized to create the meeting report</response>
             <response code="200">Return the created meeting report id</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.AssignCoach(System.String,BuildUp.API.Models.CoachAssignmentModel)">
@@ -1646,18 +1648,6 @@
             The coach description
             </summary>
             <example>I'm an awesome coach</example>
-        </member>
-        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.BuilderId">
-            <summary>
-            The builder ID
-            </summary>
-            <example>5f1fe90a58c8ab093c4f772a</example>
-        </member>
-        <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.CoachId">
-            <summary>
-            The coach ID
-            </summary>
-            <example>5f1fe90a58c8ab093c4f772a</example>
         </member>
         <member name="P:BuildUp.API.Models.MeetingReports.CreateMeetingReportModel.NextMeetingDate">
             <summary>

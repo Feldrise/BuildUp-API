@@ -413,6 +413,8 @@ namespace BuildUp.API.Controllers
         /// <param name="createMeetingReportModel"></param>
         /// <returns></returns>
         /// <response code="400">The meeting report can't be created</response>
+        /// <response code="401">You are not authorized to create the meeting report</response>
+        /// <response code="403">You are not authorized to create the meeting report</response>
         /// <response code="200">Return the created meeting report id</response>
         [Authorize(Roles = Role.Coach)]
         [HttpPost("{builderId:length(24)}/meeting_reports")]
@@ -420,12 +422,18 @@ namespace BuildUp.API.Controllers
         {
             var currentUserId = User.Identity.Name;
 
-            if (builderId != createMeetingReportModel.BuilderId)
+            try
             {
-                return BadRequest("The submitted meeting report doesn't have the same builder ID as the current builder");
+                await _buildersService.CreateMeetingReportAsync(currentUserId, builderId, createMeetingReportModel);
             }
-
-            await _buildersService.CreateMeetingReportAsync(currentUserId, createMeetingReportModel);
+            catch (UnauthorizedAccessException e)
+            {
+                return Unauthorized($"You are not authorized: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Their was an error creating the meeting report: {e.Message}");
+            }
 
             return Ok();
         }

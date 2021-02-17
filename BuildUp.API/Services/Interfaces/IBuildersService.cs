@@ -52,7 +52,7 @@ namespace BuildUp.API.Services.Interfaces
         Task<List<Builder>> GetCandidatingBuildersAsync();
         Task<List<Builder>> GetActiveBuildersAsync();
 
-        Task<string> CreateMeetingReportAsync(string currentUserId, CreateMeetingReportModel toCreate);
+        Task<string> CreateMeetingReportAsync(string currentUserId, string builderId, CreateMeetingReportModel toCreate);
         Task<List<MeetingReport>> GetMeetingReportsFromAdminAsync(string builderId);
         Task<List<MeetingReport>> GetMeetingReportsFromCoachAsync(string currentUserId, string builderId);
         Task<List<MeetingReport>> GetMeetingReportsFromBuilderAsync(string currentUserId, string builderId);
