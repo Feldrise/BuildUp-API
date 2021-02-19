@@ -32,7 +32,7 @@ namespace BuildUp.API.Controllers
         /// (Admin) Get all coachs
         /// </summary>
         /// <returns>All coachs</returns>
-        /// <response code="401">You are not allowed to view coachs</response>
+        /// <response code="401">You don't have enough permissions</response>
         /// <response code="200">Return all coachs</response>
         [Authorize(Roles = Role.Admin)]
         [HttpGet]
@@ -46,14 +46,16 @@ namespace BuildUp.API.Controllers
         /// <summary>
         /// (Coach,Admin) Get a coach from his user's ID
         /// </summary>
-        /// <param name="id" exemple="5f1fe90a58c8ab093c4f772a"></param>
-        /// <returns>The coach with all informations</returns>
+        /// <param name="userId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns>The coach corresponding to the user id</returns>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response
         /// <response code="403">You are not allowed to view this coach info</response>
         /// <response code="404">The coach doesn't exist</response>
         /// <response code="200">Return the coach infos</response>
         [Authorize(Roles = Role.Admin + "," + Role.Coach)]
-        [HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<Coach>> GetCoach(string id)
+        [HttpGet("{userId:length(24)}")]
+        public async Task<ActionResult<Coach>> GetCoach(string userId)
         {
             var currentUserId = User.Identity.Name;
             Coach coach;
@@ -62,16 +64,20 @@ namespace BuildUp.API.Controllers
             {
                 if (User.IsInRole(Role.Admin))
                 {
-                    coach = await _coachService.GetCoachFromAdminAsync(id);
+                    coach = await _coachService.GetCoachFromAdminAsync(userId);
                 }
                 else if (User.IsInRole(Role.Coach))
                 {
-                    coach = await _coachService.GetCoachFromCoachAsync(currentUserId, id);
+                    coach = await _coachService.GetCoachFromCoachAsync(currentUserId, userId);
                 }
                 else
                 {
                     return Forbid("You must be part of the Buildup program");
                 }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not authorized to view this coach info: {e.Message}");
             }
             catch (Exception e)
             {
@@ -87,13 +93,15 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Builder,Admin) Return the user corresponding to the coach
+        /// (Builder,Coach,Admin) Return the user corresponding to the coach
         /// </summary>
         /// <param name="coachId"></param>
         /// <returns></returns>
-        /// <response code="403">You are not allowed to view this user info</response>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response
+        /// <response code="403">You are not allowed to view this builder user</response>
         /// <response code="404">The user doesn't exist</response>
-        /// <response code="200">Return user infos</response>
+        /// <response code="200">Return the user's infos</response>
         [Authorize(Roles = Role.Admin + "," + Role.Builder)]
         [HttpGet("{coachId:length(24)}/user")]
         public async Task<ActionResult<User>> GetUser(string coachId)
@@ -120,6 +128,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to get user's info: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't get the user: {e.Message}");
@@ -132,15 +144,59 @@ namespace BuildUp.API.Controllers
 
             return Ok(user);
         }
+        /// <summary>
+        /// (Admin) Get candidating coachs
+        /// </summary>
+        /// <returns>A list of candidating coachs</returns>
+        /// <response code="401">You don't have enough permissions</response>
+        /// <response code="200">return a list of candidating coachs</response>
+        [Authorize(Roles = Role.Admin)]
+        [HttpGet("candidating")]
+        public async Task<ActionResult<List<Coach>>> GetCandidatingCoachs()
+        {
+            var result = await _coachService.GetCandidatingCoachsAsync();
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// (Admin) Get active coachs
+        /// </summary>
+        /// <returns>A list of active coachs</returns>
+        /// <response code="401">You don't have enough permissions</response>
+        /// <response code="200">return a list of active coachs</response>
+        [Authorize(Roles = Role.Admin)]
+        [HttpGet("active")]
+        public async Task<ActionResult<List<Coach>>> GetActiveCoachs()
+        {
+            var result = await _coachService.GetActiveCoachsAsync();
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// (Builder,Admin) Get available coachs
+        /// </summary>
+        /// <returns>A list of available coachs</returns>
+        /// <response code="401">You don't have enough permissions</response>
+        /// <response code="200">return a list of available coachs</response>
+        [Authorize(Roles = Role.Builder + "," + Role.Admin)]
+        [HttpGet("available")]
+        public async Task<ActionResult<List<AvailableCoachModel>>> GetAvailableCoachs()
+        {
+            var result = await _coachService.GetAvailableCoachAsync();
+
+            return Ok(result);
+        }
 
         /// <summary>
         /// (Admin,Coach) Get the builders of a coach
         /// </summary>
         /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns>The coach's builder</returns>
-        /// <response code="401">You are not allowed to view this coach's builders</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to view this coach's builders</response>
-        /// <response code="404">The coach's builders doesn't exist</response>
         /// <response code="200">Return coach's builders</response>
         [Authorize(Roles = Role.Admin + "," + Role.Coach)]
         [HttpGet("{coachId:length(24)}/builders")]
@@ -164,6 +220,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to get the builders: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't get the builders: {e.Message}");
@@ -173,34 +233,13 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Builder,Coach,Admin) Get the coach's card
-        /// </summary>
-        /// <param name="coachId" example="5f1fe90a58c8ab093c4f772a"></param>
-        /// <returns></returns>
-        /// <response code="401">You are not allowed to view coach's card</response>
-        /// <response code="404">The coach's card was not found</response>
-        /// <response code="200">Return coach's card</response>
-        [HttpGet("{coachId:length(24)}/card")]
-        public async Task<ActionResult<byte[]>> GetBuilderCard(string coachId)
-        {
-            var image = await _coachService.GetCoachCardAsync(coachId);
-
-            if (image == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(image);
-        }
-
-        /// <summary>
         /// (Coach,Admin) Get coach's form answers
         /// </summary>
         /// <param name="coachId"></param>
         /// <returns>The builder's form answer</returns>
-        /// <response code="401">You are not allowed to view this coach's form</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to view this coach's form</response>
-        /// <response code="404">The coach's form doesn't exist</response>
         /// <response code="200">Return coach's form</response>
         [Authorize]
         [HttpGet("{coachId:length(24)}/form")]
@@ -224,17 +263,37 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"Impossible to get the coach's form: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't get the coach's form: {e.Message}");
             }
 
-            if (result == null)
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// (Builder,Coach,Admin) Get the coach's card
+        /// </summary>
+        /// <param name="coachId" example="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns></returns>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="404">The coach's card was not found</response>
+        /// <response code="200">Return coach's card</response>
+        [HttpGet("{coachId:length(24)}/card")]
+        public async Task<ActionResult<byte[]>> GetBuilderCard(string coachId)
+        {
+            var image = await _coachService.GetCoachCardAsync(coachId);
+
+            if (image == null)
             {
                 return NotFound();
             }
 
-            return Ok(result);
+            return Ok(image);
         }
 
         /// <summary>
@@ -306,55 +365,10 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Admin) Get candidating coachs
-        /// </summary>
-        /// <returns>A list of candidating coachs</returns>
-        /// <response code="401">You are not allowed to view candidating coachs</response>
-        /// <response code="200">return a list of candidating coachs</response>
-        [Authorize(Roles = Role.Admin)]
-        [HttpGet("candidating")]
-        public async Task<ActionResult<List<Coach>>> GetCandidatingCoachs()
-        {
-            var result = await _coachService.GetCandidatingCoachsAsync();
-
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// (Admin) Get active coachs
-        /// </summary>
-        /// <returns>A list of active coachs</returns>
-        /// <response code="401">You are not allowed to view active coachs</response>
-        /// <response code="200">return a list of active coachs</response>
-        [Authorize(Roles = Role.Admin)]
-        [HttpGet("active")]
-        public async Task<ActionResult<List<Coach>>> GetActiveCoachs()
-        {
-            var result = await _coachService.GetActiveCoachsAsync();
-
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// (Builder,Admin) Get available coachs
-        /// </summary>
-        /// <returns>A list of available coachs</returns>
-        /// <response code="401">You are not allowed to view available coachs</response>
-        /// <response code="200">return a list of available coachs</response>
-        [Authorize(Roles = Role.Builder + "," + Role.Admin)]
-        [HttpGet("available")]
-        public async Task<ActionResult<List<AvailableCoachModel>>> GetAvailableCoachs()
-        {
-            var result = await _coachService.GetAvailableCoachAsync();
-
-            return Ok(result);
-        }
-
-        /// <summary>
         /// (*) Register the coach
         /// </summary>
         /// <param name="coachRegisterModel"></param>
-        /// <returns>The registered user ID</returns>
+        /// <returns>The registered coach ID</returns>
         /// <response code="400">The coach can't be registered</response>
         /// <response code="200">Return the registered coach id</response>
         [AllowAnonymous]
@@ -375,43 +389,12 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Coach) Sign the coach integration paper
-        /// </summary>
-        /// <param name="coachId" example="5f1fed8458c8ab093c4f77bf"></param>
-        /// <returns>If the PDF was successfully generated</returns>
-        /// <response code="401">You are not allowed to sign</response>
-        /// <response code="403">You are not allowed to sign</response>
-        /// <response code="200">The paper was successfully signed</response>
-        [Authorize(Roles = Role.Coach)]
-        [HttpPut("{coachId:length(24)}/sign_integration")]
-        public async Task<IActionResult> SignIntegration(string coachId)
-        {
-            var currentUserId = User.Identity.Name;
-
-            try
-            {
-                var sucess = await _coachService.SignFicheIntegrationAsync(currentUserId, coachId);
-            
-                if (sucess)
-                {
-                    return Ok(true);
-                }
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-
-            return BadRequest("The PDF can't be generated");
-        }
-
-        /// <summary>
         /// (Coach,Admin) Update a coach
         /// </summary>
         /// <param name="coachId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <param name="coachUpdateModel"></param>
         /// <returns></returns>
-        /// <response code="401">You are not allowed to update this coach</response>
+        /// <response code="401">You don't have enough permissions</response>
         /// <response code="403">You are not allowed to update this coach</response>
         /// <response code="200">The coach has been successfully updated</response>
         [Authorize(Roles = Role.Admin + "," + Role.Coach)]
@@ -435,6 +418,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to update this coach: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't update the coach: {e.Message}");
@@ -448,7 +435,7 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <param name="coachId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <returns></returns>
-        /// <response code="401">You are not allowed to refuse this coach</response>
+        /// <response code="401">You don't have enough permissions</response>
         /// <response code="200">The coach has been successfully refused</response>
         [Authorize(Roles = Role.Admin)]
         [HttpPut("{coachId:length(24)}/refuse")]
@@ -460,12 +447,47 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// (Coach) Sign the coach integration paper
+        /// </summary>
+        /// <param name="coachId" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <returns>If the PDF was successfully generated</returns>
+        /// <response code="401">You don't have enough permissions</response>
+        /// <response code="403">You are not allowed to sign</response>
+        /// <response code="200">The paper was successfully signed</response>
+        [Authorize(Roles = Role.Coach)]
+        [HttpPut("{coachId:length(24)}/sign_integration")]
+        public async Task<IActionResult> SignIntegration(string coachId)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                var sucess = await _coachService.SignFicheIntegrationAsync(currentUserId, coachId);
+
+                if (sucess)
+                {
+                    return Ok(true);
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to sign: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Signing was unsuccessfull: {e.Message}");
+            }
+
+            return BadRequest("The PDF can't be generated");
+        }
+
+        /// <summary>
         /// (Coach) Accept a coach request
         /// </summary>
         /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <param name="requestId" exemple="5f1fe90a58c8ab093c4f772a"></param>
-        /// <response code="400">Their was an error accepting the request</response> 
-        /// <response code="401">You are not allowed to accept the requests</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to accept the requests</response>
         /// <response code="200">The request has been accepted</response>
         [Authorize(Roles = Role.Coach)]
@@ -484,6 +506,10 @@ namespace BuildUp.API.Controllers
                 {
                     return Forbid("You must be a coach");
                 }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to accept this request: {e.Message}");
             }
             catch (Exception e)
             {
@@ -518,6 +544,10 @@ namespace BuildUp.API.Controllers
                 {
                     return Forbid("You must be a coach");
                 }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"Can't refuse the request: {e.Message}");
             }
             catch (Exception e)
             {
