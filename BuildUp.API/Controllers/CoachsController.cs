@@ -519,13 +519,13 @@ namespace BuildUp.API.Controllers
             return Ok();
         }
 
-        // <summary>
+        /// <summary>
         /// (Coach) Refuse a coach request
         /// </summary>
         /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <param name="requestId" exemple="5f1fe90a58c8ab093c4f772a"></param>
-        /// <response code="400">Their was an error refusing the request</response> 
-        /// <response code="401">You are not allowed to refuse the requests</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to refuse the requests</response>
         /// <response code="200">The request has been refused</response>
         [Authorize(Roles = Role.Coach)]

@@ -75,9 +75,7 @@ namespace BuildUp.API.Services
 
             if (coach == null) throw new Exception("The coach doesn't exist");
 
-            return await (await _users.FindAsync(databaseUser =>
-                databaseUser.Id == coach.UserId
-            )).FirstOrDefaultAsync();
+            return await GetUserFromId(coach.Id);
         }
 
         public async Task<User> GetUserFromCoachAsync(string currentUserId, string coachId)
@@ -87,9 +85,7 @@ namespace BuildUp.API.Services
             if (coach == null) throw new Exception("The coach doesn't exist");
             if (coach.UserId != currentUserId) throw new UnauthorizedAccessException("You are not the user corresponding this coach");
 
-            return await (await _users.FindAsync(databaseUser =>
-                databaseUser.Id == coach.UserId
-            )).FirstOrDefaultAsync();
+            return await GetUserFromId(coach.UserId);
         }
 
         public async Task<User> GetUserFromBuilderAsync(string currentUserId, string coachId)
@@ -103,9 +99,7 @@ namespace BuildUp.API.Services
 
             if (coach == null) throw new Exception("The coach doesn't exist");
 
-            return await (await _users.FindAsync(databaseUser =>
-                databaseUser.Id == coach.UserId
-            )).FirstOrDefaultAsync();
+            return await GetUserFromId(coach.UserId);
         }
 
         // Getting "specific" coachs

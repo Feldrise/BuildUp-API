@@ -33,7 +33,8 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <param name="id" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns>The builder with all informations</returns>
-        /// <response code="403">You are not allowed to view this builder info</response>
+        /// <response code="401">You are not allowed to refuse the requests</response>s
+        /// <response code="403"></response>
         /// <response code="404">The builder doesn't exist</response>
         /// <response code="200">Return builder infos</response>
         [Authorize]
@@ -62,6 +63,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to view this builder: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't get the builder: {e.Message}");
@@ -76,12 +81,13 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Builder,Admin) Return the user corresponding to the builder
+        /// (Builder,Coach,Admin) Return the user corresponding to the builder
         /// </summary>
         /// <param name="builderId"></param>
         /// <returns></returns>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to view this user info</response>
-        /// <response code="404">The user doesn't exist</response>
         /// <response code="200">Return user infos</response>
         [Authorize(Roles = Role.Admin + "," + Role.Coach + "," + Role.Builder)]
         [HttpGet("{builderId:length(24)}/user")]
@@ -109,6 +115,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to get this user: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't get the user: {e.Message}");
@@ -123,24 +133,33 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Builder,Coach,Admin) Get the builder's card
+        /// (Admin) Get candidating builders
         /// </summary>
-        /// <param name="builderId" example="5f1fe90a58c8ab093c4f772a"></param>
-        /// <returns></returns>
-        /// <response code="401">You are not allowed to view builder's card</response>
-        /// <response code="404">The builder's card was not found</response>
-        /// <response code="200">Return builder's card</response>
-        [HttpGet("{builderId:length(24)}/card")]
-        public async Task<ActionResult<byte[]>> GetBuilderCard(string builderId)
+        /// <returns>A list of candidating builders</returns>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="200">return a list of candidating builders</response>
+        [Authorize(Roles = Role.Admin)]
+        [HttpGet("candidating")]
+        public async Task<ActionResult<List<Builder>>> GetCandidatingBuilders()
         {
-            var image = await _buildersService.GetBuilderCardAsync(builderId);
+            var result = await _buildersService.GetCandidatingBuildersAsync();
 
-            if (image == null)
-            {
-                return NotFound();
-            }
+            return Ok(result);
+        }
 
-            return Ok(image);
+        /// <summary>
+        /// (Admin) Get active builders
+        /// </summary>
+        /// <returns>A list of active builders</returns>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="200">return a list of active builders</response>
+        [Authorize(Roles = Role.Admin)]
+        [HttpGet("active")]
+        public async Task<ActionResult<List<Builder>>> GetActiveBuilders()
+        {
+            var result = await _buildersService.GetActiveBuildersAsync();
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -148,7 +167,8 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns>The builder's coach</returns>
-        /// <response code="401">You are not allowed to view this builder's coach</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to view this builder's coach</response>
         /// <response code="404">The builder's coach doesn't exist</response>
         /// <response code="200">Return builder's coach</response>
@@ -174,6 +194,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to get the builder's coach: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't get the coach: {e.Message}");
@@ -192,7 +216,8 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <param name="builderId"></param>
         /// <returns>The builder's form answer</returns>
-        /// <response code="401">You are not allowed to view this builder's form</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to view this builder's form</response>
         /// <response code="404">The builder's form doesn't exist</response>
         /// <response code="200">Return builder's form</response>
@@ -222,6 +247,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to view this form: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't get the builder's form: {e.Message}");
@@ -240,7 +269,8 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <param name="builderId"></param>
         /// <returns>The builder's project</returns>
-        /// <response code="401">You are not allowed to view this builder's project</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to view this builder's project</response>
         /// <response code="404">The builder's project doesn't exist</response>
         /// <response code="200">Return builder's project</response>
@@ -270,6 +300,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to see this project: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't get the builder's project: {e.Message}");
@@ -281,6 +315,27 @@ namespace BuildUp.API.Controllers
             }
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// (Builder,Coach,Admin) Get the builder's card
+        /// </summary>
+        /// <param name="builderId" example="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns></returns>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="404">The builder's card was not found</response>
+        /// <response code="200">Return builder's card</response>
+        [HttpGet("{builderId:length(24)}/card")]
+        public async Task<ActionResult<byte[]>> GetBuilderCard(string builderId)
+        {
+            var image = await _buildersService.GetBuilderCardAsync(builderId);
+
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(image);
         }
 
         /// <summary>
@@ -320,7 +375,7 @@ namespace BuildUp.API.Controllers
             }
             catch (UnauthorizedAccessException e)
             {
-                return Unauthorized($"You don't have the right to do that: {e.Message}");
+                return Unauthorized($"You are not allowed to get reports: {e.Message}");
             }
             catch (Exception e)
             {
@@ -331,41 +386,11 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Admin) Get candidating builders
-        /// </summary>
-        /// <returns>A list of candidating builders</returns>
-        /// <response code="401">You are not allowed to view candidating builders</response>
-        /// <response code="200">return a list of candidating builders</response>
-        [Authorize(Roles = Role.Admin)]
-        [HttpGet("candidating")]
-        public async Task<ActionResult<List<Builder>>> GetCandidatingBuilders()
-        {
-            var result = await _buildersService.GetCandidatingBuildersAsync();
-
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// (Admin) Get active builders
-        /// </summary>
-        /// <returns>A list of active builders</returns>
-        /// <response code="401">You are not allowed to view active builders</response>
-        /// <response code="200">return a list of active builders</response>
-        [Authorize(Roles = Role.Admin)]
-        [HttpGet("active")]
-        public async Task<ActionResult<List<Builder>>> GetActiveBuilders()
-        {
-            var result = await _buildersService.GetActiveBuildersAsync();
-
-            return Ok(result);
-        }
-
-        /// <summary>
         /// (*) Register the builder
         /// </summary>
         /// <param name="builderRegisterModel" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <returns>The registered user ID</returns>
-        /// <response code="400">The builder can't be registered</response>
+        /// <response code="400">There was an error in the request</response>
         /// <response code="200">Return the registered builder id</response>
         [AllowAnonymous]
         [HttpPost("register")]
@@ -390,7 +415,8 @@ namespace BuildUp.API.Controllers
         /// <param name="builderId" example="5f1fe90a58c8ab093c4f772a"></param>
         /// <param name="projectSubmitModel"></param>
         /// <returns></returns>
-        /// <response code="400">The project can't be submit</response>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="403">You are not allowed to submit project for this builder</response>s
         /// <response code="200">Return the submited project's id</response>
         [AllowAnonymous]
         [HttpPost("{builderId:length(24)}/submit_project")]
@@ -398,10 +424,44 @@ namespace BuildUp.API.Controllers
         {
             if (builderId != projectSubmitModel.BuilderId)
             {
-                return BadRequest("The submitted project doesn't have the same builder ID as the current builder");
+                return Forbid("The submitted project doesn't have the same builder ID as the current builder");
             }
 
-            await _buildersService.SubmitProjectAsync(projectSubmitModel);
+            string projectId;
+
+            try
+            {
+                projectId = await _buildersService.SubmitProjectAsync(projectSubmitModel);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't submit the project: {e.Message}");
+            }
+
+            return Ok(projectId);
+        }
+
+        /// <summary>
+        /// (Admin,Builder) Assigna coach to a builder
+        /// </summary>
+        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <param name="coachAssignmentModel"></param>
+        /// <returns></returns>
+        /// <response code="400">The meeting report can't be created</response>
+        /// <response code="401">You are not authorized to create the meeting report</response>
+        /// <response code="200">The coach has been successfully assigned</response>
+        [Authorize(Roles = Role.Admin + "," + Role.Builder)]
+        [HttpPost("{builderId:length(24)}/assign")]
+        public async Task<IActionResult> AssignCoach(string builderId, [FromBody] CoachAssignmentModel coachAssignmentModel)
+        {
+            try
+            {
+                await _buildersService.AssignCoachAsync(coachAssignmentModel.CoachId, builderId);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"There was an error assigning the coach: {e.Message}");
+            }
 
             return Ok();
         }
@@ -439,61 +499,13 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
-        /// (Admin,Builder) Assigna coach to a builder
-        /// </summary>
-        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
-        /// <param name="coachAssignmentModel"></param>
-        /// <returns></returns>
-        /// <response code="401">You are not allowed to view active builders</response>
-        /// <response code="200">The coach has been successfully assigned</response>
-        [Authorize(Roles = Role.Admin + "," + Role.Builder)]
-        [HttpPost("{builderId:length(24)}/assign")]
-        public async Task<IActionResult> AssignCoach(string builderId, [FromBody]CoachAssignmentModel coachAssignmentModel)
-        {
-            await _buildersService.AssignCoachAsync(coachAssignmentModel.CoachId, builderId);
-
-            return Ok();
-        }
-
-        /// <summary>
-        /// (Builder) Sign the builder integration paper
-        /// </summary>
-        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
-        /// <returns>If the PDF was successfully generated</returns>
-        /// <response code="401">You are not allowed to sign</response>
-        /// <response code="403">You are not allowed to sign</response>
-        /// <response code="200">The paper was successfully signed</response>
-        [Authorize(Roles = Role.Builder)]
-        [HttpPut("{builderId:length(24)}/sign_integration")]
-        public async Task<IActionResult> SignIntegration(string builderId)
-        {
-            var currentUserId = User.Identity.Name;
-
-            try
-            {
-                var sucess = await _buildersService.SignFicheIntegrationAsync(currentUserId, builderId);
-
-                if (sucess)
-                {
-                    return Ok(true);
-                }
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-
-            return BadRequest("The PDF can't be generated");
-        }
-
-
-        /// <summary>
         /// (Builder,Admin) Update a builder
         /// </summary>
         /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <param name="builderUpdateModel"></param>
         /// <returns></returns>
-        /// <response code="401">You are not allowed to update this builder</response>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to update this builder</response>
         /// <response code="200">The builder has been successfully updated</response>
         [Authorize(Roles = Role.Admin + "," + Role.Builder)]
@@ -517,6 +529,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not authorized to update this builder: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't update the builder: {e.Message}");
@@ -532,7 +548,8 @@ namespace BuildUp.API.Controllers
         /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <param name="projectUpdateModel"></param>
         /// <returns></returns>
-        /// <response code="401">You are not allowed to update this project</response>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to update this project</response>
         /// <response code="200">The project has been successfully updated</response>
         [Authorize(Roles = Role.Admin + "," + Role.Builder)]
@@ -556,6 +573,10 @@ namespace BuildUp.API.Controllers
                     return Forbid("You must be part of the Buildup program");
                 }
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to update this project: {e.Message}");
+            }
             catch (Exception e)
             {
                 return BadRequest($"Can't update the project: {e.Message}");
@@ -564,13 +585,12 @@ namespace BuildUp.API.Controllers
             return Ok();
         }
 
-
         /// <summary>
         /// (Admin) Refuse a builder
         /// </summary>
         /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <returns></returns>
-        /// <response code="401">You are not allowed to refuse this builder</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="200">The builder has been successfully refused</response>
         [Authorize(Roles = Role.Admin)]
         [HttpPut("{builderId:length(24)}/refuse")]
@@ -580,5 +600,42 @@ namespace BuildUp.API.Controllers
 
             return Ok();
         }
+
+        /// <summary>
+        /// (Builder) Sign the builder integration paper
+        /// </summary>
+        /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
+        /// <returns>If the PDF was successfully generated</returns>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="403">You are not allowed to sign</response>
+        /// <response code="200">The paper was successfully signed</response>
+        [Authorize(Roles = Role.Builder)]
+        [HttpPut("{builderId:length(24)}/sign_integration")]
+        public async Task<IActionResult> SignIntegration(string builderId)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                var sucess = await _buildersService.SignFicheIntegrationAsync(currentUserId, builderId);
+
+                if (sucess)
+                {
+                    return Ok(true);
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to sign: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return BadRequest("The PDF can't be generated");
+        }
+
     }
 }

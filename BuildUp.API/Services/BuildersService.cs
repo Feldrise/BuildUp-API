@@ -52,6 +52,7 @@ namespace BuildUp.API.Services
             _notificationService = notificationService;
         }
 
+        // Getting the builder
         public Task<Builder> GetBuilderFromAdminAsync(string userId)
         {
             return GetBuilderFromUserId(userId);
@@ -61,7 +62,7 @@ namespace BuildUp.API.Services
         {
             Coach coach = await GetCoachFromUserId(currentUserId);
 
-            if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
+            if (coach == null) throw new UnauthorizedAccessException("The current user is not a coach");
 
             Builder builder = await GetBuilderFromUserId(userId);
 
@@ -69,6 +70,8 @@ namespace BuildUp.API.Services
             {
                 return null;
             }
+
+            if (builder.CoachId != coach.Id) throw new UnauthorizedAccessException("You are not the coach of this builder");
 
             return (builder.CoachId == coach.Id) ? builder : null;
         }
@@ -82,38 +85,32 @@ namespace BuildUp.API.Services
                 return null;
             }
 
-            if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see info", "currentUserId");
+            if (builder.UserId != currentUserId) throw new UnauthorizedAccessException("You are not the builder you want's to see info");
 
             return builder;
         }
 
+        // Getting the user corresponding to the builder
         public async Task<User> GetUserFromAdminAsync(string builderId)
         {
             Builder builder = await GetBuilderFromBuilderId(builderId);
 
             if (builder == null) throw new Exception("The builder doesn't exist");
 
-            return await (await _users.FindAsync(databaseUser =>
-                databaseUser.Id == builder.UserId
-            )).FirstOrDefaultAsync();
+            return await GetUserFromId(builder.UserId);
         }
 
         public async Task<User> GetUserFromCoachAsync(string currentUserId, string builderId)
         {
             Coach coach = await GetCoachFromUserId(currentUserId);
 
-            if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
+            if (coach == null) throw new UnauthorizedAccessException("The current user is not a coach");
 
             Builder builder = await GetBuilderFromBuilderId(builderId);
 
-            if (builder == null || builder.CoachId != coach.Id)
-            {
-                throw new Exception("You can't get user for this builder");
-            }
+            if (builder == null || builder.CoachId != coach.Id) throw new UnauthorizedAccessException("You are not the coach of this builder");
 
-            return await (await _users.FindAsync(databaseUser =>
-                databaseUser.Id == builder.UserId
-            )).FirstOrDefaultAsync();
+            return await GetUserFromId(builder.UserId);
         }
 
         public async Task<User> GetUserFromBuilderAsync(string currentUserId, string builderId)
@@ -122,148 +119,34 @@ namespace BuildUp.API.Services
 
             if (builder == null) throw new Exception("The builder doesn't exist");
 
-            if (builder.UserId != currentUserId)
-            {
-                throw new Exception("You can't get user for this builder");
-            }
+            if (builder.UserId != currentUserId) throw new UnauthorizedAccessException("You are not the builder");
 
-            return await (await _users.FindAsync(databaseUser =>
-                databaseUser.Id == builder.UserId
-            )).FirstOrDefaultAsync();
+            return await GetUserFromId(builder.Id);
         }
 
-        public async Task<byte[]> GetBuilderCardAsync(string builderId)
+        // Getting "specific" builder
+        public async Task<List<Builder>> GetCandidatingBuildersAsync()
         {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
+            var candidatingBuilders = await (await _builders.FindAsync(databaseBuilder =>
+                databaseBuilder.Status == BuilderStatus.Candidating
+            )).ToListAsync();
 
-            if (builder == null || builder.BuilderCardId == null) { return null; }
-
-            return (await _filesService.GetFile(builder.BuilderCardId)).Data;
+            return candidatingBuilders;
         }
 
-        public async Task<Coach> GetCoachForBuilderFromAdminAsync(string builderId)
+        public async Task<List<Builder>> GetActiveBuildersAsync()
         {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
+            var activeBuilders = await (await _builders.FindAsync(databaseBuilder =>
+                databaseBuilder.Status == BuilderStatus.Validated
+            )).ToListAsync();
 
-            if (builder == null)
-            {
-                return null;
-            }
-
-            return await GetCoachFromId(builder.CoachId);
+            return activeBuilders;
         }
 
-        public async Task<Coach> GetCoachForBuilderFromBuilderAsync(string currentUserId, string builderId)
-        {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null || builder.UserId != currentUserId)
-            {
-                throw new Exception("This builder can view this coach");
-            }
-
-            return await GetCoachFromId(builder.CoachId);
-        }
-
-        public async Task<List<BuildupFormQA>> GetBuilderFormFromAdminAsync(string builderId)
-        {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null)
-            {
-                return null;
-            }
-
-            return await _formsService.GetFormQAsAsync(builder.UserId);
-        }
-
-        public async Task<List<BuildupFormQA>> GetBuilderFormFromCoachAsync(string currentUserId, string builderId)
-        {
-            Coach coach = await GetCoachFromUserId(currentUserId);
-
-            if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
-
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null || builder.CoachId != coach.Id)
-            {
-                return null;
-            }
-
-            return await _formsService.GetFormQAsAsync(builder.UserId);
-        }
-
-        public async Task<List<BuildupFormQA>> GetBuilderFormFromBuilderAsync(string currentUserId, string builderId)
-        {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null)
-            {
-                return null;
-            }
-
-            if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see form answers", "currentUserId");
-
-            return await _formsService.GetFormQAsAsync(builder.UserId);
-        }
-
-        public async Task<Project> GetBuilderProjectFromAdminAsync(string builderId)
-        {
-            return await _projectsService.GetProjectAsync(builderId);
-        }
-
-        public async Task<Project> GetBuilderProjectFromCoachAsync(string currentUserId, string builderId)
-        {
-            Coach coach = await GetCoachFromUserId(currentUserId);
-
-            if (coach == null) throw new ArgumentException("The current user is not a coach", "currentUserId");
-
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null || builder.CoachId != coach.Id)
-            {
-                return null;
-            }
-
-            return await _projectsService.GetProjectAsync(builderId);
-        }
-
-        public async Task<Project> GetBuilderProjectFromBuilderAsync(string currentUserId, string builderId)
-        {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null)
-            {
-                return null;
-            }
-
-            if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see the project", "currentUserId");
-
-            return await _projectsService.GetProjectAsync(builderId);
-        }
-
-        public async Task UpdateProjectFromAdmin(string projectId, ProjectUpdateModel projectUpdateModel)
-        {
-            await _projectsService.UpdateProjectAsync(projectId, projectUpdateModel);
-        }
-        public async Task UpdateProjectFromBuilder(string currentUserId, string builderId, string projectId, ProjectUpdateModel projectUpdateModel)
-        {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null)
-            {
-                throw new Exception("The builder doesn't exist, you may not be authorized to permorm actions");
-            }
-            
-            if (builder.UserId != currentUserId) throw new ArgumentException("The current user is not the builder he want's to see the project", "currentUserId");
-
-            await _projectsService.UpdateProjectAsync(projectId, projectUpdateModel);
-        }
-
-
+        // Register the builder
         public async Task<string> RegisterBuilderAsync(BuilderRegisterModel builderRegisterModel)
         {
-            if (!UserExist(builderRegisterModel.UserId)) throw new ArgumentException("The user doesn't existe", "builderRegisterModel.UserId");
+            if (!UserExist(builderRegisterModel.UserId)) throw new Exception("The user doesn't existe");
             if (BuilderExist(builderRegisterModel.UserId)) throw new Exception("The builder already exists");
 
             string builderId = await RegisterToDatabase(builderRegisterModel);
@@ -279,30 +162,208 @@ namespace BuildUp.API.Services
             return _projectsService.SubmitProjectAsync(projectSubmitModel);
         }
 
+        // Updating the builder
+        public async Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("This builder doesn't exist");
+
+            User user = await GetUserFromAdminAsync(builderId);
+
+            if (user == null) throw new Exception("Their is no user for builder...");
+
+            await UpdateBuilder(builderId, builderUpdateModel);
+
+            // Only admins are supposed to be able to change the steps
+            // Since we don't want to spam, we only check notifications
+            // on admin side
+            if (builder.Step == BuilderSteps.Preselected && builderUpdateModel.Step == BuilderSteps.AdminMeeting)
+            {
+                await _notificationService.NotifyPreselectionBuilder(user.Email, user.FirstName);
+            }
+            if (builder.Step == BuilderSteps.AdminMeeting && builderUpdateModel.Step == BuilderSteps.CoachMeeting)
+            {
+                await _notificationService.NotifyAdminMeetingValidatedBuilder(user.Email, user.FirstName);
+            }
+        }
+
+        public async Task UpdateBuilderFromBuilderAsync(string currentUserId, string builderId, BuilderUpdateModel builderUpdateModel)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.UserId != currentUserId) throw new UnauthorizedAccessException("You are not the builder you prettend to be");
+
+            await UpdateBuilder(builderId, builderUpdateModel);
+        }
+
+        public async Task UpdateProjectFromAdmin(string projectId, ProjectUpdateModel projectUpdateModel)
+        {
+            await _projectsService.UpdateProjectAsync(projectId, projectUpdateModel);
+        }
+
+        public async Task UpdateProjectFromBuilder(string currentUserId, string builderId, string projectId, ProjectUpdateModel projectUpdateModel)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+            if (builder.UserId != currentUserId) throw new UnauthorizedAccessException("The current user is not the builder he want's to see the project");
+
+            await _projectsService.UpdateProjectAsync(projectId, projectUpdateModel);
+        }
+
+        // Refuse the builder
+        public async Task RefuseBuilderAsync(string builderId)
+        {
+            var update = Builders<Builder>.Update
+                .Set(databaseBuilder => databaseBuilder.Status, BuilderStatus.Deleted)
+                .Set(databaseBuilder => databaseBuilder.Step, BuilderSteps.Abandoned);
+
+            await _builders.UpdateOneAsync(databaseBuilder =>
+                databaseBuilder.Id == builderId,
+                update
+            );
+        }
+
+
+        // Assigning coach to the builder
+        public async Task AssignCoachAsync(string coachId, string builderId)
+        {
+            Coach coach = await GetCoachFromId(coachId);
+
+            if (coach == null) throw new Exception("This coach doesn't exist");
+
+            User coachUser = await GetUserFromId(coach.UserId);
+                
+            if (coachUser == null) throw new Exception("Their is no user for this coach...");
+
+            var update = Builders<Builder>.Update
+                .Set(dbBuilder => dbBuilder.CoachId, coachId);
+
+            await _builders.UpdateOneAsync(databaseBuilder =>
+                databaseBuilder.Id == builderId,
+                update
+            );
+
+            await _coachRequests.InsertOneAsync(new CoachRequest()
+            {
+                BuilderId = builderId,
+                CoachId = coachId,
+                Status = CoachRequestStatus.Waiting
+            });
+
+            await _notificationService.NotifyBuilderChoosedCoach(coachUser.Email);
+        }
+
+        // Getting the builder's coach
+        public async Task<Coach> GetCoachForBuilderFromAdminAsync(string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+
+            return await GetCoachFromId(builder.CoachId);
+        }
+
+        public async Task<Coach> GetCoachForBuilderFromBuilderAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+            if (builder.UserId != currentUserId) throw new UnauthorizedAccessException("You are not the builder");
+
+            return await GetCoachFromId(builder.CoachId);
+        }
+
+        // Getting the builder's form
+        public async Task<List<BuildupFormQA>> GetBuilderFormFromAdminAsync(string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+
+            return await _formsService.GetFormQAsAsync(builder.UserId);
+        }
+
+        public async Task<List<BuildupFormQA>> GetBuilderFormFromCoachAsync(string currentUserId, string builderId)
+        {
+            Coach coach = await GetCoachFromUserId(currentUserId);
+
+            if (coach == null) throw new UnauthorizedAccessException("You are not a coach");
+
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+            if (builder.CoachId != coach.Id) throw new UnauthorizedAccessException("You are not the coach of this builder");
+
+            return await _formsService.GetFormQAsAsync(builder.UserId);
+        }
+
+        public async Task<List<BuildupFormQA>> GetBuilderFormFromBuilderAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+            if (builder.UserId != currentUserId) throw new UnauthorizedAccessException("You are not the builder you want to see forms");
+
+            return await _formsService.GetFormQAsAsync(builder.UserId);
+        }
+
+        // Getting the builder's project
+        public async Task<Project> GetBuilderProjectFromAdminAsync(string builderId)
+        {
+            return await _projectsService.GetProjectAsync(builderId);
+        }
+
+        public async Task<Project> GetBuilderProjectFromCoachAsync(string currentUserId, string builderId)
+        {
+            Coach coach = await GetCoachFromUserId(currentUserId);
+
+            if (coach == null) throw new UnauthorizedAccessException("You are not a coach");
+
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+            if (builder.CoachId != coach.Id) throw new UnauthorizedAccessException("You are not the coach of this builder");
+
+            return await _projectsService.GetProjectAsync(builderId);
+        }
+
+        public async Task<Project> GetBuilderProjectFromBuilderAsync(string currentUserId, string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("The builder doesn't exist");
+            if (builder.UserId != currentUserId) throw new UnauthorizedAccessException("You are not the builder you want to see project");
+
+            return await _projectsService.GetProjectAsync(builderId);
+        }
+
+        // Getting the builder's card
+        public async Task<byte[]> GetBuilderCardAsync(string builderId)
+        {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null || builder.BuilderCardId == null) { return null; }
+
+            return (await _filesService.GetFile(builder.BuilderCardId)).Data;
+        }
+
+        // Signging the PDF for the integration
         public async Task<bool> SignFicheIntegrationAsync(string currentUserId, string builderId)
         {
             Builder builder = await GetBuilderFromBuilderId(builderId);
 
-            if (builder == null || builder.UserId != currentUserId)
-            {
-                throw new Exception("You don't have the permission to sign");
-            }
+            if (builder == null) throw new Exception("The builder doesn't exist");
+            if (builder.UserId != currentUserId) throw new UnauthorizedAccessException("You are not the builder you want to sign for");
 
-            User user = await (await _users.FindAsync(databaseUser =>
-                databaseUser.Id == builder.UserId
-            )).FirstOrDefaultAsync();
+            User user = await GetUserFromId(builder.UserId);
 
-            if (user == null)
-            {
-                throw new Exception("The user doesn't exist...");
-            }
+            if (user == null) throw new Exception("The user doesn't exist...");
 
             Project project = await _projectsService.GetProjectAsync(builderId);
 
-            if (project == null)
-            {
-                throw new Exception("The builder doesn't have project...");
-            }
+            if (project == null) throw new Exception("The builder doesn't have project...");
 
             PdfIntegrationBuilder pdfIntegrationBuilder = new PdfIntegrationBuilder()
             {
@@ -344,141 +405,23 @@ namespace BuildUp.API.Services
 
                 await _notificationService.NotifySignedIntegrationPaperBuilder(builderId, user.Email, user.FirstName);
 
-
                 return true;
             }
 
             return false;
         }
 
-        public async Task UpdateBuilderFromAdminAsync(string builderId, BuilderUpdateModel builderUpdateModel)
-        {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null)
-            {
-                throw new Exception("This builder doesn't exist");
-            }
-
-            User user = await GetUserFromAdminAsync(builderId);
-
-            if (user == null)
-            {
-                throw new Exception("Their is no user for builder...");
-            }
-
-            await UpdateBuilder(builderId, builderUpdateModel);
-
-            if (builder.Step == BuilderSteps.Preselected && builderUpdateModel.Step == BuilderSteps.AdminMeeting)
-            {
-                await _notificationService.NotifyPreselectionBuilder(user.Email, user.FirstName);
-            }
-            if (builder.Step == BuilderSteps.AdminMeeting && builderUpdateModel.Step == BuilderSteps.CoachMeeting)
-            {
-                await _notificationService.NotifyAdminMeetingValidatedBuilder(user.Email, user.FirstName);
-            }
-        }
-        
-        public async Task UpdateBuilderFromBuilderAsync(string currentUserId, string builderId, BuilderUpdateModel builderUpdateModel)
-        {
-            Builder builder = await GetBuilderFromBuilderId(builderId);
-
-            if (builder == null || builder.UserId != currentUserId)
-            {
-                throw new Exception("This builder can't be update by current user");
-            }
-
-            await UpdateBuilder(builderId, builderUpdateModel);
-        }
-
-        public async Task RefuseBuilderAsync(string builderId)
-        {
-            var update = Builders<Builder>.Update
-                .Set(databaseBuilder => databaseBuilder.Status, BuilderStatus.Deleted)
-                .Set(databaseBuilder => databaseBuilder.Step, BuilderSteps.Abandoned);
-
-            await _builders.UpdateOneAsync(databaseBuilder =>
-                databaseBuilder.Id == builderId,
-                update
-            );
-        }
-
-        public async Task AssignCoachAsync(string coachId, string builderId)
-        {
-            Coach coach = await (await _coachs.FindAsync(databaseCoach =>
-                databaseCoach.Id == coachId
-            )).FirstOrDefaultAsync();
-
-            if (coach == null)
-            {
-                throw new Exception("This coach doesn't exist");
-            }
-
-            User coachUser = await (await _users.FindAsync(databaseUser =>
-                databaseUser.Id == coach.UserId
-            )).FirstOrDefaultAsync();
-
-            if (coachUser == null)
-            {
-                throw new Exception("Their is no user for this coach...");
-            }
-
-            var update = Builders<Builder>.Update
-                .Set(dbBuilder => dbBuilder.CoachId, coachId);
-
-            await _builders.UpdateOneAsync(databaseBuilder => 
-                databaseBuilder.Id == builderId, 
-                update
-            );
-
-            await _coachRequests.InsertOneAsync(new CoachRequest()
-            {
-                BuilderId = builderId,
-                CoachId = coachId,
-                Status = CoachRequestStatus.Waiting
-            });
-
-            await _notificationService.NotifyBuilderChoosedCoach(coachUser.Email);
-        }
-
-        public async Task<List<Builder>> GetCandidatingBuildersAsync()
-        {
-            var candidatingBuilders = await (await _builders.FindAsync(databaseBuilder =>
-                databaseBuilder.Status == BuilderStatus.Candidating
-            )).ToListAsync();
-
-            return candidatingBuilders;
-        }
-
-        public async Task<List<Builder>> GetActiveBuildersAsync()
-        {
-            var activeBuilders = await (await _builders.FindAsync(databaseBuilder =>
-                databaseBuilder.Status == BuilderStatus.Validated
-            )).ToListAsync();
-
-            return activeBuilders;
-        }
-
+        // Manage meeting reports
         public async Task<string> CreateMeetingReportAsync(string currentUserId, string builderId, CreateMeetingReportModel toCreate)
         {
             Coach coach = await GetCoachFromUserId(currentUserId);
 
-            if (coach == null)
-            {
-                throw new Exception("The user is not a coach in the database...");
-            }
+            if (coach == null) throw new Exception("You are not a coach");
 
             Builder builder = await GetBuilderFromBuilderId(builderId);
 
-            if (builder == null)
-            {
-                throw new Exception("The builder for the meeting report doesn't exist...");
-            }
-
-            if (builder.CoachId != coach.Id)
-            {
-                throw new UnauthorizedAccessException("You are not the coach of the builder");
-            }
+            if (builder == null) throw new Exception("The builder for the meeting report doesn't exist...");
+            if (builder.CoachId != coach.Id) throw new UnauthorizedAccessException("You are not the coach of the builder");
 
             MeetingReport meetingReport = new MeetingReport()
             {
@@ -512,22 +455,13 @@ namespace BuildUp.API.Services
         {
             Coach coach = await GetCoachFromUserId(currentUserId);
 
-            if (coach == null)
-            {
-                throw new Exception("The user is not a coach in the database...");
-            }
+            if (coach == null) throw new Exception("You are not a coach");
 
             Builder builder = await GetBuilderFromBuilderId(builderId);
 
-            if (builder == null)
-            {
-                throw new Exception("The builder doesn't exist...");
-            }
+            if (builder == null) throw new Exception("The builder doesn't exist...");
 
-            if (builder.CoachId != coach.Id)
-            {
-                throw new Exception("You are not the coach of the builder");
-            }
+            if (builder.CoachId != coach.Id) throw new UnauthorizedAccessException("You are not the coach of the builder");
 
             return await GetMeetingReportsFromAdminAsync(builderId);
         }
@@ -536,10 +470,7 @@ namespace BuildUp.API.Services
         {
             Builder builder = await GetBuilderFromUserId(currentUserId);
 
-            if (builder == null)
-            {
-                throw new Exception("The builder seems to not exist");
-            }
+            if (builder == null) throw new Exception("You are not a builder");
 
             if (builder.Id != builderId)
             {
@@ -547,6 +478,51 @@ namespace BuildUp.API.Services
             }
 
             return await GetMeetingReportsFromAdminAsync(builderId);
+        }
+
+        private async Task<Builder> GetBuilderFromUserId(string userId)
+        {
+            var builder = await _builders.FindAsync(databaseBuilder =>
+                databaseBuilder.UserId == userId
+            );
+
+            return await builder.FirstOrDefaultAsync();
+        }
+
+        private async Task<Builder> GetBuilderFromBuilderId(string builderId)
+        {
+            var builder = await _builders.FindAsync(databaseBuilder =>
+                databaseBuilder.Id == builderId
+            );
+
+            return await builder.FirstOrDefaultAsync();
+        }
+
+        private async Task<Coach> GetCoachFromUserId(string userId)
+        {
+            var coach = await _coachs.FindAsync(databaseCoach =>
+                databaseCoach.UserId == userId
+            );
+
+            return await coach.FirstOrDefaultAsync();
+        }
+
+        private async Task<Coach> GetCoachFromId(string id)
+        {
+            var coach = await _coachs.FindAsync(databaseCoach =>
+                databaseCoach.Id == id
+            );
+
+            return await coach.FirstOrDefaultAsync();
+        }
+
+        private async Task<User> GetUserFromId(string id)
+        {
+            var user = await _users.FindAsync(databaseUser =>
+                databaseUser.Id == id
+            );
+
+            return await user.FirstOrDefaultAsync();
         }
 
         private async Task<string> RegisterToDatabase(BuilderRegisterModel builderRegisterModel)
@@ -598,42 +574,6 @@ namespace BuildUp.API.Services
                databaseBuilder.Id == id,
                update
             );
-        }
-
-        private async Task<Builder> GetBuilderFromUserId(string userId)
-        {
-            var builder = await _builders.FindAsync(databaseBuilder =>
-                databaseBuilder.UserId == userId
-            );
-
-            return await builder.FirstOrDefaultAsync();
-        }
-
-        private async Task<Builder> GetBuilderFromBuilderId(string builderId)
-        {
-            var builder = await _builders.FindAsync(databaseBuilder =>
-                databaseBuilder.Id == builderId
-            );
-
-            return await builder.FirstOrDefaultAsync();
-        }
-
-        private async Task<Coach> GetCoachFromUserId(string userId)
-        {
-            var coach = await _coachs.FindAsync(databaseCoach =>
-                databaseCoach.UserId == userId
-            );
-
-            return await coach.FirstOrDefaultAsync();
-        }
-
-        private async Task<Coach> GetCoachFromId(string id)
-        {
-            var coach = await _coachs.FindAsync(databaseCoach =>
-                databaseCoach.Id == id
-            );
-
-            return await coach.FirstOrDefaultAsync();
         }
 
         private bool BuilderExist(string userId)
