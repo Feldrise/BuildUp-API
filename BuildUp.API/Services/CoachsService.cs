@@ -409,6 +409,26 @@ namespace BuildUp.API.Services
                databaseBuilder.Id == request.BuilderId,
                builderUpdate
             );
+
+            Builder builder = await (await _builders.FindAsync(databaseBuilder =>
+                databaseBuilder.Id == request.BuilderId
+            )).FirstOrDefaultAsync();
+
+            if (builder == null)
+            {
+                throw new Exception("This builder doesn't exist");
+            }
+
+            User builderUser = await (await _users.FindAsync(databaseUser =>
+                databaseUser.Id == builder.UserId
+            )).FirstOrDefaultAsync();
+
+            if (builderUser == null)
+            {
+                throw new Exception("Their is no user for this builder...");
+            }
+
+            await _notificationService.NotifyCoachAcceptBuilder(builderUser.Email, builderUser.FirstName);
         }
 
         public async Task RefuseCoachRequestAsync(string currentUserId, string coachId, string requestId)

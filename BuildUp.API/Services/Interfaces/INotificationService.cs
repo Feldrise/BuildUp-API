@@ -14,7 +14,10 @@ namespace BuildUp.API.Services.Interfaces
         // Builders
         Task NotifyPreselectionBuilder(string email, string name);
         Task NotifyAdminMeetingValidatedBuilder(string email, string name);
-        
+        Task NotifyCoachAcceptBuilder(string email, string name);
+        Task NotifySignedIntegrationPaperBuilder(string builderId, string email, string name);
+
+
         // Coachs
         Task NotifyPreselectionCoach(string email, string name);
         Task NotifyAcceptationCoach(string email);

@@ -87,6 +87,41 @@ namespace BuildUp.API.Services
             );
         }
 
+        public async Task NotifyCoachAcceptBuilder(string email, string name)
+        {
+            string subject = "Build Up - Un Coach t’a accepté !";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/validate_coach_builder.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", name);
+
+            await SendMailAsync(
+                subject,
+                message,
+                email
+            );
+        }
+
+        public async Task NotifySignedIntegrationPaperBuilder(string builderId, string email, string name)
+        {
+            string subject = "Bienvenue dans le programme Build Up by NTF !";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/signature_builder.html");
+            var pdfIntegrationPaperPath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/builders/{builderId}.pdf");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", name);
+
+            await SendMailAsync(
+                subject,
+                message,
+                email,
+                pdfIntegrationPaperPath,
+                $"{name}_fiche_integration.pdf"
+            );
+        }
+
         // Coach
         public async Task NotifyPreselectionCoach(string email, string name)
         {

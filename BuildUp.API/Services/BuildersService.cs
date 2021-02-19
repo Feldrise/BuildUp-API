@@ -342,6 +342,9 @@ namespace BuildUp.API.Services
                    update
                 );
 
+                await _notificationService.NotifySignedIntegrationPaperBuilder(builderId, user.Email, user.FirstName);
+
+
                 return true;
             }
 
