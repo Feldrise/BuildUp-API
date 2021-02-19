@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 using BuildUp.API.Entities;
 using BuildUp.API.Entities.Notification;
 using MongoDB.Driver;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using System.Net.Mime;
 
 namespace BuildUp.API.Services
 {
@@ -20,9 +23,12 @@ namespace BuildUp.API.Services
 
         private readonly IMongoCollection<CoachNotification> _coachNotifications;
 
-        public NotificationService(IMongoSettings mongoSettings, IMailCredentials mailCredentials)
+        readonly IWebHostEnvironment _env;
+
+        public NotificationService(IMongoSettings mongoSettings, IMailCredentials mailCredentials, IWebHostEnvironment env)
         {
             _mailCredentials = mailCredentials;
+            _env = env;
 
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -34,12 +40,12 @@ namespace BuildUp.API.Services
         {
             string subject = "Inscription au program Build-up !";
 
-            string message = "";
-            message += $"Bienvenue {registerModel.FirstName} {registerModel.LastName} dans le programme Build-Up !\n";
-            message += "Ta candidature va être évalué. Nous t'invitons à télécharger l'application Build-Up (https://new-talents.fr/application-buildup) pour te connecter.\n";
-            message += "\n";
-            message += "Nous t'avons généré un mot de passe aléatoire. Nous te conseillons de le changer dans les plus bref délais.\n";
-            message += $"Voici le mot de passe généré : {password}";
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/reception_candidature.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$fullName", registerModel.FirstName);
+            message = message.Replace("$builderOrCoach", registerModel.Role == Role.Builder ? "Builder" : "Coach");
+            message = message.Replace("$password", password);
 
             await SendMailAsync(
                 subject,
@@ -48,17 +54,97 @@ namespace BuildUp.API.Services
             );
         }
 
-        public async Task NotifyPreselectionBuilder(string email, string fullName)
+        // Builders
+        public async Task NotifyPreselectionBuilder(string email, string name)
         {
-            string subject = "Programme Build Up - Préselection";
+            string subject = "Programme Build Up - Tu as été présélectionné(e) !";
 
-            string message = "";
-            message += $"Bonjour {fullName},\n\n";
-            message += "Nous sommes ravie de t’annoncer que tu as été préselectionné pour participer au programme de coaching personnalisé Build Up 🎉. Je souhaiterais maintenant te convier à un entretien pour apprendre à te connaître et surtout mieux appréhender ta personnalité.\n\n";
-            message += "Nous souhaitons voir tout simplement si le programme peut vraiment t’être utile et t’apporter les meilleures solutions possibles. Je te propose de consulter mes disponibilités à ce lien : calendly.com/marc-thomas5608/entretien-sel-builder et de sélectionner le créneau qui te convient.\n\n";
-            message += "Tu n’auras plus qu’à te présenter le jour J avec un microphone fonctionnel. C’est un entretien détente, il n’y à rien à préparer. On pourrait reprendre la phrase fétiche de Mcdo, mais “viens comme tu es !” 😉.\n\n";
-            message += "À très vite et si tu as des questions entre temps ou que tu souhaites changer de créneau, n’hésite pas à me contacter via ce mail ou directement sur Discord (discord.new-talents.fr).\n\n";
-            message += "Amicalement";
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/preselection_builder.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", name);
+
+            await SendMailAsync(
+                subject,
+                message,
+                email
+            );
+        }
+
+        public async Task NotifyAdminMeetingValidatedBuilder(string email, string name)
+        {
+            string subject = "Build Up - Avis sur entretien de sélection Builder";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/validate_admin_meeting_builder.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", name);
+
+            await SendMailAsync(
+                subject,
+                message,
+                email
+            );
+        }
+
+        // Coach
+        public async Task NotifyPreselectionCoach(string email, string name)
+        {
+            string subject = "Programme Build Up - Tu as été présélectionné(e) !";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/preselection_coach.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", name);
+
+            await SendMailAsync(
+                subject,
+                message,
+                email
+            );
+        }
+
+        public async Task NotifyAcceptationCoach(string email)
+        {
+            string subject = "Build Up - Avis sur entretien de sélection Coach";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/validation_coach.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+
+            await SendMailAsync(
+                subject,
+                message,
+                email
+            );
+        }
+
+        public async Task NotifySignedIntegrationPaperCoach(string coachId, string email, string name)
+        {
+            string subject = "Bienvenue dans le programme Build Up by NTF !";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/signature_coach.html");
+            var pdfIntegrationPaperPath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/coachs/{coachId}.pdf");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", name);
+
+            await SendMailAsync(
+                subject,
+                message,
+                email,
+                pdfIntegrationPaperPath,
+                $"{name}_fiche_integration.pdf"
+            );
+        }
+
+        public async Task NotifyBuilderChoosedCoach(string email)
+        {
+            string subject = "Build Up - Un Builder attend ta réponse !";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/builder_choosed_coach.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
                 subject,
@@ -98,7 +184,7 @@ namespace BuildUp.API.Services
             );
         }
 
-        private async Task SendMailAsync(string subject, string body, string to)
+        private async Task SendMailAsync(string subject, string body, string to, string attachmentPath = "", string attachmentName = "")
         {
             using var client = new SmtpClient(_mailCredentials.Server, _mailCredentials.Port)
             {
@@ -113,8 +199,27 @@ namespace BuildUp.API.Services
                 From = new MailAddress(_mailCredentials.User),
                 To = { to },
                 Subject = subject,
-                Body = body
+                Body = body,
+                IsBodyHtml = true,
+                
             };
+
+            if (!string.IsNullOrWhiteSpace(attachmentPath) && !string.IsNullOrWhiteSpace(attachmentName))
+            {
+                // Create  the file attachment for this email message.
+                Attachment data = new Attachment(attachmentPath, MediaTypeNames.Application.Octet);
+                // Add time stamp information for the file.
+                ContentDisposition disposition = data.ContentDisposition;
+                disposition.CreationDate = System.IO.File.GetCreationTime(attachmentPath);
+                disposition.ModificationDate = System.IO.File.GetLastWriteTime(attachmentPath);
+                disposition.ReadDate = System.IO.File.GetLastAccessTime(attachmentPath);
+
+                // Change the attachement name
+                data.Name = attachmentName;
+                
+                // Add the file attachment to this email message.
+                mailMessage.Attachments.Add(data);
+            }
 
             await client.SendMailAsync(mailMessage);
         }
@@ -126,6 +231,18 @@ namespace BuildUp.API.Services
             );
 
             return await request.FirstOrDefaultAsync();
+        }
+
+        private string MessageFromHtmlFile(string path)
+        {
+            string message = "";
+
+            using (StreamReader reader = File.OpenText(path))
+            {
+                message = reader.ReadToEnd();
+            }
+
+            return message;
         }
 
     }

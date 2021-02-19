@@ -1566,17 +1566,17 @@
         </member>
         <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Competences">
             <summary>
-            Answer : Quelles sont vos compétences ?
+            Answer: Quelles sont vos compétences clés ?
             </summary>
         </member>
-        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Perspectives">
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Questions">
             <summary>
-            Answer : Quelles sont, selon vous, les principales perspectives pour qu’un projet fonctionne ?
+            All questions to show to the builder
             </summary>
         </member>
-        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.CoachDefinition">
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Answers">
             <summary>
-            Answer : Comment définissez-vous le rôle de Coach ?
+            All the answers for the questions to show to the builder
             </summary>
         </member>
         <member name="P:BuildUp.API.Models.Coachs.CoachRegisterModel.UserId">

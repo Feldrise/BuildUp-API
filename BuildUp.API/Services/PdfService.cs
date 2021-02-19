@@ -76,7 +76,7 @@ namespace BuildUp.API.Services
             fields["Nom"].SetValue(values.LastName);
             fields["Prénom"].SetValue(values.FirstName);
             fields["Birthdate"].SetValue(values.Birthdate.ToString());
-            fields["keywords"].SetValue(values.Keywords);
+            fields["keywords"].SetValue(values.Keywords ?? "Inconnue");
             fields["situation"].SetValue(values.Situation);
             fields["Code_postal"].SetValue(values.PostalCode.ToString());
             fields["ville"].SetValue(values.City);
@@ -84,10 +84,10 @@ namespace BuildUp.API.Services
             fields["phone"].SetValue(values.Phone);
             fields["mail"].SetValue(values.Email);
             fields["Where"].SetValue(values.BirthPlace);
-            fields["accroche"].SetValue(values.Accroche);
-            fields["experiences"].SetValue(values.Experience);
-            fields["ideal_builder"].SetValue(values.IdealBuilder);
-            fields["objectifs_coach"].SetValue(values.Objectifs);
+            fields["accroche"].SetValue(values.Accroche ?? "Inconnue");
+            fields["experiences"].SetValue(values.Experience ?? "Inconnue");
+            fields["ideal_builder"].SetValue(values.IdealBuilder ?? "Inconnue");
+            fields["objectifs_coach"].SetValue(values.Objectifs ?? "Inconnue");
             fields["full_name"].SetValue($"{values.FirstName} {values.LastName}");
             fields["date_naissance"].SetValue(values.Birthdate.ToString());
             fields["lieu_residence"].SetValue($"{values.Address}, {values.PostalCode} {values.City}");

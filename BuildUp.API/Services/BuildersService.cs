@@ -368,7 +368,11 @@ namespace BuildUp.API.Services
 
             if (builder.Step == BuilderSteps.Preselected && builderUpdateModel.Step == BuilderSteps.AdminMeeting)
             {
-                await _notificationService.NotifyPreselectionBuilder(user.Email, $"{user.FirstName} {user.LastName}");
+                await _notificationService.NotifyPreselectionBuilder(user.Email, user.FirstName);
+            }
+            if (builder.Step == BuilderSteps.AdminMeeting && builderUpdateModel.Step == BuilderSteps.CoachMeeting)
+            {
+                await _notificationService.NotifyAdminMeetingValidatedBuilder(user.Email, user.FirstName);
             }
         }
         
@@ -398,6 +402,24 @@ namespace BuildUp.API.Services
 
         public async Task AssignCoachAsync(string coachId, string builderId)
         {
+            Coach coach = await (await _coachs.FindAsync(databaseCoach =>
+                databaseCoach.Id == coachId
+            )).FirstOrDefaultAsync();
+
+            if (coach == null)
+            {
+                throw new Exception("This coach doesn't exist");
+            }
+
+            User coachUser = await (await _users.FindAsync(databaseUser =>
+                databaseUser.Id == coach.UserId
+            )).FirstOrDefaultAsync();
+
+            if (coachUser == null)
+            {
+                throw new Exception("Their is no user for this coach...");
+            }
+
             var update = Builders<Builder>.Update
                 .Set(dbBuilder => dbBuilder.CoachId, coachId);
 
@@ -412,6 +434,8 @@ namespace BuildUp.API.Services
                 CoachId = coachId,
                 Status = CoachRequestStatus.Waiting
             });
+
+            await _notificationService.NotifyBuilderChoosedCoach(coachUser.Email);
         }
 
         public async Task<List<Builder>> GetCandidatingBuildersAsync()
