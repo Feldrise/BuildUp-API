@@ -54,16 +54,17 @@ namespace BuildUp.API.Models.Coachs
         public string Description { get; set; }
 
         /// <summary>
-        /// Answer : Quelles sont vos compétences ?
+        /// Answer: Quelles sont vos compétences clés ?
         /// </summary>
         public string Competences { get; set; }
+
         /// <summary>
-        /// Answer : Quelles sont, selon vous, les principales perspectives pour qu’un projet fonctionne ?
+        /// All questions to show to the builder
         /// </summary>
-        public string Perspectives { get; set; }
+        public List<string> Questions { get; set; }
         /// <summary>
-        /// Answer : Comment définissez-vous le rôle de Coach ?
+        /// All the answers for the questions to show to the builder
         /// </summary>
-        public string CoachDefinition { get; set; }
+        public List<string> Answers { get; set; }
     }
 }

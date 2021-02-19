@@ -25,8 +25,9 @@ namespace BuildUp.API.Services
         private readonly IFormsService _formsService;
         private readonly IFilesService _filesService;
         private readonly IPdfService _pdfService;
+        private readonly INotificationService _notificationService;
 
-        public CoachsService(IMongoSettings mongoSettings, IFormsService formsService, IFilesService filesService, IPdfService pdfService)
+        public CoachsService(IMongoSettings mongoSettings, IFormsService formsService, IFilesService filesService, IPdfService pdfService, INotificationService notificationService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -39,6 +40,7 @@ namespace BuildUp.API.Services
             _formsService = formsService;
             _filesService = filesService;
             _pdfService = pdfService;
+            _notificationService = notificationService;
         }
 
         public Task<Coach> GetCoachFromAdminAsync(string userId)
@@ -230,6 +232,8 @@ namespace BuildUp.API.Services
                    update
                 );
 
+                await _notificationService.NotifySignedIntegrationPaperCoach(coachId, user.Email, user.FirstName);
+
                 return true;
             }
 
@@ -238,7 +242,30 @@ namespace BuildUp.API.Services
 
         public async Task UpdateCoachFromAdminAsync(string coachId, CoachUpdateModel coachUpdateModel)
         {
+            Coach coach = await GetCoachFromCoachId(coachId);
+
+            if (coach == null)
+            {
+                throw new Exception("This coach doesn't exist");
+            }
+
+            User user = await GetUserFromAdminAsync(coachId);
+
+            if (user == null)
+            {
+                throw new Exception("Their is no user for this coach...");
+            }
+
             await UpdateCoach(coachId, coachUpdateModel);
+
+            if (coach.Step == CoachSteps.Preselected && coachUpdateModel.Step == CoachSteps.Meeting)
+            {
+                await _notificationService.NotifyPreselectionCoach(user.Email, user.FirstName);
+            }
+            if (coach.Step != CoachSteps.Signing && coachUpdateModel.Step == CoachSteps.Signing)
+            {
+                await _notificationService.NotifyAcceptationCoach(user.Email);
+            }
         }
 
         public async Task UpdateCoachFromCoachAsync(string currentUserId, string coachId, CoachUpdateModel coachUpdateModel)
@@ -314,9 +341,28 @@ namespace BuildUp.API.Services
                     Situation = activeCoach.Situation,
                     Description = activeCoach.Description,
 
-                    Competences = await _formsService.GetAnswerForQuestionAsync(user.Id, "Quelles sont vos compétences ?"),
-                    Perspectives = await _formsService.GetAnswerForQuestionAsync(user.Id, "Quelles sont, selon vous, les principales perspectives pour qu’un projet fonctionne ?"),
-                    CoachDefinition = await _formsService.GetAnswerForQuestionAsync(user.Id, "Comment définissez-vous le rôle de Coach ?")
+                    Competences = await _formsService.GetAnswerForQuestionAsync(user.Id, "Quelles sont vos compétences clés ?") ?? "Inconnue",
+                    Questions = new List<string>()
+                    {
+                        "Comment définissez-vous le rôle de Coach ?",
+                        "Pourquoi souhaitez-vous devenir Coach ?",
+                        "Qu’est-ce qui vous incite à proposer votre accompagnement ?",
+                        "Combien d’heures par semaine pouvez-vous accorder à un Builder ?",
+                        "Êtes-vous prêt à faire preuve de patience, d’écoute et de bienveillance à l’égard des Builders ?",
+                        "Quel serait le Builder idéal pour vous ?",
+                        "C'est votre moment. Dites au Builder pourquoi il doit vous choisir vous et pas un autre Coach."
+                    },
+
+                    Answers = new List<string>()
+                    {
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Comment définissez-vous le rôle de Coach ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Pourquoi souhaitez-vous devenir Coach ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Qu’est-ce qui vous incite à proposer votre accompagnement ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Combien d’heures par semaine pouvez-vous accorder à un Builder ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Êtes-vous prêt à faire preuve de patience, d’écoute et de bienveillance à l’égard des Builders ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Quel serait le Builder idéal pour vous ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "C'est votre moment. Dites au Builder pourquoi il doit vous choisir vous et pas un autre Coach.") ?? "Inconnue"
+                    }
                 };
 
                 availableCoachModels.Add(model);
