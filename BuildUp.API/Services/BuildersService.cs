@@ -445,7 +445,11 @@ namespace BuildUp.API.Services
         public async Task<List<MeetingReport>> GetMeetingReportsFromAdminAsync(string builderId)
         {
             var meetingReports = await _meetingRepors.FindAsync(databaseMeeting =>
-                databaseMeeting.BuilderId == builderId
+                databaseMeeting.BuilderId == builderId,
+                new FindOptions<MeetingReport>()
+                {
+                    Sort = Builders<MeetingReport>.Sort.Descending("Date")
+                }
             );
 
             return await meetingReports.ToListAsync();
