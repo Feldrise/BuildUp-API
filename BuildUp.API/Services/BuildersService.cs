@@ -182,7 +182,7 @@ namespace BuildUp.API.Services
             {
                 await _notificationService.NotifyPreselectionBuilder(user.Email, user.FirstName);
             }
-            if (builder.Step == BuilderSteps.AdminMeeting && builderUpdateModel.Step == BuilderSteps.CoachMeeting)
+            if (builder.Step != BuilderSteps.CoachMeeting && builderUpdateModel.Step == BuilderSteps.CoachMeeting)
             {
                 await _notificationService.NotifyAdminMeetingValidatedBuilder(user.Email, user.FirstName);
             }
