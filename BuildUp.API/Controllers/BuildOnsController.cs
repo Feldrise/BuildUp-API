@@ -40,6 +40,47 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// (Builder,Coach,Admin) Get the buildon step corresponding to id
+        /// </summary>
+        /// <param name="buildOnStepId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns>All build-ons</returns>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="404">The buildon step was not found</response>
+        /// <response code="200">Return buildons</response>
+        [HttpGet("steps/{buildOnStepId:length(24)}")]
+        public async Task<ActionResult<BuildOnStep>> GetBuildOnStep(string buildOnStepId)
+        {
+            BuildOnStep step = await _buildOnsService.GetBuildOnStepAsync(buildOnStepId);
+
+            if (step == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(step);
+        }
+
+        /// <summary>
+        /// (Builder,Coach,Admin) Get the first buildon step
+        /// </summary>
+        /// <returns>All build-ons</returns>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="404">The buildon step was not found</response>
+        /// <response code="200">Return buildons</response>
+        [HttpGet("steps/first")]
+        public async Task<ActionResult<BuildOnStep>> GetFirstBuildOnStep()
+        {
+            BuildOnStep step = await _buildOnsService.GetFirstBuildOnStepAsync();
+
+            if (step == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(step);
+        }
+
+        /// <summary>
         /// (Builder,Coach,Admin) Get all buildon's steps
         /// </summary>
         /// <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>

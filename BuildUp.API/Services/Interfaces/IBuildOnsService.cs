@@ -14,6 +14,9 @@ namespace BuildUp.API.Services.Interfaces
         Task<List<BuildOn>> GetAllAsync();
         Task<List<BuildOnStep>> GetAllStepsAsync(string buildonId);
 
+        Task<BuildOnStep> GetBuildOnStepAsync(string buildOnStepId);
+        Task<BuildOnStep> GetFirstBuildOnStepAsync();
+
         // Updating build-ons and steps
         Task<List<BuildOn>> UpdateBuildOnsAsync(List<BuildOnManageModel> buildOnManageModels);
         Task<List<BuildOnStep>> UpdateBuildOnStepsAsync(string buildOnId, List<BuildOnStepManageModel> buildOnStepManageModels);

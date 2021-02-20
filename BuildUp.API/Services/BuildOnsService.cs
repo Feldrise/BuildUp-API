@@ -64,6 +64,24 @@ namespace BuildUp.API.Services
             )).ToListAsync();
         }
 
+        public async Task<BuildOnStep> GetBuildOnStepAsync(string buildOnStepId)
+        {
+            return await GetBuildOnStep(buildOnStepId);
+        }
+
+        public async Task<BuildOnStep> GetFirstBuildOnStepAsync()
+        {
+            List<BuildOn> buildOns = await GetAllAsync();
+
+            if (buildOns.Count < 1) return null;
+
+            List<BuildOnStep> buildOnSteps = await GetAllStepsAsync(buildOns.First().Id);
+
+            if (buildOnSteps.Count < 1) return null;
+
+            return buildOnSteps.First();
+        }
+
         // Updating build-ons and steps
         public async Task<List<BuildOn>> UpdateBuildOnsAsync(List<BuildOnManageModel> buildOnManageModels)
         {
