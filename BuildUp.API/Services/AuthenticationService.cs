@@ -43,8 +43,8 @@ namespace BuildUp.API.Services
 
             var user = await (
                 await _users.FindAsync(
-                    user => user.Email == username ||
-                    user.Username == username
+                    user => user.Email == username.ToLower() ||
+                    user.Username == username.ToLower()
                 )
             ).FirstOrDefaultAsync();
 
@@ -111,10 +111,10 @@ namespace BuildUp.API.Services
                 Birthdate = userRegister.Birthdate,
                 BirthPlace = userRegister.BirthPlace,
 
-                Email = userRegister.Email,
+                Email = userRegister.Email.ToLower(),
                 Phone = userRegister.Phone,
                 DiscordTag = userRegister.DiscordTag,
-                Username = userRegister.Username,
+                Username = userRegister.Username.ToLower(),
 
                 Department = userRegister.Department,
                 City = userRegister.City,
@@ -136,8 +136,8 @@ namespace BuildUp.API.Services
         private bool UserExist(string email, string username)
         {
             return _users.AsQueryable<User>().Any(user =>
-                user.Email == email ||
-                user.Username == username
+                user.Email == email.ToLower() ||
+                user.Username == username.ToLower()
             );
         }
 
