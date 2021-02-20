@@ -38,7 +38,7 @@ namespace BuildUp.API.Services
 
         public async Task NotifieAccountCreationAsync(RegisterModel registerModel, string password)
         {
-            string subject = "Inscription au program Build-up !";
+            string subject = "Inscription au programme Build-up !";
 
             var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/reception_candidature.html");
 
@@ -185,6 +185,36 @@ namespace BuildUp.API.Services
                 subject,
                 message,
                 email
+            );
+        }
+
+        public async Task NotifyBuildOnReturningSubmited(string coachMail)
+        {
+            string subject = "Build Up - Ton Builder a terminé son étape ! ";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/buildon_returning_submited.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+
+            await SendMailAsync(
+                subject,
+                message,
+                coachMail
+            );
+        }
+
+        public async Task NotifyBuildonStepValidated(string builderMail)
+        {
+            string subject = "Build Up - Ton étape vient d’être validée ! ";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/validation_buildon_step.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+
+            await SendMailAsync(
+                subject,
+                message,
+                builderMail
             );
         }
 

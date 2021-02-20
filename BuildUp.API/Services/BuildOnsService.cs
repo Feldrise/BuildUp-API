@@ -23,8 +23,9 @@ namespace BuildUp.API.Services
         private readonly IBuildersService _buildersService;
         private readonly ICoachsService _coachsService;
         private readonly IProjectsService _projectsService;
+        private readonly INotificationService _notificationService;
 
-        public BuildOnsService(IMongoSettings mongoSettings, IFilesService filesService, IBuildersService buildersService, ICoachsService coachsService, IProjectsService projectsService)
+        public BuildOnsService(IMongoSettings mongoSettings, IFilesService filesService, IBuildersService buildersService, ICoachsService coachsService, IProjectsService projectsService, INotificationService notificationService)
         {
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
@@ -37,6 +38,7 @@ namespace BuildUp.API.Services
             _buildersService = buildersService;
             _coachsService = coachsService;
             _projectsService = projectsService;
+            _notificationService = notificationService;
         }
 
         // Getting build-ons and steps
@@ -235,10 +237,16 @@ namespace BuildUp.API.Services
 
             if (builder == null) throw new UnauthorizedAccessException("You are not a builder");
 
+            Coach coachForBuilder = await _buildersService.GetCoachForBuilderFromAdminAsync(builder.Id);
             var project = await _projectsService.GetProjectAsync(builder.Id);
 
             if (project == null) throw new Exception("The project doesn't exist");
+            if (coachForBuilder == null) throw new Exception("This builder don't have a coach...");
             if (project.Id != projectId) throw new UnauthorizedAccessException("The project doesn't belong to you");
+
+            User userForCoach = await _coachsService.GetUserFromAdminAsync(coachForBuilder.Id);
+
+            if (userForCoach == null) throw new Exception("The coach doesn't have any user");
 
             // Then we register the returning
             string fileId = null;
@@ -260,6 +268,9 @@ namespace BuildUp.API.Services
             };
 
             await _buildOnReturnings.InsertOneAsync(returning);
+
+            // Now we need to notify the coach
+            await _notificationService.NotifyBuildOnReturningSubmited(userForCoach.Email);
 
             return returning.Id;
         }
@@ -347,7 +358,7 @@ namespace BuildUp.API.Services
         {
             var buildOnReturning = await GetReturning(buildOnReturningId);
 
-            if (buildOnReturning == null || buildOnReturning.FileId == null) throw new Exception("It seems that the returning doesn't exist");
+            if (buildOnReturning == null) throw new Exception("It seems that the returning doesn't exist");
 
             Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
             Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
@@ -384,8 +395,6 @@ namespace BuildUp.API.Services
             };
 
             await _buildOnReturnings.InsertOneAsync(returning);
-
-            await IncrementProjectBuildOnStep(project);
         }
 
         public async Task ValidateBuildOnStepFromCoach(string currentUserId, string projectId, string buildOnStepId)
@@ -412,8 +421,6 @@ namespace BuildUp.API.Services
             };
 
             await _buildOnReturnings.InsertOneAsync(returning);
-
-            await IncrementProjectBuildOnStep(project);
         }
 
         private async Task<BuildOn> GetBuildOn(string buildOnId)
@@ -552,6 +559,11 @@ namespace BuildUp.API.Services
 
         private async Task IncrementProjectBuildOnStep(Project project)
         {
+            // We need the Builder for the future notification
+            User builderUser = await _buildersService.GetUserFromAdminAsync(project.BuilderId);
+
+            if (builderUser == null) throw new Exception("The builder of this project doesn't exist...");
+
             List<BuildOn> buildOns = await GetAllAsync();
 
             if (buildOns.Count < 1) throw new Exception("Build-up have no build-ons yet...");
@@ -605,6 +617,7 @@ namespace BuildUp.API.Services
             }
 
             await _projectsService.UpdateProjectBuildOnStep(project.Id, newBuildOnId, newBuildOnStepId);
+            await _notificationService.NotifyBuildonStepValidated(builderUser.Email);
         }
 
     }
