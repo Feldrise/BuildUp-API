@@ -343,8 +343,8 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <param name="builderId"></param>
         /// <returns>The builder's meeting reports</returns>
-        /// <response code="400">Unexpected error while getting the builder meeting reports</response>
-        /// <response code="401">You are not allowed to view this builder's meeting reports</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to view this builder's meeting reports</response>
         /// <response code="200">Return meeting reports's project</response>
         [Authorize]
@@ -447,8 +447,9 @@ namespace BuildUp.API.Controllers
         /// <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
         /// <param name="coachAssignmentModel"></param>
         /// <returns></returns>
-        /// <response code="400">The meeting report can't be created</response>
-        /// <response code="401">You are not authorized to create the meeting report</response>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>
+        /// <response code="403">You are not allowed to submit project for this builder</response>s
         /// <response code="200">The coach has been successfully assigned</response>
         [Authorize(Roles = Role.Admin + "," + Role.Builder)]
         [HttpPost("{builderId:length(24)}/assign")]

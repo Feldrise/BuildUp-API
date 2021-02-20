@@ -10,38 +10,47 @@ namespace BuildUp.API.Services.Interfaces
 {
     public interface IBuildOnsService
     {
+        // Getting build-ons and steps
         Task<List<BuildOn>> GetAllAsync();
-
-        Task<byte[]> GetImageForBuildOnAsync(string buildOnId);
-
-        Task<List<BuildOn>> UpdateBuildOnsAsync(List<BuildOnManageModel> buildOnManageModels);
-        Task DeleteBuildOnAsync(string buildonId);
-
-        // STEPS
         Task<List<BuildOnStep>> GetAllStepsAsync(string buildonId);
-        Task<byte[]> GetImageForBuildOnStepAsync(string buildOnStepId);
 
+        // Updating build-ons and steps
+        Task<List<BuildOn>> UpdateBuildOnsAsync(List<BuildOnManageModel> buildOnManageModels);
         Task<List<BuildOnStep>> UpdateBuildOnStepsAsync(string buildOnId, List<BuildOnStepManageModel> buildOnStepManageModels);
+
+        // Deleting build-ons and steps
+        Task DeleteBuildOnAsync(string buildonId);
         Task DeleteBuildOnStepAsync(string buildonStepId);
 
-        // Proofs
-        Task<FileModel> GetReturningFileFromAdmin(string buildOnReturningId);
-        Task<FileModel> GetReturningFileFromCoach(string currentUserId, string buildOnReturningId);
-        Task<FileModel> GetReturningFileFromBuilder(string currentUserId, string buildOnReturningId);
+        // Getting image for build-ons and steps
+        Task<byte[]> GetImageForBuildOnAsync(string buildOnId);
 
-        Task RefuseReturningFromAdmin(string buildOnReturningId);
-        Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId);
-        Task AcceptReturningFromAdmin(string projectId, string buildOnReturningId);
-        Task AcceptReturningFromCoach(string currentUserId, string projectId, string buildOnReturningId);
+        Task<byte[]> GetImageForBuildOnStepAsync(string buildOnStepId);
 
-        Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnStepId);
-        Task ValidateBuildOnStepFromCoach(string currentUserId, string projectId, string buildOnStepId);
-
-
+        // Getting the proofs
         Task<List<BuildOnReturning>> GetReturningsFromAdmin(string projectId);
         Task<List<BuildOnReturning>> GetReturningFromBuilder(string currentUserId, string projectId);
         Task<List<BuildOnReturning>> GetReturningFromCoach(string currentUserId, string projectId);
 
+        // Getting proof file
+        Task<FileModel> GetReturningFileFromAdmin(string buildOnReturningId);
+        Task<FileModel> GetReturningFileFromCoach(string currentUserId, string buildOnReturningId);
+        Task<FileModel> GetReturningFileFromBuilder(string currentUserId, string buildOnReturningId);
+
+        // Sending proof
         Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel);
+
+        // Accepting proofs
+        Task AcceptReturningFromAdmin(string projectId, string buildOnReturningId);
+        Task AcceptReturningFromCoach(string currentUserId, string projectId, string buildOnReturningId);
+
+        // Refusing proofs
+        Task RefuseReturningFromAdmin(string buildOnReturningId);
+        Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId);
+        
+        // Validating step
+        Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnStepId);
+        Task ValidateBuildOnStepFromCoach(string currentUserId, string projectId, string buildOnStepId);
+
     }
 }

@@ -39,6 +39,7 @@ namespace BuildUp.API.Services
             _projectsService = projectsService;
         }
 
+        // Getting build-ons and steps
         public async Task<List<BuildOn>> GetAllAsync()
         {
             return await (await _buildOns.FindAsync(databaseBuildOn =>
@@ -50,23 +51,18 @@ namespace BuildUp.API.Services
             )).ToListAsync();
         }
 
-        public async Task<byte[]> GetImageForBuildOnAsync(string buildOnId)
+        public async Task<List<BuildOnStep>> GetAllStepsAsync(string buildonId)
         {
-            BuildOn buildOn = await GetBuildOn(buildOnId);
-
-            if (buildOn == null || buildOn.ImageId == null) { return null;  }
-
-            return (await _filesService.GetFile(buildOn.ImageId)).Data;
-        }
-        public async Task<byte[]> GetImageForBuildOnStepAsync(string buildOnStepId)
-        {
-            BuildOnStep buildOnStep = await GetBuildOnStep(buildOnStepId);
-
-            if (buildOnStep == null || buildOnStep.ImageId == null) { return null; }
-
-            return (await _filesService.GetFile(buildOnStep.ImageId)).Data;
+            return await (await _buildOnSteps.FindAsync(databaseBuildOnStep =>
+                databaseBuildOnStep.BuildOnId == buildonId,
+                new FindOptions<BuildOnStep>()
+                {
+                    Sort = Builders<BuildOnStep>.Sort.Ascending("Index")
+                }
+            )).ToListAsync();
         }
 
+        // Updating build-ons and steps
         public async Task<List<BuildOn>> UpdateBuildOnsAsync(List<BuildOnManageModel> buildOnManageModels)
         {
             List<BuildOn> result = new List<BuildOn>();
@@ -84,24 +80,6 @@ namespace BuildUp.API.Services
             }
 
             return result;
-        }
-
-        public async Task DeleteBuildOnAsync(string buildonId)
-        {
-            await _buildOns.DeleteOneAsync(databaseBuildOn =>
-                databaseBuildOn.Id == buildonId
-            );
-        }
-
-        public async Task<List<BuildOnStep>> GetAllStepsAsync(string buildonId)
-        {
-            return await (await _buildOnSteps.FindAsync(databaseBuildOnStep =>
-                databaseBuildOnStep.BuildOnId == buildonId,
-                new FindOptions<BuildOnStep>()
-                {
-                    Sort = Builders<BuildOnStep>.Sort.Ascending("Index")
-                }
-            )).ToListAsync();
         }
 
         public async Task<List<BuildOnStep>> UpdateBuildOnStepsAsync(string buildOnId, List<BuildOnStepManageModel> buildOnStepManageModels)
@@ -123,6 +101,14 @@ namespace BuildUp.API.Services
             return result;
         }
 
+        // Deleting build-ons and steps
+        public async Task DeleteBuildOnAsync(string buildonId)
+        {
+            await _buildOns.DeleteOneAsync(databaseBuildOn =>
+                databaseBuildOn.Id == buildonId
+            );
+        }
+
         public async Task DeleteBuildOnStepAsync(string buildonStepId)
         {
             await _buildOnSteps.DeleteOneAsync(databaseBuildOnStep =>
@@ -130,64 +116,167 @@ namespace BuildUp.API.Services
             );
         }
 
-        public async Task RefuseReturningFromAdmin(string buildOnReturningId)
+        // Getting image for build-ons and steps
+        public async Task<byte[]> GetImageForBuildOnAsync(string buildOnId)
         {
-            var update = Builders<BuildOnReturning>.Update
-                .Set(dbBuildOnReturnging => dbBuildOnReturnging.Status, BuildOnReturningStatus.Refused);
+            BuildOn buildOn = await GetBuildOn(buildOnId);
 
-            await _buildOnReturnings.UpdateOneAsync(databaseBuildOnReturning =>
-                databaseBuildOnReturning.Id == buildOnReturningId,
-                update
-            );
+            if (buildOn == null || buildOn.ImageId == null) { return null;  }
+
+            return (await _filesService.GetFile(buildOn.ImageId)).Data;
         }
 
-        public async Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId)
+        public async Task<byte[]> GetImageForBuildOnStepAsync(string buildOnStepId)
         {
-            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseReturning =>
-                databaseReturning.Id == buildOnReturningId
-            )).FirstOrDefaultAsync();
+            BuildOnStep buildOnStep = await GetBuildOnStep(buildOnStepId);
+
+            if (buildOnStep == null || buildOnStep.ImageId == null) { return null; }
+
+            return (await _filesService.GetFile(buildOnStep.ImageId)).Data;
+        }
+
+        // Getting the proofs
+        public async Task<List<BuildOnReturning>> GetReturningsFromAdmin(string projectId)
+        {
+            return await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.ProjectId == projectId
+            )).ToListAsync();
+        }
+
+        public async Task<List<BuildOnReturning>> GetReturningFromBuilder(string currentUserId, string projectId)
+        {
+            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(projectId);
+
+            if (builder == null) throw new UnauthorizedAccessException("You are not a builder");
+            if (project == null) throw new Exception("The project doesn't exist");
+            if (builder.Id != project.BuilderId) throw new UnauthorizedAccessException("You are not the owner of this project");
+
+            return await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.ProjectId == projectId
+            )).ToListAsync();
+        }
+        public async Task<List<BuildOnReturning>> GetReturningFromCoach(string currentUserId, string projectId)
+        {
+            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(projectId);
+
+            if (coach == null) throw new UnauthorizedAccessException("You are not a coach");
+            if (project == null) throw new Exception("The project doesn't exist");
+
+            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
+
+            if (coach.Id != builderCoach.Id) throw new UnauthorizedAccessException("You are not the coach of this builder");
+
+            return await (await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.ProjectId == projectId
+            )).ToListAsync();
+        }
+
+        // Getting proof file
+        public async Task<FileModel> GetReturningFileFromAdmin(string buildOnReturningId)
+        {
+            var buildOnReturning = await GetReturning(buildOnReturningId);
 
             if (buildOnReturning == null || buildOnReturning.FileId == null)
             {
-                throw new Exception("It seems that the returning doesn't exist");
+                return null;
+            }
+
+            return await _filesService.GetFile(buildOnReturning.FileId);
+        }
+
+        public async Task<FileModel> GetReturningFileFromCoach(string currentUserId, string buildOnReturningId)
+        {
+            var buildOnReturning = await GetReturning(buildOnReturningId);
+
+            if (buildOnReturning == null || buildOnReturning.FileId == null)
+            {
+                return null;
             }
 
             Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
             Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
 
-            if (coach == null ||
-                project == null)
-            {
-                throw new Exception("It seems that the coach or the project doesn't exist");
-            }
+            if (coach == null) throw new UnauthorizedAccessException("You are not a coach");
+            if (project == null) throw new Exception("The project doesn't exist");
 
             Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
 
-            if (coach.Id != builderCoach?.Id)
-            {
-                throw new Exception("You don't have the right to refuse this returning");
-            }
+            if (coach.Id != builderCoach.Id) throw new UnauthorizedAccessException("You are not the coach of this builder");
 
-            buildOnReturning.Status = BuildOnReturningStatus.Refused;
-
-            await _buildOnReturnings.ReplaceOneAsync(databaseReturning =>
-                databaseReturning.Id == buildOnReturning.Id,
-                buildOnReturning
-            );
+            return await _filesService.GetFile(buildOnReturning.FileId);
         }
 
+        public async Task<FileModel> GetReturningFileFromBuilder(string currentUserId, string buildOnReturningId)
+        {
+            var buildOnReturning = await GetReturning(buildOnReturningId);
+
+            if (buildOnReturning == null || buildOnReturning.FileId == null)
+            {
+                return null;
+            }
+
+            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
+
+            if (builder == null) throw new UnauthorizedAccessException("You are not a builder");
+            if (project == null) throw new Exception("The project doesn't exist");
+            if (builder.Id != project.BuilderId) throw new UnauthorizedAccessException("You are not the owner of this project");
+
+            return await _filesService.GetFile(buildOnReturning.FileId);
+        }
+
+        // Sending proof
+        public async Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel)
+        {
+            // First we need basics checks
+            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
+
+            if (builder == null) throw new UnauthorizedAccessException("You are not a builder");
+
+            var project = await _projectsService.GetProjectAsync(builder.Id);
+
+            if (project == null) throw new Exception("The project doesn't exist");
+            if (project.Id != projectId) throw new UnauthorizedAccessException("The project doesn't belong to you");
+
+            // Then we register the returning
+            string fileId = null;
+            if (buildOnReturningSubmitModel.File != null && buildOnReturningSubmitModel.File.Length >= 1)
+            {
+                var filename = $"{projectId}_{buildOnReturningSubmitModel.FileName}";
+                fileId = await _filesService.UploadFile(filename, buildOnReturningSubmitModel.File, false);
+            }
+
+            BuildOnReturning returning = new BuildOnReturning()
+            {
+                ProjectId = projectId,
+                BuildOnStepId = buildOnReturningSubmitModel.BuildOnStepId,
+                Type = buildOnReturningSubmitModel.Type,
+                Status = BuildOnReturningStatus.Waiting,
+                FileName = buildOnReturningSubmitModel.FileName,
+                FileId = fileId,
+                Comment = buildOnReturningSubmitModel.Comment
+            };
+
+            await _buildOnReturnings.InsertOneAsync(returning);
+
+            return returning.Id;
+        }
+
+        // Accepting proof
         public async Task AcceptReturningFromAdmin(string projectId, string buildOnReturningId)
         {
             var project = await _projectsService.GetProjectFromIdAsync(projectId);
 
             if (project == null) throw new Exception("The project doesn't exist");
 
-            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseBuildOnReturning =>
-                databaseBuildOnReturning.Id == buildOnReturningId
-            )).FirstOrDefaultAsync();
+            var buildOnReturning = await GetReturning(buildOnReturningId);
 
             if (buildOnReturning == null) throw new Exception("The build-on returning doesn't exist");
 
+            // We check if the returnging is waiting for coach validation or 
+            // if it already has been provided
             if (buildOnReturning.Status == BuildOnReturningStatus.Waiting)
             {
                 buildOnReturning.Status = BuildOnReturningStatus.WaitingCoach;
@@ -211,26 +300,20 @@ namespace BuildUp.API.Services
 
             if (project == null) throw new Exception("The project doesn't exist");
 
-            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseBuildOnReturning =>
-                databaseBuildOnReturning.Id == buildOnReturningId
-            )).FirstOrDefaultAsync();
+            var buildOnReturning = await GetReturning(buildOnReturningId);
 
             if (buildOnReturning == null) throw new Exception("The build-on returning doesn't exist");
 
             Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
 
-            if (coach == null)
-            {
-                throw new Exception("It seems that the coach doesn't exist");
-            }
+            if (coach == null) throw new UnauthorizedAccessException("You are not a coach");
 
             Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
 
-            if (coach.Id != builderCoach?.Id)
-            {
-                throw new Exception("You don't have the right to accept this returning");
-            }
+            if (coach.Id != builderCoach?.Id) throw new UnauthorizedAccessException("You are not the coach of the builder who submited the returning");
 
+            // We check if the returnging is waiting for admin validation or 
+            // if it already has been provided
             if (buildOnReturning.Status == BuildOnReturningStatus.Waiting)
             {
                 buildOnReturning.Status = BuildOnReturningStatus.WaitingAdmin;
@@ -248,6 +331,43 @@ namespace BuildUp.API.Services
 
         }
 
+        // Refusing proof
+        public async Task RefuseReturningFromAdmin(string buildOnReturningId)
+        {
+            var update = Builders<BuildOnReturning>.Update
+                .Set(dbBuildOnReturnging => dbBuildOnReturnging.Status, BuildOnReturningStatus.Refused);
+
+            await _buildOnReturnings.UpdateOneAsync(databaseBuildOnReturning =>
+                databaseBuildOnReturning.Id == buildOnReturningId,
+                update
+            );
+        }
+
+        public async Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId)
+        {
+            var buildOnReturning = await GetReturning(buildOnReturningId);
+
+            if (buildOnReturning == null || buildOnReturning.FileId == null) throw new Exception("It seems that the returning doesn't exist");
+
+            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
+            Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
+
+            if (coach == null) throw new UnauthorizedAccessException("You are not a coach");
+            if (project == null) throw new Exception("The project doesn't exist");
+
+            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
+
+            if(coach.Id != builderCoach?.Id) throw new UnauthorizedAccessException("You are not the coach of the builder who submited the returning");
+
+            buildOnReturning.Status = BuildOnReturningStatus.Refused;
+
+            await _buildOnReturnings.ReplaceOneAsync(databaseReturning =>
+                databaseReturning.Id == buildOnReturning.Id,
+                buildOnReturning
+            );
+        }
+
+        // Validating step
         public async Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnStepId)
         {
             var project = await _projectsService.GetProjectFromIdAsync(projectId);
@@ -276,17 +396,11 @@ namespace BuildUp.API.Services
 
             Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
 
-            if (coach == null)
-            {
-                throw new Exception("It seems that the coach doesn't exist");
-            }
+            if (coach == null) throw new UnauthorizedAccessException("You are not a coach");
 
             Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
 
-            if (coach.Id != builderCoach?.Id)
-            {
-                throw new Exception("You don't have the right to accept this step");
-            }
+            if (coach.Id != builderCoach?.Id) throw new UnauthorizedAccessException("You are not the coach of the builder you wan't to validate step");
 
             BuildOnReturning returning = new BuildOnReturning()
             {
@@ -302,202 +416,31 @@ namespace BuildUp.API.Services
             await IncrementProjectBuildOnStep(project);
         }
 
-
-        public async Task<FileModel> GetReturningFileFromAdmin(string buildOnReturningId)
+        private async Task<BuildOn> GetBuildOn(string buildOnId)
         {
-            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseReturning =>
-                databaseReturning.Id == buildOnReturningId
-            )).FirstOrDefaultAsync();
+            var buildOn = await _buildOns.FindAsync(databaseBuildOn =>
+                databaseBuildOn.Id == buildOnId
+            );
 
-            if (buildOnReturning == null || buildOnReturning.FileId == null) { 
-                return null; 
-            }
-
-            return await _filesService.GetFile(buildOnReturning.FileId);
+            return await buildOn.FirstOrDefaultAsync();
         }
 
-        public async Task<FileModel> GetReturningFileFromCoach(string currentUserId, string buildOnReturningId)
+        private async Task<BuildOnStep> GetBuildOnStep(string buildOnStepId)
         {
-            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseReturning =>
-                databaseReturning.Id == buildOnReturningId
-            )).FirstOrDefaultAsync();
+            var buildOnStep = await _buildOnSteps.FindAsync(databaseBuildOnStep =>
+                databaseBuildOnStep.Id == buildOnStepId
+            );
 
-            if (buildOnReturning == null || buildOnReturning.FileId == null)
-            {
-                return null;
-            }
-
-            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
-            Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
-
-            if (coach == null ||
-                project == null)
-            {
-                throw new Exception("It seems that the coach or the project doesn't exist");
-            }
-
-            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
-
-            if (coach.Id != builderCoach?.Id)
-            {
-                throw new Exception("You don't have the right to view this returning's file");
-            }
-
-            return await _filesService.GetFile(buildOnReturning.FileId);
+            return await buildOnStep.FirstOrDefaultAsync();
         }
 
-        public async Task<FileModel> GetReturningFileFromBuilder(string currentUserId, string buildOnReturningId)
+        private async Task<BuildOnReturning> GetReturning(string returningId)
         {
-            var buildOnReturning = await (await _buildOnReturnings.FindAsync(databaseReturning =>
-                databaseReturning.Id == buildOnReturningId
-            )).FirstOrDefaultAsync();
+            var returning = await _buildOnReturnings.FindAsync(databaseReturning =>
+                databaseReturning.Id == returningId
+            );
 
-            if (buildOnReturning == null || buildOnReturning.FileId == null)
-            {
-                return null;
-            }
-
-            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
-            Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
-
-            if (builder == null ||
-                project == null ||
-                builder.Id != project.BuilderId)
-            {
-                throw new Exception("You don't have the right to view this returning file");
-            }
-
-            return await _filesService.GetFile(buildOnReturning.FileId);
-        }
-
-        public async Task<List<BuildOnReturning>> GetReturningsFromAdmin(string projectId)
-        {
-            return await (await _buildOnReturnings.FindAsync(databaseReturning =>
-                databaseReturning.ProjectId == projectId
-            )).ToListAsync();
-        }
-
-        public async Task<List<BuildOnReturning>> GetReturningFromBuilder(string currentUserId, string projectId)
-        {
-            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
-            Project project = await _projectsService.GetProjectFromIdAsync(projectId);
-
-            if (builder == null ||
-                project == null ||
-                builder.Id != project.BuilderId)
-            {
-                throw new Exception("You don't have the right to view this builder returning");
-            }
-
-            return await (await _buildOnReturnings.FindAsync(databaseReturning =>
-                databaseReturning.ProjectId == projectId
-            )).ToListAsync();
-        }
-        public async Task<List<BuildOnReturning>> GetReturningFromCoach(string currentUserId, string projectId)
-        {
-            Coach coach = await _coachsService.GetCoachFromAdminAsync(currentUserId);
-            Project project = await _projectsService.GetProjectFromIdAsync(projectId);
-
-            if (coach == null ||
-                project == null)
-            {
-                throw new Exception("It seems that the coach or the project doesn't exist");
-            }
-
-            Coach builderCoach = await _buildersService.GetCoachForBuilderFromAdminAsync(project.BuilderId);
-
-            if (coach.Id != builderCoach.Id)
-            {
-                throw new Exception("You don't have the right to view this builder returning");
-            }
-
-            return await(await _buildOnReturnings.FindAsync(databaseReturning =>
-               databaseReturning.ProjectId == projectId
-            )).ToListAsync();
-        }
-
-
-        public async Task<string> SendReturningAsync(string currentUserId, string projectId, BuildOnReturningSubmitModel buildOnReturningSubmitModel)
-        {
-            // First we need basics checks
-            Builder builder = await _buildersService.GetBuilderFromAdminAsync(currentUserId);
-
-            if (builder == null)
-            {
-                throw new Exception("You are not a builder");
-            }
-
-            var project = await _projectsService.GetProjectAsync(builder.Id);
-
-            if (project == null || project.Id != projectId)
-            {
-                throw new Exception("The project doesn't belong to you");
-            }
-
-            string fileId = null;
-            if (buildOnReturningSubmitModel.File != null && buildOnReturningSubmitModel.File.Length >= 1)
-            {
-                var filename = $"{projectId}_{buildOnReturningSubmitModel.FileName}";
-                fileId = await _filesService.UploadFile(filename, buildOnReturningSubmitModel.File, false);
-            }
-
-            BuildOnReturning returning = new BuildOnReturning()
-            {
-                ProjectId = projectId,
-                BuildOnStepId = buildOnReturningSubmitModel.BuildOnStepId,
-                Type = buildOnReturningSubmitModel.Type,
-                Status = BuildOnReturningStatus.Waiting,
-                FileName = buildOnReturningSubmitModel.FileName,
-                FileId = fileId,
-                Comment = buildOnReturningSubmitModel.Comment
-            };
-
-            await _buildOnReturnings.InsertOneAsync(returning);
-
-            return returning.Id;
-        }
-
-        private async Task IncrementProjectBuildOnStep(Project project)
-        {
-            List<BuildOn> buildOns = await GetAllAsync();
-            string newBuildOn;
-            string newBuildOnStep;
-
-            if (project.CurrentBuildOn == null)
-            {
-                // TODO: if their is less than one Build-on step in the first Build-on it will
-                // just crash..
-                newBuildOn = buildOns.First().Id;
-                newBuildOnStep = (await GetAllStepsAsync(buildOns.First().Id))[1].Id;
-            }
-            else
-            {
-                BuildOn currentBuildOn = await GetBuildOn(project.CurrentBuildOn);
-                BuildOnStep currentStep = await GetBuildOnStep(project.CurrentBuildOnStep);
-
-                List<BuildOnStep> buildOnSteps = await GetAllStepsAsync(currentBuildOn.Id);
-
-                if (currentStep.Index == buildOnSteps.Count - 1)
-                {
-                    if (currentBuildOn.Index == buildOns.Count - 1)
-                    {
-                        newBuildOn = null;
-                        newBuildOnStep = null;
-                    }
-                    else
-                    {
-                        newBuildOn = buildOns[currentBuildOn.Index + 1].Id;
-                        newBuildOnStep = (await GetAllStepsAsync(buildOns[currentBuildOn.Index + 1].Id)).First().Id;
-                    }
-                }
-                else
-                {
-                    newBuildOn = currentBuildOn.Id;
-                    newBuildOnStep = buildOnSteps[currentStep.Index + 1].Id;
-                }
-            }
-
-            await _projectsService.UpdateProjectBuildOnStep(project.Id, newBuildOn, newBuildOnStep);
+            return await returning.FirstOrDefaultAsync();
         }
 
         private async Task<BuildOn> CreateBuildOnAsync(int index, BuildOnManageModel buildOnManageModel)
@@ -511,9 +454,33 @@ namespace BuildUp.API.Services
             };
 
             await _buildOns.InsertOneAsync(buildOn);
+
+            // We directly update the build-on to save the image
             buildOn = await UpdateBuildOnAsync(buildOn.Id, index, buildOnManageModel);
 
             return buildOn;
+        }
+
+        private async Task<BuildOnStep> CreateBuildOnStepAsync(string buildOnId, int index, BuildOnStepManageModel buildOnStepManageModel)
+        {
+            BuildOnStep buildOnStep = new BuildOnStep()
+            {
+                BuildOnId = buildOnId,
+                Index = index,
+
+                Name = buildOnStepManageModel.Name,
+                Description = buildOnStepManageModel.Description,
+                ReturningType = buildOnStepManageModel.ReturningType,
+                ReturningDescription = buildOnStepManageModel.ReturningDescription,
+                ReturningLink = buildOnStepManageModel.ReturningLink
+            };
+
+            await _buildOnSteps.InsertOneAsync(buildOnStep);
+
+            // We directly update the build-on step to save the image
+            buildOnStep = await UpdateBuildOnStepAsync(buildOnId, buildOnStep.Id, index, buildOnStepManageModel);
+
+            return buildOnStep;
         }
 
         private async Task<BuildOn> UpdateBuildOnAsync(string buildOnId, int index, BuildOnManageModel buildOnManageModel)
@@ -544,26 +511,6 @@ namespace BuildUp.API.Services
                 Name = buildOnManageModel.Name,
                 Description = buildOnManageModel.Description,
             };
-        }
-
-        private async Task<BuildOnStep> CreateBuildOnStepAsync(string buildOnId, int index, BuildOnStepManageModel buildOnStepManageModel)
-        {
-            BuildOnStep buildOnStep = new BuildOnStep()
-            {
-                BuildOnId = buildOnId,
-                Index = index,
-
-                Name = buildOnStepManageModel.Name,
-                Description = buildOnStepManageModel.Description,
-                ReturningType = buildOnStepManageModel.ReturningType,
-                ReturningDescription = buildOnStepManageModel.ReturningDescription,
-                ReturningLink = buildOnStepManageModel.ReturningLink
-            };
-
-            await _buildOnSteps.InsertOneAsync(buildOnStep);
-            buildOnStep = await UpdateBuildOnStepAsync(buildOnId, buildOnStep.Id, index, buildOnStepManageModel);
-
-            return buildOnStep;
         }
 
         private async Task<BuildOnStep> UpdateBuildOnStepAsync(string buildOnId, string buildonStepId, int index, BuildOnStepManageModel buildOnStepManageModel)
@@ -603,22 +550,61 @@ namespace BuildUp.API.Services
             };
         }
 
-        private async Task<BuildOn> GetBuildOn(string buildOnId)
+        private async Task IncrementProjectBuildOnStep(Project project)
         {
-            var buildOn = await _buildOns.FindAsync(databaseBuildOn =>
-                databaseBuildOn.Id == buildOnId
-            );
+            List<BuildOn> buildOns = await GetAllAsync();
 
-            return await buildOn.FirstOrDefaultAsync();
-        }
+            if (buildOns.Count < 1) throw new Exception("Build-up have no build-ons yet...");
 
-        private async Task<BuildOnStep> GetBuildOnStep(string buildOnStepId)
-        {
-            var buildOnStep = await _buildOnSteps.FindAsync(databaseBuildOnStep =>
-                databaseBuildOnStep.Id == buildOnStepId
-            );
+            string newBuildOnId;
+            string newBuildOnStepId;
 
-            return await buildOnStep.FirstOrDefaultAsync();
+            if (project.CurrentBuildOn == null)
+            {
+                newBuildOnId = buildOns.First().Id;
+
+                var buildOnSteps = await GetAllStepsAsync(buildOns.First().Id);
+
+                if (buildOnSteps.Count < 1) return;
+
+                newBuildOnStepId = buildOnSteps[1].Id;
+            }
+            else
+            {
+                BuildOn currentBuildOn = await GetBuildOn(project.CurrentBuildOn);
+                BuildOnStep currentStep = await GetBuildOnStep(project.CurrentBuildOnStep);
+
+                List<BuildOnStep> currentBuildOnSteps = await GetAllStepsAsync(currentBuildOn.Id);
+
+                // Case 1: we are at the last step of the current build-on
+                if (currentStep.Index == currentBuildOnSteps.Count - 1)
+                {
+                    // If we are at the last build-on, no need to continue
+                    if (currentBuildOn.Index == buildOns.Count - 1)
+                    {
+                        newBuildOnId = null;
+                        newBuildOnStepId = null;
+                    }
+                    else
+                    {
+                        BuildOn newBuildOn = buildOns[currentBuildOn.Index + 1];
+                        List<BuildOnStep> newSteps = await GetAllStepsAsync(newBuildOn.Id);
+
+                        if (newSteps.Count < 1) return;
+
+                        newBuildOnId = newBuildOn.Id;
+                        newBuildOnStepId = newSteps.First().Id;
+                    }
+                }
+                // Case 2: we wan't the next from the current build-on
+                else
+                {
+                    newBuildOnId = currentBuildOn.Id;
+                    newBuildOnStepId = currentBuildOnSteps[currentStep.Index + 1].Id;
+                }
+            }
+
+            await _projectsService.UpdateProjectBuildOnStep(project.Id, newBuildOnId, newBuildOnStepId);
         }
 
     }

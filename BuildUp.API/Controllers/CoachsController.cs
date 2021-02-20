@@ -49,7 +49,7 @@ namespace BuildUp.API.Controllers
         /// <param name="userId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns>The coach corresponding to the user id</returns>
         /// <response code="400">There was an error in the request</response>
-        /// <response code="401">You don't have enough permissions</response
+        /// <response code="401">You don't have enough permissions</response>
         /// <response code="403">You are not allowed to view this coach info</response>
         /// <response code="404">The coach doesn't exist</response>
         /// <response code="200">Return the coach infos</response>
@@ -98,7 +98,7 @@ namespace BuildUp.API.Controllers
         /// <param name="coachId"></param>
         /// <returns></returns>
         /// <response code="400">There was an error in the request</response>
-        /// <response code="401">You don't have enough permissions</response
+        /// <response code="401">You don't have enough permissions</response>
         /// <response code="403">You are not allowed to view this builder user</response>
         /// <response code="404">The user doesn't exist</response>
         /// <response code="200">Return the user's infos</response>

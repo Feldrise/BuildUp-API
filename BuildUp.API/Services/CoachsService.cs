@@ -75,7 +75,7 @@ namespace BuildUp.API.Services
 
             if (coach == null) throw new Exception("The coach doesn't exist");
 
-            return await GetUserFromId(coach.Id);
+            return await GetUserFromId(coach.UserId);
         }
 
         public async Task<User> GetUserFromCoachAsync(string currentUserId, string coachId)

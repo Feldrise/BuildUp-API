@@ -132,8 +132,8 @@
             </summary>
             <param name="builderId"></param>
             <returns>The builder's meeting reports</returns>
-            <response code="400">Unexpected error while getting the builder meeting reports</response>
-            <response code="401">You are not allowed to view this builder's meeting reports</response>s
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="403">You are not allowed to view this builder's meeting reports</response>
             <response code="200">Return meeting reports's project</response>
         </member>
@@ -164,8 +164,9 @@
             <param name="builderId" example="5f1fed8458c8ab093c4f77bf"></param>
             <param name="coachAssignmentModel"></param>
             <returns></returns>
-            <response code="400">The meeting report can't be created</response>
-            <response code="401">You are not authorized to create the meeting report</response>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>
+            <response code="403">You are not allowed to submit project for this builder</response>s
             <response code="200">The coach has been successfully assigned</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.CreateMeetingReport(System.String,BuildUp.API.Models.MeetingReports.CreateMeetingReportModel)">
@@ -227,19 +228,19 @@
         </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOns">
             <summary>
-            Get all build-ons
+            (Builder,Coach,Admin) Get all build-ons
             </summary>
             <returns>All build-ons</returns>
-            <response code="401">You are not allowed to view buildons</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="200">Return buildons</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOnSteps(System.String)">
             <summary>
-            Get all buildon's steps
+            (Builder,Coach,Admin) Get all buildon's steps
             </summary>
             <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <returns></returns>
-            <response code="401">You are not allowed to view buildon's step</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="200">Return buildon's step</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOnImage(System.String)">
@@ -248,7 +249,7 @@
             </summary>
             <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <returns></returns>
-            <response code="401">You are not allowed to view buildon's image</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="404">The image was not found</response>
             <response code="200">Return buildon's image</response>
         </member>
@@ -258,8 +259,31 @@
             </summary>
             <param name="buildOnStepId" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <returns></returns>
-            <response code="401">You are not allowed to view buildon's step's image</response>
+            <response code="401">You don't have enough permissions</response>s
+            <response code="404">The image was not found</response>
             <response code="200">Return buildon's image</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetReturnings(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get returnings for project
+            </summary>
+            <param name="projectId"></param>
+            <returns></returns>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>
+            <response code="403">You are not allowed to get returnings</response>
+            <response code="200">Return the returnings</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetReturningFile(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Get a returnging file
+            </summary>
+            <param name="returningId"></param>
+            <returns></returns>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>
+            <response code="403">You are not allowed to view returning file</response>
+            <response code="200">Return the returning file</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.SyncBuildOns(System.Collections.Generic.List{BuildUp.API.Models.BuildOn.BuildOnManageModel})">
             <summary>
@@ -267,7 +291,8 @@
             </summary>
             <param name="buildOnManageModels"></param>
             <returns></returns>
-            <response code="401">You are not allowed to view buildon's step</response>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="200">Return synced buildons</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.SyncBuildOnSteps(System.String,System.Collections.Generic.List{BuildUp.API.Models.BuildOn.BuildOnStepManageModel})">
@@ -277,62 +302,9 @@
             <param name="buildOnId" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <param name="buildOnManageStepModels"></param>
             <returns></returns>
-            <response code="401">You are not allowed to view buildon's step</response>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="200">Return synced buildons</response>
-        </member>
-        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetReturnings(System.String)">
-            <summary>
-            (Builder,Coach,Admin) Get returnings for project
-            </summary>
-            <param name="projectId"></param>
-            <returns></returns>
-            <response code="400">The request is wrong</response>
-            <response code="403">You are not allowed to get returnings</response>
-            <response code="200">Return the returnings</response>
-        </member>
-        <member name="M:BuildUp.API.Controllers.BuildOnsController.GetReturningFile(System.String,System.String)">
-            <summary>
-            (Builder) Submit a returning
-            </summary>
-            <param name="projectId"></param>
-            <param name="returningId"></param>
-            <returns></returns>
-            <response code="400">The request is wrong</response>
-            <response code="403">You are not allowed to view returning file</response>
-            <response code="200">Return the returning file</response>
-        </member>
-        <member name="M:BuildUp.API.Controllers.BuildOnsController.AcceptReturning(System.String,System.String)">
-            <summary>
-            (Admin,Coach) Accept returning
-            </summary>
-            <param name="projectId"></param>
-            <param name="returningId"></param>
-            <returns></returns>
-            <response code="400">The request is wrong</response>
-            <response code="403">You are not allowed to accept returning</response>
-            <response code="200">The returning has been accepted</response>
-        </member>
-        <member name="M:BuildUp.API.Controllers.BuildOnsController.ValidateBuildOnStep(System.String,System.String)">
-            <summary>
-            (Admin,Coach) Accept returning
-            </summary>
-            <param name="projectId"></param>
-            <param name="buildOnStepId"></param>
-            <returns></returns>
-            <response code="400">The request is wrong</response>
-            <response code="403">You are not allowed to accept build-on steps</response>
-            <response code="200">The build-on step has been accepted</response>
-        </member>
-        <member name="M:BuildUp.API.Controllers.BuildOnsController.RefuseReturnging(System.String,System.String)">
-            <summary>
-            (Admin,Coach) Refuse returning
-            </summary>
-            <param name="projectId"></param>
-            <param name="returningId"></param>
-            <returns></returns>
-            <response code="400">The request is wrong</response>
-            <response code="403">You are not allowed to refuse returning</response>
-            <response code="200">The returning has been refused</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.SubmitReturning(System.String,BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel)">
             <summary>
@@ -341,9 +313,45 @@
             <param name="projectId"></param>
             <param name="buildOnReturningSubmitModel"></param>
             <returns></returns>
-            <response code="400">The request is wrong</response>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="403">You are not allowed to submit returnings</response>
             <response code="200">Return the returning id</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.AcceptReturning(System.String,System.String)">
+            <summary>
+            (Admin,Coach) Accept returning
+            </summary>
+            <param name="projectId"></param>
+            <param name="returningId"></param>
+            <returns></returns>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
+            <response code="403">You are not allowed to accept returning</response>
+            <response code="200">The returning has been accepted</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.RefuseReturnging(System.String)">
+            <summary>
+            (Admin,Coach) Refuse returning
+            </summary>
+            <param name="returningId"></param>
+            <returns></returns>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
+            <response code="403">You are not allowed to refuse returning</response>
+            <response code="200">The returning has been refused</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.ValidateBuildOnStep(System.String,System.String)">
+            <summary>
+            (Admin,Coach) Validate build-on step without any proof
+            </summary>
+            <param name="projectId"></param>
+            <param name="buildOnStepId"></param>
+            <returns></returns>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
+            <response code="403">You are not allowed to accept build-on steps</response>
+            <response code="200">The build-on step has been accepted</response>
         </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetAllCoach">
             <summary>
@@ -353,8 +361,30 @@
             <response code="401">You don't have enough permissions</response>
             <response code="200">Return all coachs</response>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BuildUp.API.Controllers.CoachsController.GetCoach(System.String)" -->
-        <!-- Badly formed XML comment ignored for member "M:BuildUp.API.Controllers.CoachsController.GetUser(System.String)" -->
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetCoach(System.String)">
+            <summary>
+            (Coach,Admin) Get a coach from his user's ID
+            </summary>
+            <param name="userId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns>The coach corresponding to the user id</returns>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>
+            <response code="403">You are not allowed to view this coach info</response>
+            <response code="404">The coach doesn't exist</response>
+            <response code="200">Return the coach infos</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.CoachsController.GetUser(System.String)">
+            <summary>
+            (Builder,Coach,Admin) Return the user corresponding to the coach
+            </summary>
+            <param name="coachId"></param>
+            <returns></returns>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>
+            <response code="403">You are not allowed to view this builder user</response>
+            <response code="404">The user doesn't exist</response>
+            <response code="200">Return the user's infos</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.GetCandidatingCoachs">
             <summary>
             (Admin) Get candidating coachs
