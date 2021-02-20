@@ -330,11 +330,12 @@
             <response code="403">You are not allowed to accept returning</response>
             <response code="200">The returning has been accepted</response>
         </member>
-        <member name="M:BuildUp.API.Controllers.BuildOnsController.RefuseReturnging(System.String)">
+        <member name="M:BuildUp.API.Controllers.BuildOnsController.RefuseReturnging(System.String,BuildUp.API.Models.BuildOn.BuildOnReturningRefusingModel)">
             <summary>
             (Admin,Coach) Refuse returning
             </summary>
             <param name="returningId"></param>
+            <param name="reason">The reason why it has been refused</param>
             <returns></returns>
             <response code="400">There was an error in the request</response>
             <response code="401">You don't have enough permissions</response>s
@@ -1483,6 +1484,12 @@
             The buildon description
             </summary>
             <example>Dans ce buildon vous allez...</example>
+        </member>
+        <member name="P:BuildUp.API.Models.BuildOn.BuildOnReturningRefusingModel.Reason">
+            <summary>
+            The reason why it is refused
+            </summary>
+            <example>Je crois que cette fois c'est toi qui n'a pas assez dormi Lucas ❤</example>
         </member>
         <member name="P:BuildUp.API.Models.BuildOn.BuildOnReturningSubmitModel.BuildOnStepId">
             <summary>

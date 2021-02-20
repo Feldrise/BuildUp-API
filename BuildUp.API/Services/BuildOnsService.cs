@@ -343,8 +343,20 @@ namespace BuildUp.API.Services
         }
 
         // Refusing proof
-        public async Task RefuseReturningFromAdmin(string buildOnReturningId)
+        public async Task RefuseReturningFromAdmin(string buildOnReturningId, string reason)
         {
+            var buildOnReturning = await GetReturning(buildOnReturningId);
+
+            if (buildOnReturning == null) throw new Exception("It seems that the returning doesn't exist");
+
+            Project project = await _projectsService.GetProjectFromIdAsync(buildOnReturning.ProjectId);
+
+            if (project == null) throw new Exception("The project doesn't exist");
+
+            User builderUser = await _buildersService.GetUserFromAdminAsync(project.BuilderId);
+
+            if (builderUser == null) throw new Exception("Their is no user for this project...");
+
             var update = Builders<BuildOnReturning>.Update
                 .Set(dbBuildOnReturnging => dbBuildOnReturnging.Status, BuildOnReturningStatus.Refused);
 
@@ -352,9 +364,11 @@ namespace BuildUp.API.Services
                 databaseBuildOnReturning.Id == buildOnReturningId,
                 update
             );
+
+            await _notificationService.NotifyBuildOnReturningRefusedByAdmin(builderUser.Email, builderUser.FirstName, reason);
         }
 
-        public async Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId)
+        public async Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId, string reason)
         {
             var buildOnReturning = await GetReturning(buildOnReturningId);
 
@@ -370,12 +384,18 @@ namespace BuildUp.API.Services
 
             if(coach.Id != builderCoach?.Id) throw new UnauthorizedAccessException("You are not the coach of the builder who submited the returning");
 
+            User builderUser = await _buildersService.GetUserFromAdminAsync(project.BuilderId);
+
+            if (builderUser == null) throw new Exception("Their is no user for this project...");
+
             buildOnReturning.Status = BuildOnReturningStatus.Refused;
 
             await _buildOnReturnings.ReplaceOneAsync(databaseReturning =>
                 databaseReturning.Id == buildOnReturning.Id,
                 buildOnReturning
             );
+
+            await _notificationService.NotifyBuildOnReturningRefusedByCoach(builderUser.Email, builderUser.FirstName, reason);
         }
 
         // Validating step

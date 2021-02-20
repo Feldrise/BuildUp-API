@@ -316,6 +316,7 @@ namespace BuildUp.API.Controllers
         /// (Admin,Coach) Refuse returning
         /// </summary>
         /// <param name="returningId"></param>
+        /// <param name="reason">The reason why it has been refused</param>
         /// <returns></returns>
         /// <response code="400">There was an error in the request</response>
         /// <response code="401">You don't have enough permissions</response>s
@@ -323,7 +324,7 @@ namespace BuildUp.API.Controllers
         /// <response code="200">The returning has been refused</response>
         [HttpPut("projects/{projectId:length(24)}/returnings/{returningId}/refuse")]
         [Authorize(Roles = Role.Admin + "," + Role.Coach)]
-        public async Task<IActionResult> RefuseReturnging(string returningId)
+        public async Task<IActionResult> RefuseReturnging(string returningId, [FromBody] BuildOnReturningRefusingModel reason)
         {
             var currentUserId = User.Identity.Name;
 
@@ -331,11 +332,11 @@ namespace BuildUp.API.Controllers
             {
                 if (User.IsInRole(Role.Admin))
                 {
-                    await _buildOnsService.RefuseReturningFromAdmin(returningId);
+                    await _buildOnsService.RefuseReturningFromAdmin(returningId, reason.Reason);
                 }
                 else if (User.IsInRole(Role.Coach))
                 {
-                    await _buildOnsService.RefuseReturningFromCoach(currentUserId, returningId);
+                    await _buildOnsService.RefuseReturningFromCoach(currentUserId, returningId, reason.Reason);
                 }
                 else
                 {

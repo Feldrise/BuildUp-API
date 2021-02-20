@@ -52,6 +52,15 @@ namespace BuildUp.API.Services
                 message,
                 registerModel.Email
             );
+
+            if (registerModel.Role == Role.Builder)
+            {
+                await NotifyBuilderCandidating();
+            }
+            else if (registerModel.Role == Role.Coach)
+            {
+                await NotifyCoachCandidating();
+            }
         }
 
         // Builders
@@ -120,6 +129,8 @@ namespace BuildUp.API.Services
                 pdfIntegrationPaperPath,
                 $"{name}_fiche_integration.pdf"
             );
+
+            await NotifyBuilderIntegrationSucess();
         }
 
         // Coach
@@ -171,6 +182,8 @@ namespace BuildUp.API.Services
                 pdfIntegrationPaperPath,
                 $"{name}_fiche_integration.pdf"
             );
+
+            await NotifyCoachIntegrationSucess();
         }
 
         public async Task NotifyBuilderChoosedCoach(string email)
@@ -188,6 +201,7 @@ namespace BuildUp.API.Services
             );
         }
 
+        // Build-Ons
         public async Task NotifyBuildOnReturningSubmited(string coachMail)
         {
             string subject = "Build Up - Ton Builder a terminé son étape ! ";
@@ -215,6 +229,101 @@ namespace BuildUp.API.Services
                 subject,
                 message,
                 builderMail
+            );
+        }
+
+        public async Task NotifyBuildOnReturningRefusedByCoach(string builderMail, string builderName, string reason)
+        {
+            string subject = "Build Up - Ton Coach n’a pas accepté ton étape ! 😕";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/buildon_step_refused_coach.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", builderName);
+            message = message.Replace("$reason", reason);
+
+            await SendMailAsync(
+                subject,
+                message,
+                builderMail
+            );
+        }
+
+        public async Task NotifyBuildOnReturningRefusedByAdmin(string builderMail, string builderName, string reason)
+        {
+            string subject = "Build Up - Un responsable Builders n’a pas accepté ton étape ! 😕";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/buildon_step_refused_admin.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", builderName);
+            message = message.Replace("$reason", reason);
+
+            await SendMailAsync(
+                subject,
+                message,
+                builderMail
+            );
+        }
+
+
+        // Admin
+        public async Task NotifyBuilderCandidating()
+        {
+            string subject = "Notif - Une nouvelle candidature Builder est disponible ! ";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/admin/candidature_builder.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+
+            await SendMailAsync(
+                subject,
+                message,
+                "builder@new-talents.fr"
+            );
+        }
+        
+        public async Task NotifyCoachCandidating()
+        {
+            string subject = "Notif - Une nouvelle candidature Coach est disponible ! ";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/admin/candidature_coach.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+
+            await SendMailAsync(
+                subject,
+                message,
+                "coach@new-talents.fr"
+            );
+        }
+
+        public async Task NotifyBuilderIntegrationSucess()
+        {
+            string subject = "Notif - Un Builder a signé sa fiche d’intégration ! ";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/admin/builder_integration_success.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+
+            await SendMailAsync(
+                subject,
+                message,
+                "builder@new-talents.fr"
+            );
+        }
+        public async Task NotifyCoachIntegrationSucess()
+        {
+            string subject = "Notif - Un Coach a signé sa fiche d’intégration ! ";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/admin/coach_integration_success.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+
+            await SendMailAsync(
+                subject,
+                message,
+                "coach@new-talents.fr"
             );
         }
 

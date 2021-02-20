@@ -45,8 +45,8 @@ namespace BuildUp.API.Services.Interfaces
         Task AcceptReturningFromCoach(string currentUserId, string projectId, string buildOnReturningId);
 
         // Refusing proofs
-        Task RefuseReturningFromAdmin(string buildOnReturningId);
-        Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId);
+        Task RefuseReturningFromAdmin(string buildOnReturningId, string reason);
+        Task RefuseReturningFromCoach(string currentUserId, string buildOnReturningId, string reason);
         
         // Validating step
         Task ValidateBuildOnStepFromAdmin(string projectId, string buildOnStepId);
