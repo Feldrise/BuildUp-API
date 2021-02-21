@@ -571,7 +571,7 @@ namespace BuildUp.API.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Can't accept the requests: {e.Message}");
+                return BadRequest($"Can't mark the notification as read: {e.Message}");
             }
 
             return Ok();

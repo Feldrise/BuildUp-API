@@ -43,5 +43,9 @@ namespace BuildUp.API.Services.Interfaces
         Task CreateCoachNotification(string coachId, string content);
         Task<List<CoachNotification>> GetCoachNotificationsAsync(string coachId);
         Task MakeCoachNotificationReadAsync(string coachId, string notificationId);
+
+        Task CreateBuilderNotification(string builderId, string content);
+        Task<List<BuilderNotification>> GetBuilderNotificationsAsync(string builderId);
+        Task MakeBuilderNotificationReadAsync(string builderId, string notificationId);
     }
 }

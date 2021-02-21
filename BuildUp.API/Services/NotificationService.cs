@@ -22,6 +22,7 @@ namespace BuildUp.API.Services
         private readonly IMailCredentials _mailCredentials;
 
         private readonly IMongoCollection<CoachNotification> _coachNotifications;
+        private readonly IMongoCollection<BuilderNotification> _builderNotifications;
 
         readonly IWebHostEnvironment _env;
 
@@ -34,6 +35,7 @@ namespace BuildUp.API.Services
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
 
             _coachNotifications = database.GetCollection<CoachNotification>("coach_notifications");
+            _builderNotifications = database.GetCollection<BuilderNotification>("builder_notifications");
         }
 
         public async Task NotifieAccountCreationAsync(RegisterModel registerModel, string password)
@@ -346,9 +348,9 @@ namespace BuildUp.API.Services
 
         public async Task<List<CoachNotification>> GetCoachNotificationsAsync(string coachId)
         {
-            return await (await _coachNotifications.FindAsync(databaseRequest =>
-                databaseRequest.CoachId == coachId &&
-                !databaseRequest.Seen
+            return await (await _coachNotifications.FindAsync(databaseNotification =>
+                databaseNotification.CoachId == coachId &&
+                !databaseNotification.Seen
             )).ToListAsync();
         }
 
@@ -370,6 +372,51 @@ namespace BuildUp.API.Services
                 .Set(databaseNotification => databaseNotification.Seen, true);
 
             await _coachNotifications.UpdateOneAsync(databaseNotification =>
+                databaseNotification.Id == notificationId,
+                update
+            );
+        }
+
+        public async Task CreateBuilderNotification(string builderId, string content)
+        {
+            BuilderNotification notification = new BuilderNotification()
+            {
+                BuilderId = builderId,
+                Date = DateTime.Now,
+                Content = content,
+
+                Seen = false
+            };
+
+            await _builderNotifications.InsertOneAsync(notification);
+        }
+
+        public async Task<List<BuilderNotification>> GetBuilderNotificationNotificationsAsync(string builderId)
+        {
+            return await (await _builderNotifications.FindAsync(databaseNotification =>
+                databaseNotification.BuilderId == builderId &&
+                !databaseNotification.Seen
+            )).ToListAsync();
+        }
+
+        public async Task MakeBuilderNotificationReadAsync(string builderId, string notificationId)
+        {
+            BuilderNotification notification = await GetBuilderNotification(notificationId);
+
+            if (notification == null)
+            {
+                throw new Exception("The notification seems to not exist anymore");
+            }
+
+            if (notification.BuilderId != builderId)
+            {
+                throw new UnauthorizedAccessException("You are not the builder for this notifiction");
+            }
+
+            var update = Builders<BuilderNotification>.Update
+                .Set(databaseNotification => databaseNotification.Seen, true);
+
+            await _builderNotifications.UpdateOneAsync(databaseNotification =>
                 databaseNotification.Id == notificationId,
                 update
             );
@@ -417,11 +464,20 @@ namespace BuildUp.API.Services
 
         private async Task<CoachNotification> GetCoachNotification(string notificationId)
         {
-            var request = await _coachNotifications.FindAsync(databaseNotification =>
+            var notification = await _coachNotifications.FindAsync(databaseNotification =>
                 databaseNotification.Id == notificationId
             );
 
-            return await request.FirstOrDefaultAsync();
+            return await notification.FirstOrDefaultAsync();
+        }
+
+        private async Task<BuilderNotification> GetBuilderNotification(string notificationId)
+        {
+            var notification = await _builderNotifications.FindAsync(databaseNotification =>
+                databaseNotification.Id == notificationId
+            );
+
+            return await notification.FirstOrDefaultAsync();
         }
 
         private string MessageFromHtmlFile(string path)

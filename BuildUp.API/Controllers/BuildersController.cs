@@ -13,6 +13,7 @@ using BuildUp.API.Models.Builders;
 using BuildUp.API.Entities.Form;
 using BuildUp.API.Models.Projects;
 using BuildUp.API.Models.MeetingReports;
+using BuildUp.API.Entities.Notification;
 
 namespace BuildUp.API.Controllers
 {
@@ -22,10 +23,12 @@ namespace BuildUp.API.Controllers
     public class BuildersController : ControllerBase
     {
         private readonly IBuildersService _buildersService;
+        private readonly INotificationService _notificationService;
 
-        public BuildersController(IBuildersService buildersService)
+        public BuildersController(IBuildersService buildersService, INotificationService notificationService)
         {
             _buildersService = buildersService;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -386,6 +389,22 @@ namespace BuildUp.API.Controllers
         }
 
         /// <summary>
+        /// (Builder) Get notification for a builder
+        /// </summary>
+        /// <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <returns>The notifications</returns>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="200">Return the notifications</response>
+        [Authorize(Roles = Role.Builder)]
+        [HttpGet("{builderId:length(24)}/notifications")]
+        public async Task<ActionResult<List<BuilderNotification>>> GetNotifications(string builderId)
+        {
+            List<BuilderNotification> notifications = await _notificationService.GetBuilderNotificationsAsync(builderId);
+
+            return Ok(notifications);
+        }
+
+        /// <summary>
         /// (*) Register the builder
         /// </summary>
         /// <param name="builderRegisterModel" example="5f1fed8458c8ab093c4f77bf"></param>
@@ -636,6 +655,44 @@ namespace BuildUp.API.Controllers
             }
 
             return BadRequest("The PDF can't be generated");
+        }
+
+        /// <summary>
+        /// (Builder) Mark a notification as read
+        /// </summary>
+        /// <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <param name="notificationId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
+        /// <response code="403">You are not allowed to mark this notification as read</response>
+        /// <response code="200">The request has been accepted</response>
+        [Authorize(Roles = Role.Builder)]
+        [HttpPut("{builderId:length(24)}/notifications/{notificationId:length(24)}/read")]
+        public async Task<IActionResult> ReadNotification(string builderId, string notificationId)
+        {
+            var currentUserId = User.Identity.Name;
+
+            try
+            {
+                if (User.IsInRole(Role.Builder))
+                {
+                    await _notificationService.MakeBuilderNotificationReadAsync(builderId, notificationId);
+                }
+                else
+                {
+                    return Forbid("You must be a builder");
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to mark this notification as read: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Can't mark the notification as read: {e.Message}");
+            }
+
+            return Ok();
         }
 
     }
