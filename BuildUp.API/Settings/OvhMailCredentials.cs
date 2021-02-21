@@ -11,7 +11,10 @@ namespace BuildUp.API.Settings
         public string Server { get; set; }
         public int Port { get; set; }
 
-        public string User { get; set; }
-        public string Password { get; set; }
+        public string BuilderUser { get; set; }
+        public string BuilderPassword { get; set; }
+
+        public string CoachUser { get; set; }
+        public string CoachPassword { get; set; }
     }
 }

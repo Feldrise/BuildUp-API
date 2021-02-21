@@ -26,6 +26,9 @@ namespace BuildUp.API.Services
 
         readonly IWebHostEnvironment _env;
 
+        private const string OrigineCoach = "coach";
+        private const string OrigineBuilder = "builder";
+
         public NotificationService(IMongoSettings mongoSettings, IMailCredentials mailCredentials, IWebHostEnvironment env)
         {
             _mailCredentials = mailCredentials;
@@ -50,6 +53,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$password", password);
 
             await SendMailAsync(
+                registerModel.Role == Role.Coach ? OrigineCoach : OrigineBuilder,
                 subject,
                 message,
                 registerModel.Email
@@ -76,6 +80,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$name", name);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 email
@@ -92,6 +97,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$name", name);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 email
@@ -108,6 +114,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$name", name);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 email
@@ -125,6 +132,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$name", name);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 email,
@@ -146,6 +154,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$name", name);
 
             await SendMailAsync(
+                OrigineCoach,
                 subject,
                 message,
                 email
@@ -161,6 +170,7 @@ namespace BuildUp.API.Services
             string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
+                OrigineCoach,
                 subject,
                 message,
                 email
@@ -178,6 +188,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$name", name);
 
             await SendMailAsync(
+                OrigineCoach,
                 subject,
                 message,
                 email,
@@ -197,6 +208,7 @@ namespace BuildUp.API.Services
             string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
+                OrigineCoach,
                 subject,
                 message,
                 email
@@ -213,6 +225,7 @@ namespace BuildUp.API.Services
             string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
+                OrigineCoach,
                 subject,
                 message,
                 coachMail
@@ -221,7 +234,7 @@ namespace BuildUp.API.Services
             await CreateCoachNotification(coachId, "Votre Builder vient de soumettre une nouvelle étape !");
         }
 
-        public async Task NotifyBuildonStepValidated(string builderMail)
+        public async Task NotifyBuildonStepValidated(string builderId, string builderMail)
         {
             string subject = "Build Up - Ton étape vient d’être validée ! ";
 
@@ -230,10 +243,13 @@ namespace BuildUp.API.Services
             string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 builderMail
             );
+
+            await CreateBuilderNotification(builderId, "L'étape a été accepté ! On passe à la suite 🎉");
         }
 
         public async Task NotifyBuildOnReturningRefusedByCoach(string builderMail, string builderName, string reason)
@@ -247,6 +263,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$reason", reason);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 builderMail
@@ -264,6 +281,7 @@ namespace BuildUp.API.Services
             message = message.Replace("$reason", reason);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 builderMail
@@ -281,6 +299,7 @@ namespace BuildUp.API.Services
             string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 "builder@new-talents.fr"
@@ -296,6 +315,7 @@ namespace BuildUp.API.Services
             string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
+                OrigineCoach,
                 subject,
                 message,
                 "coach@new-talents.fr"
@@ -311,6 +331,7 @@ namespace BuildUp.API.Services
             string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
+                OrigineBuilder,
                 subject,
                 message,
                 "builder@new-talents.fr"
@@ -325,6 +346,7 @@ namespace BuildUp.API.Services
             string message = MessageFromHtmlFile(htmlPath);
 
             await SendMailAsync(
+                OrigineCoach,
                 subject,
                 message,
                 "coach@new-talents.fr"
@@ -391,7 +413,7 @@ namespace BuildUp.API.Services
             await _builderNotifications.InsertOneAsync(notification);
         }
 
-        public async Task<List<BuilderNotification>> GetBuilderNotificationNotificationsAsync(string builderId)
+        public async Task<List<BuilderNotification>> GetBuilderNotificationsAsync(string builderId)
         {
             return await (await _builderNotifications.FindAsync(databaseNotification =>
                 databaseNotification.BuilderId == builderId &&
@@ -422,19 +444,21 @@ namespace BuildUp.API.Services
             );
         }
 
-        private async Task SendMailAsync(string subject, string body, string to, string attachmentPath = "", string attachmentName = "")
+        private async Task SendMailAsync(string origine, string subject, string body, string to, string attachmentPath = "", string attachmentName = "")
         {
             using var client = new SmtpClient(_mailCredentials.Server, _mailCredentials.Port)
             {
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(_mailCredentials.User, _mailCredentials.Password),
+                Credentials = new NetworkCredential(
+                    origine == OrigineCoach ? _mailCredentials.CoachUser : _mailCredentials.BuilderUser,
+                    origine == OrigineCoach ? _mailCredentials.CoachPassword : _mailCredentials.BuilderPassword),
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 EnableSsl = true
             };
 
             MailMessage mailMessage = new MailMessage()
             {
-                From = new MailAddress(_mailCredentials.User),
+                From = new MailAddress(origine == OrigineCoach ? _mailCredentials.CoachUser : _mailCredentials.BuilderUser),
                 To = { to },
                 Subject = subject,
                 Body = body,

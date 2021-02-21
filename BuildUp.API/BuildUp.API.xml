@@ -137,6 +137,15 @@
             <response code="403">You are not allowed to view this builder's meeting reports</response>
             <response code="200">Return meeting reports's project</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.GetNotifications(System.String)">
+            <summary>
+            (Builder) Get notification for a builder
+            </summary>
+            <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <returns>The notifications</returns>
+            <response code="401">You don't have enough permissions</response>s
+            <response code="200">Return the notifications</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.BuildersController.RegisterBuilder(BuildUp.API.Models.Builders.BuilderRegisterModel)">
             <summary>
             (*) Register the builder
@@ -225,6 +234,17 @@
             <response code="401">You don't have enough permissions</response>s
             <response code="403">You are not allowed to sign</response>
             <response code="200">The paper was successfully signed</response>
+        </member>
+        <member name="M:BuildUp.API.Controllers.BuildersController.ReadNotification(System.String,System.String)">
+            <summary>
+            (Builder) Mark a notification as read
+            </summary>
+            <param name="builderId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <param name="notificationId" exemple="5f1fe90a58c8ab093c4f772a"></param>
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
+            <response code="403">You are not allowed to mark this notification as read</response>
+            <response code="200">The request has been accepted</response>
         </member>
         <member name="M:BuildUp.API.Controllers.BuildOnsController.GetBuildOns">
             <summary>
@@ -936,6 +956,24 @@
             Some comments made by the coach
             </summary>
             <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Notification.BuilderNotification.Date">
+            <summary>
+            The date when the notification was created
+            </summary>
+            <example>2020-08-15T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Notification.BuilderNotification.Content">
+            <summary>
+            The content of the notification
+            </summary>
+            <example>This is a notification</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Notification.BuilderNotification.Seen">
+            <summary>
+            Indicate if the notification has been seen
+            </summary>
+            <example>false</example>
         </member>
         <member name="P:BuildUp.API.Entities.Notification.CoachNotification.Date">
             <summary>

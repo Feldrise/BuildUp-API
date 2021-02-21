@@ -655,7 +655,7 @@ namespace BuildUp.API.Services
             }
 
             await _projectsService.UpdateProjectBuildOnStep(project.Id, newBuildOnId, newBuildOnStepId);
-            await _notificationService.NotifyBuildonStepValidated(builderUser.Email);
+            await _notificationService.NotifyBuildonStepValidated(project.BuilderId, builderUser.Email);
         }
 
     }

@@ -27,7 +27,7 @@ namespace BuildUp.API.Services.Interfaces
 
         // Build-ons
         Task NotifyBuildOnReturningSubmited(string coachId, string coachMail);
-        Task NotifyBuildonStepValidated(string builderMail);
+        Task NotifyBuildonStepValidated(string builderId, string builderMail);
 
         Task NotifyBuildOnReturningRefusedByCoach(string builderMail, string builderName, string reason);
         Task NotifyBuildOnReturningRefusedByAdmin(string builderMail, string builderName, string reason);
