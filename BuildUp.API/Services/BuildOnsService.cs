@@ -288,7 +288,7 @@ namespace BuildUp.API.Services
             await _buildOnReturnings.InsertOneAsync(returning);
 
             // Now we need to notify the coach
-            await _notificationService.NotifyBuildOnReturningSubmited(userForCoach.Email);
+            await _notificationService.NotifyBuildOnReturningSubmited(coachForBuilder.Id, userForCoach.Email);
 
             return returning.Id;
         }

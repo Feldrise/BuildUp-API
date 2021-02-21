@@ -12,8 +12,15 @@ namespace BuildUp.API.Entities.Notification
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+        
         [BsonRepresentation(BsonType.ObjectId)]
         public string CoachId { get; set; }
+
+        /// <summary>
+        /// The date when the notification was created
+        /// </summary>
+        /// <example>2020-08-15T14:40:04.1351158+01:00</example>
+        public DateTime Date { get; set; }
 
         /// <summary>
         /// The content of the notification

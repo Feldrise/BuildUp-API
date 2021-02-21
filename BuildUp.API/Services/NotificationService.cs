@@ -202,7 +202,7 @@ namespace BuildUp.API.Services
         }
 
         // Build-Ons
-        public async Task NotifyBuildOnReturningSubmited(string coachMail)
+        public async Task NotifyBuildOnReturningSubmited(string coachId, string coachMail)
         {
             string subject = "Build Up - Ton Builder a terminé son étape ! ";
 
@@ -215,6 +215,8 @@ namespace BuildUp.API.Services
                 message,
                 coachMail
             );
+
+            await CreateCoachNotification(coachId, "Votre Builder vient de soumettre une nouvelle étape !");
         }
 
         public async Task NotifyBuildonStepValidated(string builderMail)
@@ -327,6 +329,21 @@ namespace BuildUp.API.Services
             );
         }
 
+        // News
+        public async Task CreateCoachNotification(string coachId, string content)
+        {
+            CoachNotification notification = new CoachNotification()
+            {
+                CoachId = coachId,
+                Date = DateTime.Now,
+                Content = content,
+
+                Seen = false
+            };
+
+            await _coachNotifications.InsertOneAsync(notification);
+        }
+
         public async Task<List<CoachNotification>> GetCoachNotificationsAsync(string coachId)
         {
             return await (await _coachNotifications.FindAsync(databaseRequest =>
@@ -346,7 +363,7 @@ namespace BuildUp.API.Services
 
             if (notification.CoachId != coachId)
             {
-                throw new Exception("You are not the coach for this notifiction");
+                throw new UnauthorizedAccessException("You are not the coach for this notifiction");
             }
 
             var update = Builders<CoachNotification>.Update

@@ -335,31 +335,13 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <returns>The requests</returns>
-        /// <response code="401">You are not allowed to view notifications</response>s
-        /// <response code="403">You are not allowed to view notifications</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="200">Return the notifications</response>
         [Authorize(Roles = Role.Coach)]
         [HttpGet("{coachId:length(24)}/notifications")]
         public async Task<ActionResult<List<CoachNotification>>> GetNotifications(string coachId)
         {
-            var currentUserId = User.Identity.Name;
-            List<CoachNotification> notifications;
-
-            try
-            {
-                if (User.IsInRole(Role.Coach))
-                {
-                    notifications = await _notificationService.GetCoachNotificationsAsync(coachId);
-                }
-                else
-                {
-                    return Forbid("You must be a coach");
-                }
-            }
-            catch (Exception e)
-            {
-                return BadRequest($"Can't get the notifications: {e.Message}");
-            }
+            List<CoachNotification> notifications = await _notificationService.GetCoachNotificationsAsync(coachId);
 
             return Ok(notifications);
         }
@@ -562,8 +544,8 @@ namespace BuildUp.API.Controllers
         /// </summary>
         /// <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
         /// <param name="notificationId" exemple="5f1fe90a58c8ab093c4f772a"></param>
-        /// <response code="400">Their was an error reading the notification</response> 
-        /// <response code="401">You are not allowed to mark this notification as read</response>s
+        /// <response code="400">There was an error in the request</response>
+        /// <response code="401">You don't have enough permissions</response>s
         /// <response code="403">You are not allowed to mark this notification as read</response>
         /// <response code="200">The request has been accepted</response>
         [Authorize(Roles = Role.Coach)]
@@ -582,6 +564,10 @@ namespace BuildUp.API.Controllers
                 {
                     return Forbid("You must be a coach");
                 }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return Forbid($"You are not allowed to mark this notification as read: {e.Message}");
             }
             catch (Exception e)
             {

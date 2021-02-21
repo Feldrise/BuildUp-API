@@ -477,8 +477,7 @@
             </summary>
             <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <returns>The requests</returns>
-            <response code="401">You are not allowed to view notifications</response>s
-            <response code="403">You are not allowed to view notifications</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="200">Return the notifications</response>
         </member>
         <member name="M:BuildUp.API.Controllers.CoachsController.RegisterCoach(BuildUp.API.Models.Coachs.CoachRegisterModel)">
@@ -548,8 +547,8 @@
             </summary>
             <param name="coachId" exemple="5f1fe90a58c8ab093c4f772a"></param>
             <param name="notificationId" exemple="5f1fe90a58c8ab093c4f772a"></param>
-            <response code="400">Their was an error reading the notification</response> 
-            <response code="401">You are not allowed to mark this notification as read</response>s
+            <response code="400">There was an error in the request</response>
+            <response code="401">You don't have enough permissions</response>s
             <response code="403">You are not allowed to mark this notification as read</response>
             <response code="200">The request has been accepted</response>
         </member>
@@ -937,6 +936,12 @@
             Some comments made by the coach
             </summary>
             <example>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel est quam. Donec sapien ex, convallis eu magna vel, efficitur molestie est.</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Notification.CoachNotification.Date">
+            <summary>
+            The date when the notification was created
+            </summary>
+            <example>2020-08-15T14:40:04.1351158+01:00</example>
         </member>
         <member name="P:BuildUp.API.Entities.Notification.CoachNotification.Content">
             <summary>
