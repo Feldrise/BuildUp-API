@@ -15,4 +15,9 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
 COPY --from=build-env /app/out .
 COPY BuildUp.API/BuildUp.API.xml ./
+COPY BuildUp.API/PDF ./PDF
+COPY BuildUp.API/Emails/html ./Emails/html
+
+VOLUME [ "/app/Emails", "/app/wwwroot/pdf" ]
+
 ENTRYPOINT ["dotnet", "BuildUp.API.dll"]
