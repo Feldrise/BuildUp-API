@@ -101,6 +101,30 @@ namespace BuildUp.API
             services.AddScoped<IFilesService, FilesService>();
             services.AddScoped<IProjectsService, ProjectsService>();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("developerPolicy", builder =>
+                {
+                    builder.WithOrigins("http://localhost:61094")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+
+                options.AddPolicy("productionPolicy", builder =>
+                {
+                    builder.WithOrigins("https://buildup.new-talents.fr")
+                        .WithMethods("GET", "POST", "PUT", "DELETE")
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+
+                    builder.WithOrigins("https://beta.new-talents.fr", "https://new-talents.fr")
+                        .WithMethods("GET", "POST")
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                });
+            });
+
             // Other
             services.AddControllers();
         }
@@ -118,12 +142,7 @@ namespace BuildUp.API
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(builder => builder
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .SetIsOriginAllowed((host) => true)
-                .AllowCredentials()
-            );
+            app.UseCors("developerPolicy");
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
