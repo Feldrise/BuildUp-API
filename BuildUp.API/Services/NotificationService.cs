@@ -142,6 +142,22 @@ namespace BuildUp.API.Services
 
             await NotifyBuilderIntegrationSucess();
         }
+        public async Task NotifyRefusedBuilder(string email, string name)
+        {
+            string subject = "Build Up - Avis sur entretien de sélection Builder";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/refus_candidature_builder.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", name);
+
+            await SendMailAsync(
+                OrigineBuilder,
+                subject,
+                message,
+                email
+            );
+        }
 
         // Coach
         public async Task NotifyPreselectionCoach(string email, string name)
@@ -206,6 +222,23 @@ namespace BuildUp.API.Services
             var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/builder_choosed_coach.html");
 
             string message = MessageFromHtmlFile(htmlPath);
+
+            await SendMailAsync(
+                OrigineCoach,
+                subject,
+                message,
+                email
+            );
+        }
+
+        public async Task NotifyRefusedCoach(string email, string name)
+        {
+            string subject = "Build Up - Avis sur entretien de sélection Coach";
+
+            var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/refus_candidature_coach.html");
+
+            string message = MessageFromHtmlFile(htmlPath);
+            message = message.Replace("$name", name);
 
             await SendMailAsync(
                 OrigineCoach,

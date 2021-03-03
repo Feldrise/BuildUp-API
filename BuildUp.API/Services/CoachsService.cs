@@ -152,24 +152,24 @@ namespace BuildUp.API.Services
                     Competences = await _formsService.GetAnswerForQuestionAsync(user.Id, "Quelles sont vos compétences clés ?") ?? "Inconnue",
                     Questions = new List<string>()
                     {
-                        "Comment définissez-vous le rôle de Coach ?",
-                        "Pourquoi souhaitez-vous devenir Coach ?",
-                        "Qu’est-ce qui vous incite à proposer votre accompagnement ?",
-                        "Combien d’heures par semaine pouvez-vous accorder à un Builder ?",
-                        "Êtes-vous prêt à faire preuve de patience, d’écoute et de bienveillance à l’égard des Builders ?",
-                        "Quel serait le Builder idéal pour vous ?",
-                        "C'est votre moment. Dites au Builder pourquoi il doit vous choisir vous et pas un autre Coach."
+                        "Comment définis-tu le rôle de Coach ?",
+                        "Pourquoi souhaites-tu devenir Coach ?",
+                        "Qu’est-ce qui t'incite à proposer ton accompagnement ?",
+                        "Combien d’heures par semaine peux-tu accorder à un Builder ?",
+                        "Es-tu prêt à faire preuve de patience, d’écoute et de bienveillance à l’égard des Builders ?",
+                        "Quel serait le Builder idéal pour toi ?",
+                        "C'est ton moment. Dis au Builder pourquoi il doit te choisir te et pas un autre Coach."
                     },
 
                     Answers = new List<string>()
                     {
-                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Comment définissez-vous le rôle de Coach ?") ?? "Inconnue",
-                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Pourquoi souhaitez-vous devenir Coach ?") ?? "Inconnue",
-                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Qu’est-ce qui vous incite à proposer votre accompagnement ?") ?? "Inconnue",
-                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Combien d’heures par semaine pouvez-vous accorder à un Builder ?") ?? "Inconnue",
-                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Êtes-vous prêt à faire preuve de patience, d’écoute et de bienveillance à l’égard des Builders ?") ?? "Inconnue",
-                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Quel serait le Builder idéal pour vous ?") ?? "Inconnue",
-                        await _formsService.GetAnswerForQuestionAsync(user.Id, "C'est votre moment. Dites au Builder pourquoi il doit vous choisir vous et pas un autre Coach.") ?? "Inconnue"
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Comment définis-tu le rôle de Coach ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Pourquoi souhaites-tu devenir Coach ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Qu’est-ce qui t'incite à proposer ton accompagnement ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Combien d’heures par semaine peux-tu accorder à un Builder ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Es-tu prêt à faire preuve de patience, d’écoute et de bienveillance à l’égard des Builders ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "Quel serait le Builder idéal pour toi ?") ?? "Inconnue",
+                        await _formsService.GetAnswerForQuestionAsync(user.Id, "C'est ton moment. Dis au Builder pourquoi il doit te choisir toi et pas un autre Coach.") ?? "Inconnue"
                     }
                 };
 
@@ -210,6 +210,10 @@ namespace BuildUp.API.Services
             // Only admins are supposed to be able to change the steps
             // Since we don't want to spam, we only check notifications
             // on admin side
+            if (coachUpdateModel.Status == CoachStatus.Deleted)
+            {
+                await _notificationService.NotifyRefusedCoach(user.Email, user.FirstName);
+            }
             if (coach.Step == CoachSteps.Preselected && coachUpdateModel.Step == CoachSteps.Meeting)
             {
                 await _notificationService.NotifyPreselectionCoach(user.Email, user.FirstName);
@@ -232,6 +236,14 @@ namespace BuildUp.API.Services
         // Refusing the coach
         public async Task RefuseCoachAsync(string coachId)
         {
+            Coach coach = await GetCoachFromCoachId(coachId);
+
+            if (coach == null) throw new Exception("This coach doesn't exist");
+
+            User coachUser = await GetUserFromId(coach.UserId);
+                
+            if (coachUser == null) throw new Exception("Their is no user for this coach...");
+
             var update = Builders<Coach>.Update
                 .Set(databaseCoach => databaseCoach.Status, CoachStatus.Deleted)
                 .Set(databaseCoach => databaseCoach.Step, CoachSteps.Stopped);
@@ -240,6 +252,8 @@ namespace BuildUp.API.Services
                 databaseCoach.Id == coachId,
                 update
             );
+
+            await _notificationService.NotifyRefusedCoach(coachUser.Email, coachUser.FirstName);
         }
 
         // Getting the coach's builders

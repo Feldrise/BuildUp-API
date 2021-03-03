@@ -105,9 +105,10 @@ namespace BuildUp.API
             {
                 options.AddPolicy("developerPolicy", builder =>
                 {
-                    builder.WithOrigins("http://localhost:61094")
+                    builder
                         .AllowAnyHeader()
                         .AllowAnyMethod()
+                        .SetIsOriginAllowed((host) => true)
                         .AllowCredentials();
                 });
 
@@ -142,7 +143,7 @@ namespace BuildUp.API
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors("developerPolicy");
+            app.UseCors("productionPolicy");
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.

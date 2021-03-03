@@ -178,6 +178,10 @@ namespace BuildUp.API.Services
             // Only admins are supposed to be able to change the steps
             // Since we don't want to spam, we only check notifications
             // on admin side
+            if (builderUpdateModel.Status == BuilderStatus.Deleted)
+            {
+                await _notificationService.NotifyRefusedBuilder(user.Email, user.FirstName);
+            }
             if (builder.Step == BuilderSteps.Preselected && builderUpdateModel.Step == BuilderSteps.AdminMeeting)
             {
                 await _notificationService.NotifyPreselectionBuilder(user.Email, user.FirstName);
@@ -215,6 +219,14 @@ namespace BuildUp.API.Services
         // Refuse the builder
         public async Task RefuseBuilderAsync(string builderId)
         {
+            Builder builder = await GetBuilderFromBuilderId(builderId);
+
+            if (builder == null) throw new Exception("This builder doesn't exist");
+
+            User builderUser = await GetUserFromId(builder.UserId);
+                
+            if (builderUser == null) throw new Exception("Their is no user for this builder...");
+
             var update = Builders<Builder>.Update
                 .Set(databaseBuilder => databaseBuilder.Status, BuilderStatus.Deleted)
                 .Set(databaseBuilder => databaseBuilder.Step, BuilderSteps.Abandoned);
@@ -223,8 +235,9 @@ namespace BuildUp.API.Services
                 databaseBuilder.Id == builderId,
                 update
             );
-        }
 
+            await _notificationService.NotifyRefusedBuilder(builderUser.Email, builderUser.FirstName);
+        }
 
         // Assigning coach to the builder
         public async Task AssignCoachAsync(string coachId, string builderId)
