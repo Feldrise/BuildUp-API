@@ -43,7 +43,7 @@ namespace BuildUp.API.Services
 
         public async Task NotifieAccountCreationAsync(RegisterModel registerModel, string password)
         {
-            string subject = "Inscription au programme Build-up !";
+            string subject = "Inscription au programme Build Up !";
 
             var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/reception_candidature.html");
 
@@ -72,7 +72,7 @@ namespace BuildUp.API.Services
         // Builders
         public async Task NotifyPreselectionBuilder(string email, string name)
         {
-            string subject = "Programme Build Up - Tu as été présélectionné(e) !";
+            string subject = "Build Up - Tu as été présélectionné(e) !";
 
             var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/preselection_builder.html");
 
@@ -162,7 +162,7 @@ namespace BuildUp.API.Services
         // Coach
         public async Task NotifyPreselectionCoach(string email, string name)
         {
-            string subject = "Programme Build Up - Tu as été présélectionné(e) !";
+            string subject = "Build Up - Tu as été présélectionné(e) !";
 
             var htmlPath = Path.Combine(_env.ContentRootPath, $"Emails/html/preselection_coach.html");
 

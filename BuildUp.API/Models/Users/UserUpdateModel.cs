@@ -48,7 +48,11 @@ namespace BuildUp.API.Models.Users
         /// </summary>
         /// <example>Feldrise#8497</example>
         public string DiscordTag { get; set; }
-
+        /// <summary>
+        /// The user's LinkedIn
+        /// </summary>
+        /// <example>victor.denis</example>
+        public string LinkedIn { get; set; }
 
         /// <summary>
         /// The user's department

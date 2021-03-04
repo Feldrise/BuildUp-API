@@ -59,6 +59,11 @@ namespace BuildUp.API.Entities
         /// <example>Feldrise#8497</example>
         public string DiscordTag { get; set; }
         /// <summary>
+        /// The user's LinkedIn
+        /// </summary>
+        /// <example>victor.denis</example>
+        public string LinkedIn { get; set; }
+        /// <summary>
         /// The user's username
         /// </summary>
         /// <example>Feldrise</example>
