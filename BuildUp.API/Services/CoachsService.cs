@@ -331,6 +331,8 @@ namespace BuildUp.API.Services
 
                 Email = user.Email,
                 Phone = user.Phone,
+                DiscordTag = user.DiscordTag,
+                LinkedIn = user.LinkedIn,
 
                 City = user.City,
                 PostalCode = user.PostalCode,
@@ -338,11 +340,10 @@ namespace BuildUp.API.Services
 
                 Situation = coach.Situation,
 
-                Keywords = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quelles sont les mots clés qui vous définissent ?"),
-                Experience = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels sont vos expériences ?"),
-                Accroche = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quel est votre phrase d'accroche ?"),
-                IdealBuilder = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quel serait le Builder idéal pour vous ?"),
-                Objectifs = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels objectifs souhaitez-vous que votre Builder atteignent au bout des 3 mois ?")
+                Keywords = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels sont les mots clés qui te définissent ?"),
+                Experience = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quelles sont tes expériences professionnelles et personnelles ? "),
+                IdealBuilder = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quel serait le Builder idéal pour toi ?"),
+                Objectifs = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels objectifs souhaites-tu que ton Builder atteignent au bout des 3 mois ?"),
             };
 
             if (_pdfService.SignCoachIntegration(coachId, pdfIntegrationCoach))

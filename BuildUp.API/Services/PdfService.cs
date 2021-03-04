@@ -2,6 +2,8 @@
 using BuildUp.API.Services.Interfaces;
 using iText.Forms;
 using iText.Forms.Fields;
+using iText.IO.Font.Constants;
+using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using Microsoft.AspNetCore.Hosting;
 using System;
@@ -65,35 +67,37 @@ namespace BuildUp.API.Services
 
             PdfDocument pdf = new PdfDocument(new PdfReader(filePath), new PdfWriter(savePath));
             PdfAcroForm form = PdfAcroForm.GetAcroForm(pdf, false);
+            PdfFont documentFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
 
             var fields = form.GetFormFields();
 
             foreach (PdfFormField field in fields.Values)
             {
-                field.SetFontSize(12);
+                field.SetFontSize(10);
+                field.SetFont(documentFont);
             }
 
-            fields["Nom"].SetValue(values.LastName);
-            fields["Prénom"].SetValue(values.FirstName);
-            fields["Birthdate"].SetValue(values.Birthdate.ToString());
-            fields["keywords"].SetValue(values.Keywords ?? "Inconnue");
-            fields["situation"].SetValue(values.Situation);
-            fields["Code_postal"].SetValue(values.PostalCode.ToString());
-            fields["ville"].SetValue(values.City);
-            fields["adresse"].SetValue(values.Address);
+            fields["last_name"].SetValue(values.LastName);
+            fields["first_name"].SetValue(values.FirstName);
+            fields["birthdate"].SetValue(string.Format("{0:dd/MM/yyyy}", values.Birthdate));
+            fields["birthplace"].SetValue(values.BirthPlace);
+            fields["email"].SetValue(values.Email);
             fields["phone"].SetValue(values.Phone);
-            fields["mail"].SetValue(values.Email);
-            fields["Where"].SetValue(values.BirthPlace);
-            fields["accroche"].SetValue(values.Accroche ?? "Inconnue");
+            fields["linkedin"].SetValue(values.LinkedIn ?? "");
+            fields["discord"].SetValue(values.DiscordTag ?? "");
+            fields["situation"].SetValue(values.Situation);
+            fields["address"].SetValue(values.Address);
+            fields["postal_code"].SetValue(values.PostalCode.ToString());
+            fields["city"].SetValue(values.City);
+            fields["keywords"].SetValue(values.Keywords ?? "Inconnue");
             fields["experiences"].SetValue(values.Experience ?? "Inconnue");
             fields["ideal_builder"].SetValue(values.IdealBuilder ?? "Inconnue");
-            fields["objectifs_coach"].SetValue(values.Objectifs ?? "Inconnue");
-            fields["full_name"].SetValue($"{values.FirstName} {values.LastName}");
-            fields["date_naissance"].SetValue(values.Birthdate.ToString());
-            fields["lieu_residence"].SetValue($"{values.Address}, {values.PostalCode} {values.City}");
-            fields["lieu_naissance"].SetValue(values.BirthPlace);
-            fields["lieu_signe"].SetValue(values.City);
-            fields["date_signe"].SetValue(DateTime.Now.ToString());
+            fields["s_full_name"].SetValue($"{values.FirstName} {values.LastName}");
+            fields["s_birthdate"].SetValue(string.Format("{0:dd/MM/yyyy}", values.Birthdate));
+            fields["s_birthplace"].SetValue(values.BirthPlace);
+            fields["s_address"].SetValue($"{values.Address}, {values.PostalCode} {values.City}");
+            fields["s_sign_place"].SetValue(values.City);
+            fields["s_sign_date"].SetValue(string.Format("{0:dd/MM/yyyy}", DateTime.Now));
 
             PdfAcroForm.GetAcroForm(pdf, false).FlattenFields();
 

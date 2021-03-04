@@ -38,6 +38,16 @@ namespace BuildUp.API.Entities.Pdf
         /// </summary>
         /// <example>+33652809335</example>
         public string Phone { get; set; }
+        /// <summary>
+        /// The user's Discord tag
+        /// </summary>
+        /// <example>Feldrise#8497</example>
+        public string DiscordTag { get; set; }
+        /// <summary>
+        /// The user's LinkedIn
+        /// </summary>
+        /// <example>victor.denis</example>
+        public string LinkedIn { get; set; }
 
         /// <summary>
         /// The user's city
@@ -71,10 +81,6 @@ namespace BuildUp.API.Entities.Pdf
         /// Answer : Quel est votre experience ?
         /// </summary>
         public string Experience { get; set; }
-        /// <summary>
-        /// Answer : Donnez une phrase d'accroche pour vous
-        /// </summary>
-        public string Accroche { get; set; }
         /// <summary>
         /// Answer : Quel serait le Builder idéal pour vous ?
         /// </summary>

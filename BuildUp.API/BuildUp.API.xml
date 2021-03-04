@@ -1232,6 +1232,18 @@
             </summary>
             <example>+33652809335</example>
         </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.DiscordTag">
+            <summary>
+            The user's Discord tag
+            </summary>
+            <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.LinkedIn">
+            <summary>
+            The user's LinkedIn
+            </summary>
+            <example>victor.denis</example>
+        </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.City">
             <summary>
             The user's city
@@ -1265,11 +1277,6 @@
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Experience">
             <summary>
             Answer : Quel est votre experience ?
-            </summary>
-        </member>
-        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.Accroche">
-            <summary>
-            Answer : Donnez une phrase d'accroche pour vous
             </summary>
         </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.IdealBuilder">
@@ -1395,6 +1402,12 @@
             The user's Discord tag
             </summary>
             <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.User.LinkedIn">
+            <summary>
+            The user's LinkedIn
+            </summary>
+            <example>victor.denis</example>
         </member>
         <member name="P:BuildUp.API.Entities.User.Username">
             <summary>
