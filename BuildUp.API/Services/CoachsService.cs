@@ -351,6 +351,17 @@ namespace BuildUp.API.Services
                 var update = Builders<Coach>.Update
                     .Set(dbCoach => dbCoach.HasSignedFicheIntegration, true);
 
+                var coachCard = _pdfService.GenerateCoachCard(coachId, new PdfCoachCard()
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Birthdate = user.Birthdate,
+                    ValidityDate = coach.CandidatingDate.AddYears(1)
+                });
+
+                var fileId = await _filesService.UploadFile($"coachcard_{coachId}", coachCard);
+                update = update.Set(dbCoach => dbCoach.CoachCardId, fileId);
+
                 await _coachs.UpdateOneAsync(databaseCoach =>
                    databaseCoach.Id == coachId,
                    update

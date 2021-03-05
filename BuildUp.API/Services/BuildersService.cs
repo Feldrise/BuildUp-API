@@ -387,6 +387,8 @@ namespace BuildUp.API.Services
 
                 Email = user.Email,
                 Phone = user.Phone,
+                DiscordTag = user.DiscordTag,
+                LinkedIn = user.LinkedIn,
 
                 City = user.City,
                 PostalCode = user.PostalCode,
@@ -394,10 +396,7 @@ namespace BuildUp.API.Services
 
                 Situation = builder.Situation,
 
-                Keywords = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Vos proches vous présentent comme quelqu’un :"),
-                Accroche = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Donnez une phrase d'accroche pour vous"),
-                Expectation = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Pourquoi souhaitez-vous intégrer le programme Build Up ?"),
-                Objectifs = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Quels objectifs souhaitez-vous atteindre au bout des 3 mois de programme ?"),
+                Expectation = await _formsService.GetAnswerForQuestionAsync(currentUserId, "Pourquoi souhaites-tu intégrer le programme Build Up ?"),
 
                 ProjectDomaine = project.Categorie,
                 ProjectName = project.Name,
@@ -410,6 +409,17 @@ namespace BuildUp.API.Services
             {
                 var update = Builders<Builder>.Update
                     .Set(dbBuilder => dbBuilder.HasSignedFicheIntegration, true);
+
+                var builderCard = _pdfService.GenerateBuilderCard(builderId, new PdfBuilderCard()
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Birthdate = user.Birthdate,
+                    ValidityDate = builder.CandidatingDate.AddMonths(3)
+                });
+
+                var fileId = await _filesService.UploadFile($"buildercard_{builderId}", builderCard);
+                update = update.Set(dbBuilder => dbBuilder.BuilderCardId, fileId);
 
                 await _builders.UpdateOneAsync(databaseBuilder =>
                    databaseBuilder.Id == builderId,

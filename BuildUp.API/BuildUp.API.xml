@@ -1083,6 +1083,54 @@
             </summary>
             <example>15/12/2020</example>
         </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfBuilderCard.FirstName">
+            <summary>
+            The builder's first name
+            </summary>
+            <example>Elisa</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfBuilderCard.LastName">
+            <summary>
+            The builder's last name 
+            </summary>
+            <example>AUFFRAY</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfBuilderCard.Birthdate">
+            <summary>
+            The builder's birth date
+            </summary>
+            <example>2001-06-20T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfBuilderCard.ValidityDate">
+            <summary>
+            The builder's validity date
+            </summary>
+            <example>2001-06-20T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfCoachCard.FirstName">
+            <summary>
+            The coach's first name
+            </summary>
+            <example>Elisa</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfCoachCard.LastName">
+            <summary>
+            The coach's last name 
+            </summary>
+            <example>AUFFRAY</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfCoachCard.Birthdate">
+            <summary>
+            The coach's birth date
+            </summary>
+            <example>2001-06-20T14:40:04.1351158+01:00</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfCoachCard.ValidityDate">
+            <summary>
+            The coach's validity date
+            </summary>
+            <example>2001-06-20T14:40:04.1351158+01:00</example>
+        </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.FirstName">
             <summary>
             The builder's first name
@@ -1119,6 +1167,18 @@
             </summary>
             <example>+33652809335</example>
         </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.DiscordTag">
+            <summary>
+            The user's Discord tag
+            </summary>
+            <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.LinkedIn">
+            <summary>
+            The user's LinkedIn
+            </summary>
+            <example>victor.denis</example>
+        </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.City">
             <summary>
             The user's city
@@ -1142,17 +1202,6 @@
             The builder current situation
             </summary>
             <example>Etudiant</example>
-        </member>
-        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Keywords">
-            <summary>
-            Answer : Vos proches vous présentent comme quelqu’un :
-            </summary>
-            <example>Intelligente, passionnée</example>
-        </member>
-        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Accroche">
-            <summary>
-            Answer : Donnez une phrase d'accroche pour vous
-            </summary>
         </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.ProjectDomaine">
             <summary>
@@ -1189,12 +1238,6 @@
             Answer : Pourquoi souhaitez-vous intégrer le programme Build Up ?
             </summary>
             <example>Qu'il m'apprenne a faire du café</example>
-        </member>
-        <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationBuilder.Objectifs">
-            <summary>
-            Answer : Quels objectifs souhaitez-vous atteindre au bout des 3 mois de programme ?
-            </summary>
-            <example>Avoir fait couler Google</example>
         </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfIntegrationCoach.FirstName">
             <summary>

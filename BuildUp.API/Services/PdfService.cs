@@ -1,16 +1,23 @@
 ﻿using BuildUp.API.Entities.Pdf;
 using BuildUp.API.Services.Interfaces;
+using Ghostscript.NET.Rasterizer;
 using iText.Forms;
 using iText.Forms.Fields;
 using iText.IO.Font.Constants;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Xobject;
+using iText.Layout.Element;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace BuildUp.API.Services
 {
@@ -105,56 +112,154 @@ namespace BuildUp.API.Services
 
             return true;
         }
-
-        public bool SignBuilderIntegration(string builderId, PdfIntegrationBuilder values)
+        public byte[] GenerateCoachCard(string coachId, PdfCoachCard values)
         {
-            var filePath = Path.Combine(_env.ContentRootPath, $"PDF/integration_builder_fillable.pdf");
-            var savePath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/builders/{builderId}.pdf");
+            var filePath = Path.Combine(_env.ContentRootPath, $"PDF/carte_coach_fillable.pdf");
+            var savePath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/coachs/cards/{coachId}.pdf");
+            var saveImagePath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/coachs/cards/{coachId}.png");
 
             //var filePath = "/PDF/integration_coach_fillable.pdf";
             //var savePath = "/PDF/saved/toSave.pdf";
 
             PdfDocument pdf = new PdfDocument(new PdfReader(filePath), new PdfWriter(savePath));
             PdfAcroForm form = PdfAcroForm.GetAcroForm(pdf, false);
+            PdfFont documentBoldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont documentRegularFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+
+            var fields = form.GetFormFields();
+
+            fields["last_name"].SetFontSize(42);
+            fields["last_name"].SetFont(documentBoldFont);
+            fields["last_name"].SetValue(values.LastName);
+
+            fields["first_name"].SetFontSize(42);
+            fields["first_name"].SetFont(documentBoldFont);
+            fields["first_name"].SetValue(values.FirstName);
+
+            fields["birthdate"].SetFontSize(22);
+            fields["birthdate"].SetFont(documentRegularFont);
+            fields["birthdate"].SetValue(string.Format("{0:dd/MM/yyyy}", values.Birthdate));
+
+            fields["validity_date"].SetFontSize(22);
+            fields["validity_date"].SetFont(documentRegularFont);
+            fields["validity_date"].SetValue(string.Format("{0:dd/MM/yyyy}", values.ValidityDate));
+
+            PdfAcroForm.GetAcroForm(pdf, false).FlattenFields();
+
+            pdf.Close();
+
+            using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
+            {
+                byte[] buffer = File.ReadAllBytes(savePath);
+                MemoryStream ms = new MemoryStream(buffer);
+
+                rasterizer.Open(ms);
+                
+                string pageFilePath = saveImagePath;
+
+                System.Drawing.Image img = rasterizer.GetPage(200, 1);
+                img.Save(pageFilePath, ImageFormat.Png);
+            }
+
+            return File.ReadAllBytes(saveImagePath);
+        }
+
+        public bool SignBuilderIntegration(string builderId, PdfIntegrationBuilder values)
+        {
+            var filePath = Path.Combine(_env.ContentRootPath, $"PDF/integration_builder_fillable.pdf");
+            var savePath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/builders/{builderId}.pdf");
+
+            PdfDocument pdf = new PdfDocument(new PdfReader(filePath), new PdfWriter(savePath));
+            PdfAcroForm form = PdfAcroForm.GetAcroForm(pdf, false);
+            PdfFont documentFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
 
             var fields = form.GetFormFields();
 
             foreach (PdfFormField field in fields.Values)
             {
-                field.SetFontSize(12);
+                field.SetFontSize(10);
+                field.SetFont(documentFont);
             }
 
-            fields["Nom"].SetValue(values.LastName);
-            fields["Prénom"].SetValue(values.FirstName);
-            fields["Where"].SetValue(values.BirthPlace);
-            fields["Birthdate"].SetValue(values.Birthdate.ToString());
-            fields["mail"].SetValue(values.Email);
-            fields["adresse"].SetValue(values.Address);
-            fields["phone"].SetValue(values.Phone);
-            fields["Code_postal"].SetValue(values.PostalCode.ToString());
-            fields["ville"].SetValue(values.City);
+            fields["lastname"].SetValue(values.LastName);
+            fields["firstname"].SetValue(values.FirstName);
+            fields["birth_place"].SetValue(values.BirthPlace);
+            fields["birthdate"].SetValue(string.Format("{0:dd/MM/yyyy}", values.Birthdate));
+            fields["email"].SetValue(values.Email);
+            fields["mobile"].SetValue(values.Phone);
+            fields["linkedin"].SetValue(values.LinkedIn ?? "");
+            fields["discord"].SetValue(values.DiscordTag ?? "");
+            fields["address"].SetValue(values.Address);
+            fields["city"].SetValue(values.City);
+            fields["postal_code"].SetValue(values.PostalCode.ToString());
             fields["situation"].SetValue(values.Situation);
-            fields["keywords"].SetValue(values.Keywords);
-            fields["accroche"].SetValue(values.Accroche);
-            fields["domaines"].SetValue(values.ProjectDomaine);
-            fields["nom_projet"].SetValue(values.ProjectName);
-            fields["date_lancement"].SetValue(values.ProjectLaunchDate.ToString());
+            fields["domains"].SetValue(values.ProjectDomaine);
+            fields["project_name"].SetValue(values.ProjectName);
+            fields["project_launch_date"].SetValue(string.Format("{0:dd/MM/yyyy}", values.ProjectLaunchDate));
             fields["description"].SetValue(values.ProjectDescription);
-            fields["team_members"].SetValue(values.ProjectTeam);
-            fields["Attentes"].SetValue(values.Expectation);
-            fields["Objectifs"].SetValue(values.Objectifs);
-            fields["full_name"].SetValue($"{values.FirstName} {values.LastName}");
-            fields["date_naissance"].SetValue(values.Birthdate.ToString());
-            fields["lieu_residence"].SetValue($"{values.Address}, {values.PostalCode} {values.City}");
-            fields["lieu_naissance"].SetValue(values.BirthPlace);
-            fields["lieu_signe"].SetValue(values.City);
-            fields["date_signe"].SetValue(DateTime.Now.ToString());
+            fields["team"].SetValue(values.ProjectTeam);
+            fields["expectations"].SetValue(values.Expectation ?? "Impossible de récupérer cet information");
+            fields["s_fullname"].SetValue($"{values.FirstName} {values.LastName}");
+            fields["s_birthdate"].SetValue(string.Format("{0:dd/MM/yyyy}", values.Birthdate));
+            fields["s_place_birth"].SetValue(values.BirthPlace);
+            fields["s_address"].SetValue($"{values.Address}, {values.PostalCode} {values.City}");
+            fields["s_sign_place"].SetValue(values.City);
+            fields["s_sign_date"].SetValue(string.Format("{0:dd/MM/yyyy}", DateTime.Now));
 
             PdfAcroForm.GetAcroForm(pdf, false).FlattenFields();
 
             pdf.Close();
 
             return true;
+        }
+
+        public byte[] GenerateBuilderCard(string builderId, PdfBuilderCard values)
+        {
+            var filePath = Path.Combine(_env.ContentRootPath, $"PDF/carte_builder_fillable.pdf");
+            var savePath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/builders/cards/{builderId}.pdf");
+            var saveImagePath = Path.Combine(_env.ContentRootPath, $"wwwroot/pdf/builders/cards/{builderId}.png");
+
+            PdfDocument pdf = new PdfDocument(new PdfReader(filePath), new PdfWriter(savePath));
+            PdfAcroForm form = PdfAcroForm.GetAcroForm(pdf, false);
+            PdfFont documentBoldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont documentRegularFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+
+            var fields = form.GetFormFields();
+
+            fields["last_name"].SetFontSize(42);
+            fields["last_name"].SetFont(documentBoldFont);
+            fields["last_name"].SetValue(values.LastName);
+
+            fields["first_name"].SetFontSize(42);
+            fields["first_name"].SetFont(documentBoldFont);
+            fields["first_name"].SetValue(values.FirstName);
+
+            fields["birthdate"].SetFontSize(22);
+            fields["birthdate"].SetFont(documentRegularFont);
+            fields["birthdate"].SetValue(string.Format("{0:dd/MM/yyyy}", values.Birthdate));
+
+            fields["validity_date"].SetFontSize(22);
+            fields["validity_date"].SetFont(documentRegularFont);
+            fields["validity_date"].SetValue(string.Format("{0:dd/MM/yyyy}", values.ValidityDate));
+
+            PdfAcroForm.GetAcroForm(pdf, false).FlattenFields();
+
+            pdf.Close();
+
+            using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
+            {
+                byte[] buffer = File.ReadAllBytes(savePath);
+                MemoryStream ms = new MemoryStream(buffer);
+
+                rasterizer.Open(ms);
+
+                string pageFilePath = saveImagePath;
+
+                System.Drawing.Image img = rasterizer.GetPage(200, 1);
+                img.Save(pageFilePath, ImageFormat.Png);
+            }
+
+            return File.ReadAllBytes(saveImagePath);
         }
 
         public string TestPdfFields(string pdfName)
@@ -171,6 +276,15 @@ namespace BuildUp.API.Services
             var fields = form.GetFormFields();
 
             return string.Join("\n", fields.Keys.ToList());
+        }
+
+        private byte[] GetImageBytes(System.Drawing.Image image, System.Drawing.Imaging.ImageFormat format)
+        {
+            using (var ms = new System.IO.MemoryStream())
+            {
+                image.Save(ms, format);
+                return ms.ToArray();
+            }
         }
     }
 }

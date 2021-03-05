@@ -38,6 +38,16 @@ namespace BuildUp.API.Entities.Pdf
         /// </summary>
         /// <example>+33652809335</example>
         public string Phone { get; set; }
+        /// <summary>
+        /// The user's Discord tag
+        /// </summary>
+        /// <example>Feldrise#8497</example>
+        public string DiscordTag { get; set; }
+        /// <summary>
+        /// The user's LinkedIn
+        /// </summary>
+        /// <example>victor.denis</example>
+        public string LinkedIn { get; set; }
 
         /// <summary>
         /// The user's city
@@ -62,16 +72,6 @@ namespace BuildUp.API.Entities.Pdf
         /// <example>Etudiant</example>
         public string Situation { get; set; }
 
-        /// <summary>
-        /// Answer : Vos proches vous présentent comme quelqu’un :
-        /// </summary>
-        /// <example>Intelligente, passionnée</example>
-        public string Keywords { get; set; }
-        /// <summary>
-        /// Answer : Donnez une phrase d'accroche pour vous
-        /// </summary>
-        public string Accroche { get; set; }
-        
         /// <summary>
         /// The project's domain
         /// </summary>
@@ -104,11 +104,5 @@ namespace BuildUp.API.Entities.Pdf
         /// </summary>
         /// <example>Qu'il m'apprenne a faire du café</example>
         public string Expectation { get; set; }
-
-        /// <summary>
-        /// Answer : Quels objectifs souhaitez-vous atteindre au bout des 3 mois de programme ?
-        /// </summary>
-        /// <example>Avoir fait couler Google</example>
-        public string Objectifs { get; set; }
     }
 }
