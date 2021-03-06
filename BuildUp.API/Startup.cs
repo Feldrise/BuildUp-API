@@ -143,7 +143,7 @@ namespace BuildUp.API
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors("developerPolicy");
+            app.UseCors("productionPolicy");
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
