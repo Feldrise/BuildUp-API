@@ -123,6 +123,11 @@ namespace BuildUp.API
                         .WithMethods("GET", "POST")
                         .AllowAnyHeader()
                         .AllowCredentials();
+
+                    builder.WithOrigins("https://new-talents.fr", "https://new-talents.fr")
+                        .WithMethods("GET", "POST")
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                 });
             });
 
@@ -143,7 +148,7 @@ namespace BuildUp.API
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors("productionPolicy");
+            app.UseCors("developerPolicy");
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.

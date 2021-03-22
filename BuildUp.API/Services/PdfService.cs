@@ -1,6 +1,6 @@
 ﻿using BuildUp.API.Entities.Pdf;
 using BuildUp.API.Services.Interfaces;
-using Ghostscript.NET.Rasterizer;
+using BuildUp.API.Utils;
 using iText.Forms;
 using iText.Forms.Fields;
 using iText.IO.Font.Constants;
@@ -148,18 +148,7 @@ namespace BuildUp.API.Services
 
             pdf.Close();
 
-            using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
-            {
-                byte[] buffer = File.ReadAllBytes(savePath);
-                MemoryStream ms = new MemoryStream(buffer);
-
-                rasterizer.Open(ms);
-                
-                string pageFilePath = saveImagePath;
-
-                System.Drawing.Image img = rasterizer.GetPage(200, 1);
-                img.Save(pageFilePath, ImageFormat.Png);
-            }
+            $"gs -sDEVICE=pngalpha -sOutputFile={saveImagePath} -r144 {savePath}".Bash();
 
             return File.ReadAllBytes(saveImagePath);
         }
@@ -246,18 +235,7 @@ namespace BuildUp.API.Services
 
             pdf.Close();
 
-            using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
-            {
-                byte[] buffer = File.ReadAllBytes(savePath);
-                MemoryStream ms = new MemoryStream(buffer);
-
-                rasterizer.Open(ms);
-
-                string pageFilePath = saveImagePath;
-
-                System.Drawing.Image img = rasterizer.GetPage(200, 1);
-                img.Save(pageFilePath, ImageFormat.Png);
-            }
+            $"gs -sDEVICE=pngalpha -sOutputFile={saveImagePath} -r144 {savePath}".Bash();
 
             return File.ReadAllBytes(saveImagePath);
         }
