@@ -23,6 +23,8 @@ namespace BuildUp.API.Services
 
         private readonly IMongoCollection<CoachNotification> _coachNotifications;
         private readonly IMongoCollection<BuilderNotification> _builderNotifications;
+        private readonly IMongoCollection<Coach> _coachs;
+        private readonly IMongoCollection<Builder> _builders;
 
         readonly IWebHostEnvironment _env;
 
@@ -39,6 +41,8 @@ namespace BuildUp.API.Services
 
             _coachNotifications = database.GetCollection<CoachNotification>("coach_notifications");
             _builderNotifications = database.GetCollection<BuilderNotification>("builder_notifications");
+            _coachs = database.GetCollection<Coach>("coachs");
+            _builders = database.GetCollection<Builder>("builders");
         }
 
         public async Task NotifieAccountCreationAsync(RegisterModel registerModel, string password)
@@ -475,6 +479,46 @@ namespace BuildUp.API.Services
                 databaseNotification.Id == notificationId,
                 update
             );
+        }
+
+        public async Task NotifyAllAsync(string content)
+        {
+            List<Builder> builders = await (await _builders.FindAsync(dbBuilder => true)).ToListAsync();
+            List<Coach> coachs = await (await _coachs.FindAsync(dbCoach => true)).ToListAsync();
+
+            List<BuilderNotification> builderNotifications = new List<BuilderNotification>();
+            List<CoachNotification> coachNotifications = new List<CoachNotification>();
+
+            foreach (var builder in builders)
+            {
+                BuilderNotification notification = new BuilderNotification()
+                {
+                    BuilderId = builder.Id,
+                    Date = DateTime.Now,
+                    Content = content,
+    
+                    Seen = false
+                };
+
+                builderNotifications.Add(notification);
+            }
+
+            foreach (var coach in coachs)
+            {
+                CoachNotification notification = new CoachNotification()
+                {
+                    CoachId = coach.Id,
+                    Date = DateTime.Now,
+                    Content = content,
+    
+                    Seen = false
+                };
+
+                coachNotifications.Add(notification);
+            }
+
+            await _builderNotifications.InsertManyAsync(builderNotifications);
+            await _coachNotifications.InsertManyAsync(coachNotifications);
         }
 
         private async Task SendMailAsync(string origine, string subject, string body, string to, string attachmentPath = "", string attachmentName = "")

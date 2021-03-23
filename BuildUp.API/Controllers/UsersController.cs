@@ -1,4 +1,5 @@
 ﻿using BuildUp.API.Entities;
+using BuildUp.API.Entities.Notification;
 using BuildUp.API.Models.Users;
 using BuildUp.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -17,10 +18,12 @@ namespace BuildUp.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersService _userService;
+        private readonly INotificationService _notificationService;
 
-        public UsersController(IUsersService usersService)
+        public UsersController(IUsersService usersService, INotificationService notificationService)
         {
             _userService = usersService;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -42,6 +45,22 @@ namespace BuildUp.API.Controllers
             }
 
             return Ok(image);
+        }
+
+        /// <summary>
+        /// (admin) Notify all users
+        /// </summary>
+        /// <param name="notification">The notification</param>
+        /// <returns></returns>
+        /// <response code="401">You must be an admin</response>
+        /// <response code="200">The notification was successfully send</response>
+        [Authorize(Roles = Role.Admin)]
+        [HttpPost("notify/all")]
+        public async Task<IActionResult> NotifyAllUser([FromBody] UserNotification notification)
+        {
+            await _notificationService.NotifyAllAsync(notification.Content);
+
+            return Ok();
         }
 
         /// <summary>

@@ -49,5 +49,7 @@ namespace BuildUp.API.Services.Interfaces
         Task CreateBuilderNotification(string builderId, string content);
         Task<List<BuilderNotification>> GetBuilderNotificationsAsync(string builderId);
         Task MakeBuilderNotificationReadAsync(string builderId, string notificationId);
+
+        Task NotifyAllAsync(string content);
     }
 }

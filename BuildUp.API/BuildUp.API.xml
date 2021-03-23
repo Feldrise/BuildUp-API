@@ -660,6 +660,15 @@
             <response code="404">The profile_picture was not found</response>
             <response code="200">Return user's profile picture</response>
         </member>
+        <member name="M:BuildUp.API.Controllers.UsersController.NotifyAllUser(BuildUp.API.Entities.Notification.UserNotification)">
+            <summary>
+            (admin) Notify all users
+            </summary>
+            <param name="notification">The notification</param>
+            <returns></returns>
+            <response code="401">You must be an admin</response>
+            <response code="200">The notification was successfully send</response>
+        </member>
         <member name="M:BuildUp.API.Controllers.UsersController.UpdateUser(System.String,BuildUp.API.Models.Users.UserUpdateModel)">
             <summary>
             (Builder,Coach,Admin) Update a user. Only admin can edit every users
@@ -998,6 +1007,12 @@
             The current proof status
             </summary>
             <example>Validated/Waiting/Refused</example>
+        </member>
+        <member name="P:BuildUp.API.Entities.Notification.UserNotification.Content">
+            <summary>
+            The notification content
+            </summary>
+            <example>I am a notification</example>
         </member>
         <member name="P:BuildUp.API.Entities.NtfReferent.FirstName">
             <summary>
