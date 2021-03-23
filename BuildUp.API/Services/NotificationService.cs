@@ -409,7 +409,11 @@ namespace BuildUp.API.Services
         {
             return await (await _coachNotifications.FindAsync(databaseNotification =>
                 databaseNotification.CoachId == coachId &&
-                !databaseNotification.Seen
+                !databaseNotification.Seen,
+                new FindOptions<CoachNotification>()
+                {
+                    Sort = Builders<CoachNotification>.Sort.Descending("Date")
+                }
             )).ToListAsync();
         }
 
@@ -453,8 +457,11 @@ namespace BuildUp.API.Services
         public async Task<List<BuilderNotification>> GetBuilderNotificationsAsync(string builderId)
         {
             return await (await _builderNotifications.FindAsync(databaseNotification =>
-                databaseNotification.BuilderId == builderId &&
-                !databaseNotification.Seen
+                databaseNotification.BuilderId == builderId && !databaseNotification.Seen,
+                new FindOptions<BuilderNotification>()
+                {
+                    Sort = Builders<BuilderNotification>.Sort.Descending("Date")
+                }
             )).ToListAsync();
         }
 
