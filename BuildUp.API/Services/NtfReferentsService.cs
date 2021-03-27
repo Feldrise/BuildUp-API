@@ -43,7 +43,8 @@ namespace BuildUp.API.Services
                 FirstName = ntfReferentManageModel.FirstName,
                 LastName = ntfReferentManageModel.LastName,
                 Email = ntfReferentManageModel.Email,
-                DiscordTag = ntfReferentManageModel.DiscordTag
+                DiscordTag = ntfReferentManageModel.DiscordTag,
+                Competence = ntfReferentManageModel.Competence
             };
 
             await _ntfReferents.InsertOneAsync(ntfReferent);
@@ -57,7 +58,8 @@ namespace BuildUp.API.Services
                 .Set(dbNtdReferent => dbNtdReferent.FirstName, ntfReferentManageModel.FirstName)
                 .Set(dbNtdReferent => dbNtdReferent.LastName, ntfReferentManageModel.LastName)
                 .Set(dbNtdReferent => dbNtdReferent.Email, ntfReferentManageModel.Email)
-                .Set(dbNtdReferent => dbNtdReferent.DiscordTag, ntfReferentManageModel.DiscordTag);
+                .Set(dbNtdReferent => dbNtdReferent.DiscordTag, ntfReferentManageModel.DiscordTag)
+                .Set(dbNtfReferent => dbNtfReferent.Competence, ntfReferentManageModel.Competence);
 
             await _ntfReferents.UpdateOneAsync(databaseNtfReferent =>
                databaseNtfReferent.Id == id,

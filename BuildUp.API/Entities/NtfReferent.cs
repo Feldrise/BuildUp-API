@@ -33,5 +33,11 @@ namespace BuildUp.API.Entities
         /// </summary>
         /// <example>Feldrise#8497</example>
         public string DiscordTag { get; set; }
+
+        /// <summary>
+        /// The referent competences 
+        /// </summary>
+        /// <example>Stratégie d’innovation, Acquisition, SEO, Design, HTML, CSS, JS</example>
+        public string Competence { get; set; }
     }
 }
