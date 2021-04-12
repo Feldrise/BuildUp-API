@@ -145,6 +145,7 @@ namespace BuildUp.API.Services
 
                     Email = user.Email,
                     DiscordTag = user.DiscordTag,
+                    LinkedIn = user.LinkedIn,
 
                     Situation = activeCoach.Situation,
                     Description = activeCoach.Description,

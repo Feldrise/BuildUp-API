@@ -1038,6 +1038,12 @@
             </summary>
             <example>Feldrise#8497</example>
         </member>
+        <member name="P:BuildUp.API.Entities.NtfReferent.Competence">
+            <summary>
+            The referent competences 
+            </summary>
+            <example>Stratégie d’innovation, Acquisition, SEO, Design, HTML, CSS, JS</example>
+        </member>
         <member name="P:BuildUp.API.Entities.Pdf.PdfAttestationMineur.FistName">
             <summary>
             The legal tutor first name
@@ -1724,6 +1730,12 @@
             </summary>
             <example>Feldrise#8497</example>
         </member>
+        <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.LinkedIn">
+            <summary>
+            The user's linkedin
+            </summary>
+            <example>victor-denis-2a351a170</example>
+        </member>
         <member name="P:BuildUp.API.Models.Coachs.AvailableCoachModel.Situation">
             <summary>
             The coach current situation
@@ -1874,6 +1886,12 @@
             The Discord tag of NTF referent
             </summary>
             <example>Feldrise#8497</example>
+        </member>
+        <member name="P:BuildUp.API.Models.NtfReferentManageModel.Competence">
+            <summary>
+            The referent competences 
+            </summary>
+            <example>Stratégie d’innovation, Acquisition, SEO, Design, HTML, CSS, JS</example>
         </member>
         <member name="P:BuildUp.API.Models.Projects.ProjectSubmitModel.BuilderId">
             <summary>
