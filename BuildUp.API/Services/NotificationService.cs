@@ -268,6 +268,14 @@ namespace BuildUp.API.Services
                 coachMail
             );
 
+            // We also notify admins
+            await SendMailAsync(
+                OrigineCoach,
+                subject,
+                message,
+                "builder@new-talents.fr"
+            ); 
+
             await CreateCoachNotification(coachId, "Votre Builder vient de soumettre une nouvelle étape !");
         }
 
