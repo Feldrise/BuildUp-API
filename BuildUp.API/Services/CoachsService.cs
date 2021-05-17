@@ -127,10 +127,27 @@ namespace BuildUp.API.Services
                 databaseCoach.Status == CoachStatus.Validated
             )).ToListAsync();
 
-            List<AvailableCoachModel> availableCoachModels = new List<AvailableCoachModel>();
+            // We need to exclude coach who already have a builder
+            var builders = await (await _builders.FindAsync(databaseBuilder => true)).ToListAsync();
+            List<string> unavailableCoachs = new();
+
+            foreach (Builder builder in builders)
+            {
+                if (builder.CoachId != null)
+                {
+                    unavailableCoachs.Add(builder.CoachId);
+                }
+            }
+
+            List<AvailableCoachModel> availableCoachModels = new();
 
             foreach (Coach activeCoach in activeCoachs)
             {
+                if (unavailableCoachs.Contains(activeCoach.Id))
+                {
+                    continue;
+                }
+
                 User user = await GetUserFromAdminAsync(activeCoach.Id);
 
                 if (user == null) continue;
