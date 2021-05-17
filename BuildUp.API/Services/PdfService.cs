@@ -172,7 +172,7 @@ namespace BuildUp.API.Services
 
             fields["lastname"].SetValue(values.LastName);
             fields["firstname"].SetValue(values.FirstName);
-            fields["birth_place"].SetValue(values.BirthPlace);
+            fields["birth_place"].SetValue(values.BirthPlace ?? values.City);
             fields["birthdate"].SetValue(string.Format("{0:dd/MM/yyyy}", values.Birthdate));
             fields["email"].SetValue(values.Email);
             fields["mobile"].SetValue(values.Phone);
