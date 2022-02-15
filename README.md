@@ -16,3 +16,7 @@ Nous partons du principe qu’aujourd’hui, un jeune doit pouvoir bénéficier 
 ## La structure de l'API
 
 Cette API est basé sur [GraphQL](https://graphql.org/) et [gqlgen](https://github.com/99designs/gqlgen)
+
+### GrapiQL
+
+Ce repository contient un fichier répertoriant l'ensemble des requêtes qui permettent de tester l'API. Vous pourrez trouver ce fichier ici : [GraphiQL.md](https://github.com/Feldrise/BuildUp-API/blob/graphql/GraphiQL.md)
