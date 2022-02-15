@@ -9,14 +9,64 @@ import (
 
 	"new-talents.fr/buildup/graph/generated"
 	"new-talents.fr/buildup/graph/model"
+	"new-talents.fr/buildup/internal/users"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	// We first need to check the email isn't taken
+	existingUser, err := users.GetByEmail(input.Email)
+
+	if existingUser != nil {
+		return nil, &users.UserEmailAlreadyExistsError{}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	databaseUser, err := users.Create(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return databaseUser.ToModel(), nil
+}
+
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	databaseUsers, err := users.GetAll()
+
+	if err != nil {
+		return nil, err
+	}
+
+	users := []*model.User{}
+
+	for _, databaseUser := range databaseUsers {
+		user := databaseUser.ToModel()
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	databaseUser, err := users.GetById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseUser == nil {
+		return nil, &users.UserNotFoundError{}
+	}
+
+	return databaseUser.ToModel(), nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
