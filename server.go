@@ -7,8 +7,10 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi"
 	"new-talents.fr/buildup/graph"
 	"new-talents.fr/buildup/graph/generated"
+	"new-talents.fr/buildup/internal/auth"
 	"new-talents.fr/buildup/internal/config"
 	"new-talents.fr/buildup/internal/database"
 )
@@ -16,10 +18,14 @@ import (
 const defaultPort = "8083"
 
 func main() {
+	// Rooter initialization
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
+
+	rooter := chi.NewRouter()
+	rooter.Use(auth.Middleware())
 
 	// Config initialization
 	configPath := "config.yml"
@@ -38,5 +44,5 @@ func main() {
 	http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, rooter))
 }
