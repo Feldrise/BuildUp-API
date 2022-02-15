@@ -5,11 +5,11 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"new-talents.fr/buildup/graph/generated"
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/users"
+	"new-talents.fr/buildup/pkg/jwt"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -34,7 +34,27 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	// We first check the password
+	isPasswordCorrect := users.Authenticate(input)
+
+	if !isPasswordCorrect {
+		return "", &users.UserPasswordIncorrectError{}
+	}
+
+	// Then we can generate the token
+	user, err := users.GetByEmail(input.Email)
+
+	if err != nil {
+		return "", err
+	}
+
+	token, err := jwt.GenerateToken(user.ID.Hex())
+
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
