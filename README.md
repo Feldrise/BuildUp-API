@@ -1,4 +1,6 @@
-# Build Up
+# Build Up (API)
+[![Gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-squar)](https://gitmoji.dev/)
+[![Go Reference](https://pkg.go.dev/badge/github.com/99designs/gqlgen.svg)](https://pkg.go.dev/github.com/)
 
 > Ceci est le Back End de Build Up, l'application utilisant cette API est disponible sur [ce repository](https://github.com/Feldrise/BuildUp-App)
 
@@ -12,10 +14,5 @@ Le prinicipal objectif est de fournir un accompagnement personnalisé aux jeunes
 Nous partons du principe qu’aujourd’hui, un jeune doit pouvoir bénéficier d’un appui humain, matériel et bienveillant dans la viabilisation de son ou ses idées.
 
 ## La structure de l'API
-> La documentation de l'API est disponible [ici](https://api.new-talents.fr/documentation)
 
-Voici un schéma (un peu vieux...) décrivant l'API : [Lien vers un SVG](https://drive.google.com/file/d/1m8fFWuQsSNJmNGm_lfcJYlNGrae9jR0e/view?usp=sharing)
-
-![Architecture API BuildUp](https://github.com/Feldrise/BuildUp/blob/master/api_2.png)
-
-L'architecture choisi est une architecture en 3-Tier
+Cette API est basé sur [GraphQL](https://graphql.org/) et [gqlgen](https://github.com/99designs/gqlgen)
