@@ -1,0 +1,8 @@
+settings: 
+  authSecret: "cbgCqUIVKfZook1AFiFZvFJVbOAYNKD4"
+
+database: 
+  name: "DbBuildUp"
+  connectionString: "mongodb://localhost:27017"
+  collections: 
+    users: "users"
