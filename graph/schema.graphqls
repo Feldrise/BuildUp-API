@@ -1,3 +1,5 @@
+directive @needAuthentication on FIELD_DEFINITION
+
 scalar Time
 
 ###########
@@ -27,8 +29,8 @@ input Login {
 
 type Query {
   # USERS
-  users: [User!]!
-  user(id: ID!): User!
+  users: [User!]! @needAuthentication
+  user(id: ID!): User! @needAuthentication
 }
 
 type Mutation {

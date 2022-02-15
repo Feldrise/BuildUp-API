@@ -105,4 +105,45 @@ mutation createCoach {
     firstName
   }
 }
+
+# CONNEXION
+
+# Token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDUwNTA1MTUsImlkIjoiNjIwYzIzYzIwNzlmZGI3ZTA4YTEwMzJmIn0.DX-Bc44m99GINZMzqn_nncEaQEl7k1lhwLg3u6fGL9c
+mutation loginAdmin {
+  login(input: {
+    email: "admin@me.com",
+    password: "dE8bdTUE"
+  })
+}
+
+# Token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDUwNTA1MzAsImlkIjoiNjIwYzIzYzkwNzlmZGI3ZTA4YTEwMzMwIn0.tcEYDdKHtVGOthyr48Wpp7N1mrn6JCteij7pH7bIS3o
+mutation loginBuilder {
+  login(input: {
+    email: "builder@me.com",
+    password: "dE8bdTUE"
+  })
+}
+
+# Token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDUwNTA1NDAsImlkIjoiNjIwYzIzY2MwNzlmZGI3ZTA4YTEwMzMxIn0.SoRl2oRo7QoatPtS_Rida0CW21nJg2Wl8l0J0bONrQI
+mutation loginCoach {
+  login(input: {
+    email: "coach@me.com",
+    password: "dE8bdTUE"
+  })
+}
+
+mutation failedLogin1 {
+  login(input: {
+    email: "admin@me.com",
+    password: "dE8bdUE"
+  })
+}
+
+mutation failedLogin2 {
+  login(input: {
+    email: "adm@me.com",
+    password: "dE8bdTUE"
+  })
+}
+
 ```

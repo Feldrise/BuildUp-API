@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
@@ -13,6 +15,7 @@ import (
 	"new-talents.fr/buildup/internal/auth"
 	"new-talents.fr/buildup/internal/config"
 	"new-talents.fr/buildup/internal/database"
+	"new-talents.fr/buildup/internal/users"
 )
 
 const defaultPort = "8083"
@@ -24,8 +27,8 @@ func main() {
 		port = defaultPort
 	}
 
-	rooter := chi.NewRouter()
-	rooter.Use(auth.Middleware())
+	router := chi.NewRouter()
+	router.Use(auth.Middleware())
 
 	// Config initialization
 	configPath := "config.yml"
@@ -38,11 +41,20 @@ func main() {
 	// Database initialization
 	database.Init()
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	c := generated.Config{Resolvers: &graph.Resolver{}}
+	c.Directives.NeedAuthentication = func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+		if auth.ForContext(ctx) == nil {
+			return nil, &users.UserAccessDeniedError{}
+		}
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+		return next(ctx)
+	}
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
+
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, rooter))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
