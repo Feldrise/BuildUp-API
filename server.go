@@ -10,6 +10,7 @@ import (
 	"new-talents.fr/buildup/graph"
 	"new-talents.fr/buildup/graph/generated"
 	"new-talents.fr/buildup/internal/config"
+	"new-talents.fr/buildup/internal/database"
 )
 
 const defaultPort = "8083"
@@ -27,6 +28,9 @@ func main() {
 	}
 
 	config.Init(configPath)
+
+	// Database initialization
+	database.Init()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
