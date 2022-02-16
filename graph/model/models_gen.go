@@ -2,19 +2,35 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Login struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type NewBuilder struct {
-	Situation   string `json:"situation"`
-	Description string `json:"description"`
+	Situation   string      `json:"situation"`
+	Description string      `json:"description"`
+	Project     *NewProject `json:"project"`
 }
 
 type NewCoach struct {
 	Situation   string `json:"situation"`
 	Description string `json:"description"`
+}
+
+type NewProject struct {
+	Name                  string    `json:"name"`
+	Description           string    `json:"description"`
+	Team                  string    `json:"team"`
+	Categorie             string    `json:"categorie"`
+	Keywords              *string   `json:"keywords"`
+	LaunchDate            time.Time `json:"launchDate"`
+	IsLucrative           bool      `json:"isLucrative"`
+	IsOfficialyRegistered bool      `json:"isOfficialyRegistered"`
 }
 
 type NewUser struct {
@@ -27,5 +43,13 @@ type NewUser struct {
 }
 
 type Project struct {
-	ID string `json:"id"`
+	ID                    string    `json:"id"`
+	Name                  string    `json:"name"`
+	Description           string    `json:"description"`
+	Team                  string    `json:"team"`
+	Categorie             string    `json:"categorie"`
+	Keywords              string    `json:"keywords"`
+	LaunchDate            time.Time `json:"launchDate"`
+	IsLucrative           bool      `json:"isLucrative"`
+	IsOfficialyRegistered bool      `json:"isOfficialyRegistered"`
 }

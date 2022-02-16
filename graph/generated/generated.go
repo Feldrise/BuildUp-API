@@ -54,6 +54,7 @@ type ComplexityRoot struct {
 		Coach           func(childComplexity int) int
 		Description     func(childComplexity int) int
 		ID              func(childComplexity int) int
+		Project         func(childComplexity int) int
 		Situation       func(childComplexity int) int
 	}
 
@@ -71,7 +72,15 @@ type ComplexityRoot struct {
 	}
 
 	Project struct {
-		ID func(childComplexity int) int
+		Categorie             func(childComplexity int) int
+		Description           func(childComplexity int) int
+		ID                    func(childComplexity int) int
+		IsLucrative           func(childComplexity int) int
+		IsOfficialyRegistered func(childComplexity int) int
+		Keywords              func(childComplexity int) int
+		LaunchDate            func(childComplexity int) int
+		Name                  func(childComplexity int) int
+		Team                  func(childComplexity int) int
 	}
 
 	Query struct {
@@ -94,6 +103,7 @@ type ComplexityRoot struct {
 }
 
 type BuilderResolver interface {
+	Project(ctx context.Context, obj *model.Builder) (*model.Project, error)
 	Coach(ctx context.Context, obj *model.Builder) (*model.User, error)
 }
 type CoachResolver interface {
@@ -156,6 +166,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Builder.ID(childComplexity), true
+
+	case "Builder.project":
+		if e.complexity.Builder.Project == nil {
+			break
+		}
+
+		return e.complexity.Builder.Project(childComplexity), true
 
 	case "Builder.situation":
 		if e.complexity.Builder.Situation == nil {
@@ -223,12 +240,68 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.Login)), true
 
+	case "Project.categorie":
+		if e.complexity.Project.Categorie == nil {
+			break
+		}
+
+		return e.complexity.Project.Categorie(childComplexity), true
+
+	case "Project.description":
+		if e.complexity.Project.Description == nil {
+			break
+		}
+
+		return e.complexity.Project.Description(childComplexity), true
+
 	case "Project.id":
 		if e.complexity.Project.ID == nil {
 			break
 		}
 
 		return e.complexity.Project.ID(childComplexity), true
+
+	case "Project.isLucrative":
+		if e.complexity.Project.IsLucrative == nil {
+			break
+		}
+
+		return e.complexity.Project.IsLucrative(childComplexity), true
+
+	case "Project.isOfficialyRegistered":
+		if e.complexity.Project.IsOfficialyRegistered == nil {
+			break
+		}
+
+		return e.complexity.Project.IsOfficialyRegistered(childComplexity), true
+
+	case "Project.keywords":
+		if e.complexity.Project.Keywords == nil {
+			break
+		}
+
+		return e.complexity.Project.Keywords(childComplexity), true
+
+	case "Project.launchDate":
+		if e.complexity.Project.LaunchDate == nil {
+			break
+		}
+
+		return e.complexity.Project.LaunchDate(childComplexity), true
+
+	case "Project.name":
+		if e.complexity.Project.Name == nil {
+			break
+		}
+
+		return e.complexity.Project.Name(childComplexity), true
+
+	case "Project.team":
+		if e.complexity.Project.Team == nil {
+			break
+		}
+
+		return e.complexity.Project.Team(childComplexity), true
 
 	case "Query.builders":
 		if e.complexity.Query.Builders == nil {
@@ -429,12 +502,16 @@ type Builder {
   situation: String!
   description: String!
 
+  project: Project!
+
   coach: User
 }
 
 input NewBuilder {
   situation: String!
   description: String!
+
+  project: NewProject!
 }
 
 ###########
@@ -462,6 +539,32 @@ input NewCoach {
 
 type Project {
   id: ID!
+  
+  # Basic informations
+  name: String!
+  description: String!
+  team: String!
+
+  # Complementary informations
+  categorie: String!
+  keywords: String!
+  launchDate: Time!
+  isLucrative: Boolean!
+  isOfficialyRegistered: Boolean!
+}
+
+input NewProject {
+  # Basic informations
+  name: String!
+  description: String!
+  team: String!
+
+  # Complementary informations
+  categorie: String!
+  keywords: String
+  launchDate: Time!
+  isLucrative: Boolean!
+  isOfficialyRegistered: Boolean!
 }
 
 type Query {
@@ -740,6 +843,41 @@ func (ec *executionContext) _Builder_description(ctx context.Context, field grap
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Builder_project(ctx context.Context, field graphql.CollectedField, obj *model.Builder) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Builder",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Builder().Project(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Project)
+	fc.Result = res
+	return ec.marshalNProject2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Builder_coach(ctx context.Context, field graphql.CollectedField, obj *model.Builder) (ret graphql.Marshaler) {
@@ -1066,6 +1204,286 @@ func (ec *executionContext) _Project_id(ctx context.Context, field graphql.Colle
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_name(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_description(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_team(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Team, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_categorie(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categorie, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_keywords(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Keywords, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_launchDate(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LaunchDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_isLucrative(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsLucrative, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_isOfficialyRegistered(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsOfficialyRegistered, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2825,6 +3243,14 @@ func (ec *executionContext) unmarshalInputNewBuilder(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "project":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+			it.Project, err = ec.unmarshalNNewProject2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐNewProject(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -2853,6 +3279,85 @@ func (ec *executionContext) unmarshalInputNewCoach(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			it.Description, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewProject(ctx context.Context, obj interface{}) (model.NewProject, error) {
+	var it model.NewProject
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "team":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("team"))
+			it.Team, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "categorie":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categorie"))
+			it.Categorie, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "keywords":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keywords"))
+			it.Keywords, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "launchDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("launchDate"))
+			it.LaunchDate, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isLucrative":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isLucrative"))
+			it.IsLucrative, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isOfficialyRegistered":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isOfficialyRegistered"))
+			it.IsOfficialyRegistered, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2983,6 +3488,26 @@ func (ec *executionContext) _Builder(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "project":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Builder_project(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "coach":
 			field := field
 
@@ -3155,6 +3680,86 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 		case "id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Project_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Project_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Project_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "team":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Project_team(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "categorie":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Project_categorie(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "keywords":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Project_keywords(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "launchDate":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Project_launchDate(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isLucrative":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Project_isLucrative(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isOfficialyRegistered":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Project_isOfficialyRegistered(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -3868,9 +4473,28 @@ func (ec *executionContext) unmarshalNLogin2newᚑtalentsᚗfrᚋbuildupᚋgraph
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNNewProject2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐNewProject(ctx context.Context, v interface{}) (*model.NewProject, error) {
+	res, err := ec.unmarshalInputNewProject(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewUser2newᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐNewUser(ctx context.Context, v interface{}) (model.NewUser, error) {
 	res, err := ec.unmarshalInputNewUser(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNProject2newᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐProject(ctx context.Context, sel ast.SelectionSet, v model.Project) graphql.Marshaler {
+	return ec._Project(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProject2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐProject(ctx context.Context, sel ast.SelectionSet, v *model.Project) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Project(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

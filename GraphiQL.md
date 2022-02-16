@@ -45,6 +45,7 @@ Ce fichier contient les requêtes créés pour tester l'API. Vous pouvez les cop
 query getUsers {
   users {
     id,
+    createdAt,
     email,
     firstName,
     lastName,
@@ -68,6 +69,10 @@ query getBuilders {
       description,
       coach {
         firstName
+      },
+      project {
+        name,
+        description
       }
     }
   }
@@ -88,7 +93,7 @@ query getCoachs {
 }
 
 query getBuilder {
-  user(id: "620cc6a17439836aca5f84c6") {
+  user(id: "620d3324b758ac25982681d8") {
     email,
     firstName,
     lastName,
@@ -96,6 +101,10 @@ query getBuilder {
       description,
       coach {
         firstName
+      },
+      project {
+        name,
+        description
       }
     }
   }
@@ -109,7 +118,13 @@ query getCoach {
     coach {
       description,
       builders {
-        firstName
+        firstName,
+        builder {
+          project {
+            name,
+            description
+          }
+        }
       }
     }
   }
@@ -143,7 +158,17 @@ mutation createBuilder {
     lastName: "ASTICOT",
     builder: {
       situation: "Etudiant.e",
-      description: "Je suis une super étudiante qui aime plein de truc !"
+      description: "Je suis une super étudiante qui aime plein de truc !",
+      project: {
+        name: "Le chemin des fées",
+        description: "Ce projet à pour but de répertorier tous les endroits entourée de mystères et de légendes qui peuvent se trouver dans le monde.",
+        team: "Moi, mon sac et beaucoup de livre",
+        categorie: "Voyage",
+        keywords: "fée, lieux, voyage, légende",
+        launchDate: "2022-03-01T12:00:00.782Z"
+        isLucrative: false,
+        isOfficialyRegistered: true
+      }
     }
   }) {
     id,

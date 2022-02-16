@@ -20,6 +20,7 @@ type Config struct {
 			Users    string `yaml:"users"`
 			Builders string `yaml:"builders"`
 			Coachs   string `yaml:"coachs"`
+			Projects string `yaml:"projects"`
 		} `yaml:"collections"`
 	} `yaml:"database"`
 }

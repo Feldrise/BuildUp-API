@@ -10,9 +10,24 @@ import (
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/builders"
 	"new-talents.fr/buildup/internal/coachs"
+	"new-talents.fr/buildup/internal/projects"
 	"new-talents.fr/buildup/internal/users"
 	"new-talents.fr/buildup/pkg/jwt"
 )
+
+func (r *builderResolver) Project(ctx context.Context, obj *model.Builder) (*model.Project, error) {
+	databaseProjet, err := projects.GetForBuilder(obj.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseProjet == nil {
+		return nil, &projects.ProjectNotFoundError{}
+	}
+
+	return databaseProjet.ToModel(), nil
+}
 
 func (r *builderResolver) Coach(ctx context.Context, obj *model.Builder) (*model.User, error) {
 	if obj.CoachID == nil {

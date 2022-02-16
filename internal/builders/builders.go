@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/database"
+	"new-talents.fr/buildup/internal/projects"
 )
 
 type Builder struct {
@@ -38,8 +39,10 @@ func (builder *Builder) ToModel() *model.Builder {
 // Creation operation
 
 func Create(userID primitive.ObjectID, input model.NewBuilder) (*Builder, error) {
+	builderID := primitive.NewObjectID()
+
 	databaseBuilder := Builder{
-		ID:              primitive.NewObjectID(),
+		ID:              builderID,
 		UserID:          userID,
 		CandidatingDate: time.Now(),
 		Situation:       input.Situation,
@@ -50,6 +53,12 @@ func Create(userID primitive.ObjectID, input model.NewBuilder) (*Builder, error)
 
 	if err != nil {
 		return nil, err
+	}
+
+	_, err = projects.Create(builderID, *input.Project)
+
+	if err != nil {
+		return &databaseBuilder, nil
 	}
 
 	return &databaseBuilder, nil

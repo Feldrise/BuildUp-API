@@ -44,12 +44,16 @@ type Builder {
   situation: String!
   description: String!
 
+  project: Project!
+
   coach: User
 }
 
 input NewBuilder {
   situation: String!
   description: String!
+
+  project: NewProject!
 }
 
 ###########
@@ -77,6 +81,32 @@ input NewCoach {
 
 type Project {
   id: ID!
+  
+  # Basic informations
+  name: String!
+  description: String!
+  team: String!
+
+  # Complementary informations
+  categorie: String!
+  keywords: String!
+  launchDate: Time!
+  isLucrative: Boolean!
+  isOfficialyRegistered: Boolean!
+}
+
+input NewProject {
+  # Basic informations
+  name: String!
+  description: String!
+  team: String!
+
+  # Complementary informations
+  categorie: String!
+  keywords: String
+  launchDate: Time!
+  isLucrative: Boolean!
+  isOfficialyRegistered: Boolean!
 }
 
 type Query {
