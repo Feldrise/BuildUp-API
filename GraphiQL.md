@@ -48,6 +48,42 @@ query getUsers {
     email,
     firstName,
     lastName,
+    coach {
+      id,
+      description
+    }
+    builder {
+      id,
+      description
+    }
+  }
+}
+
+query getBuilders {
+  builders {
+    email,
+    firstName,
+    lastName,
+    builder {
+      description,
+      coach {
+        firstName
+      }
+    }
+  }
+}
+
+query getCoachs {
+  coachs {
+    email,
+    firstName,
+    lastName,
+    coach {
+      description,
+      builders {
+        firstName
+      }
+    }
   }
 }
 
@@ -57,7 +93,24 @@ query getBuilder {
     firstName,
     lastName,
     builder {
-      description
+      description,
+      coach {
+        firstName
+      }
+    }
+  }
+}
+
+query getCoach {
+  user(id: "620ccedca1e77c53925b35e6") {
+    email,
+    firstName,
+    lastName,
+    coach {
+      description,
+      builders {
+        firstName
+      }
     }
   }
 }
@@ -108,11 +161,18 @@ mutation createCoach {
     email: "coach@me.com",
     password: "dE8bdTUE",
     firstName: "Guillaume",
-    lastName: "EOCHE"
+    lastName: "EOCHE",
+    coach: {
+      situation: "Alternant",
+      description: "Fondateur de New Talents, je sers aujourd'hui d'exemple dans l'API de BuildUP"
+    }
   }) {
     id,
     email,
-    firstName
+    firstName,
+    coach {
+      description
+    }
   }
 }
 
