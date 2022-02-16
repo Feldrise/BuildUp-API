@@ -5,17 +5,65 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"new-talents.fr/buildup/graph/generated"
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/builders"
+	"new-talents.fr/buildup/internal/coachs"
 	"new-talents.fr/buildup/internal/users"
 	"new-talents.fr/buildup/pkg/jwt"
 )
 
 func (r *builderResolver) Coach(ctx context.Context, obj *model.Builder) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	if obj.CoachID == nil {
+		return nil, nil
+	}
+
+	databaseCoach, err := coachs.GetById(*obj.CoachID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseCoach == nil {
+		return nil, nil
+	}
+
+	databaseUser, err := users.GetById(databaseCoach.UserID.Hex())
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseUser == nil {
+		return nil, &coachs.UserNotFoundError{}
+	}
+
+	return databaseUser.ToModel(), nil
+}
+
+func (r *coachResolver) Builders(ctx context.Context, obj *model.Coach) ([]*model.User, error) {
+	databaseBuilders, err := builders.GetForCoach(obj.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	databaseUsers, err := users.GetForBuilders(databaseBuilders)
+
+	if err != nil {
+		return nil, err
+	}
+
+	users := []*model.User{}
+
+	for _, databaseUser := range databaseUsers {
+		user := databaseUser.ToModel()
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -118,7 +166,21 @@ func (r *queryResolver) Builders(ctx context.Context) ([]*model.User, error) {
 }
 
 func (r *queryResolver) Coachs(ctx context.Context) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	databaseCoachs, err := users.GetByRole(users.USERROLE_COACH)
+
+	if err != nil {
+		return nil, err
+	}
+
+	coachs := []*model.User{}
+
+	for _, databaseCoach := range databaseCoachs {
+		coach := databaseCoach.ToModel()
+
+		coachs = append(coachs, coach)
+	}
+
+	return coachs, nil
 }
 
 func (r *userResolver) Builder(ctx context.Context, obj *model.User) (*model.Builder, error) {
@@ -136,11 +198,24 @@ func (r *userResolver) Builder(ctx context.Context, obj *model.User) (*model.Bui
 }
 
 func (r *userResolver) Coach(ctx context.Context, obj *model.User) (*model.Coach, error) {
-	panic(fmt.Errorf("not implemented"))
+	databaseCoach, err := coachs.GetForUser(obj.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseCoach == nil {
+		return nil, nil
+	}
+
+	return databaseCoach.ToModel(), nil
 }
 
 // Builder returns generated.BuilderResolver implementation.
 func (r *Resolver) Builder() generated.BuilderResolver { return &builderResolver{r} }
+
+// Coach returns generated.CoachResolver implementation.
+func (r *Resolver) Coach() generated.CoachResolver { return &coachResolver{r} }
 
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
@@ -152,6 +227,7 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
 type builderResolver struct{ *Resolver }
+type coachResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

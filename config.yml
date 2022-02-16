@@ -7,3 +7,4 @@ database:
   collections: 
     users: "users"
     builders: "builders"
+    coachs: "coachs"

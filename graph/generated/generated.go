@@ -38,6 +38,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Builder() BuilderResolver
+	Coach() CoachResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	User() UserResolver
@@ -52,6 +53,7 @@ type ComplexityRoot struct {
 		CandidatingDate func(childComplexity int) int
 		Coach           func(childComplexity int) int
 		Description     func(childComplexity int) int
+		ID              func(childComplexity int) int
 		Situation       func(childComplexity int) int
 	}
 
@@ -59,6 +61,7 @@ type ComplexityRoot struct {
 		Builders        func(childComplexity int) int
 		CandidatingDate func(childComplexity int) int
 		Description     func(childComplexity int) int
+		ID              func(childComplexity int) int
 		Situation       func(childComplexity int) int
 	}
 
@@ -92,6 +95,9 @@ type ComplexityRoot struct {
 
 type BuilderResolver interface {
 	Coach(ctx context.Context, obj *model.Builder) (*model.User, error)
+}
+type CoachResolver interface {
+	Builders(ctx context.Context, obj *model.Coach) ([]*model.User, error)
 }
 type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.NewUser) (*model.User, error)
@@ -144,6 +150,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Builder.Description(childComplexity), true
 
+	case "Builder.id":
+		if e.complexity.Builder.ID == nil {
+			break
+		}
+
+		return e.complexity.Builder.ID(childComplexity), true
+
 	case "Builder.situation":
 		if e.complexity.Builder.Situation == nil {
 			break
@@ -171,6 +184,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Coach.Description(childComplexity), true
+
+	case "Coach.id":
+		if e.complexity.Coach.ID == nil {
+			break
+		}
+
+		return e.complexity.Coach.ID(childComplexity), true
 
 	case "Coach.situation":
 		if e.complexity.Coach.Situation == nil {
@@ -403,6 +423,8 @@ input Login {
 #############
 
 type Builder {
+  id: ID!
+
   candidatingDate: Time!
   situation: String!
   description: String!
@@ -420,6 +442,8 @@ input NewBuilder {
 ###########
 
 type Coach {
+  id: ID!
+
   candidatingDate: Time!
   situation: String!
   description: String!
@@ -578,6 +602,41 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _Builder_id(ctx context.Context, field graphql.CollectedField, obj *model.Builder) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Builder",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Builder_candidatingDate(ctx context.Context, field graphql.CollectedField, obj *model.Builder) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -715,6 +774,41 @@ func (ec *executionContext) _Builder_coach(ctx context.Context, field graphql.Co
 	return ec.marshalOUser2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Coach_id(ctx context.Context, field graphql.CollectedField, obj *model.Coach) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Coach",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Coach_candidatingDate(ctx context.Context, field graphql.CollectedField, obj *model.Coach) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -831,14 +925,14 @@ func (ec *executionContext) _Coach_builders(ctx context.Context, field graphql.C
 		Object:     "Coach",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Builders, nil
+		return ec.resolvers.Coach().Builders(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2849,6 +2943,16 @@ func (ec *executionContext) _Builder(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Builder")
+		case "id":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Builder_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "candidatingDate":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Builder_candidatingDate(ctx, field, obj)
@@ -2917,6 +3021,16 @@ func (ec *executionContext) _Coach(ctx context.Context, sel ast.SelectionSet, ob
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Coach")
+		case "id":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Coach_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "candidatingDate":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Coach_candidatingDate(ctx, field, obj)
@@ -2925,7 +3039,7 @@ func (ec *executionContext) _Coach(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = innerFunc(ctx)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "situation":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -2935,7 +3049,7 @@ func (ec *executionContext) _Coach(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = innerFunc(ctx)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "description":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -2945,18 +3059,28 @@ func (ec *executionContext) _Coach(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = innerFunc(ctx)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "builders":
+			field := field
+
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Coach_builders(ctx, field, obj)
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Coach_builders(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
 
-			out.Values[i] = innerFunc(ctx)
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/builders"
+	"new-talents.fr/buildup/internal/coachs"
 	"new-talents.fr/buildup/internal/database"
 )
 
@@ -79,7 +80,11 @@ func Create(input model.NewUser) (*User, error) {
 			return &databaseUser, err
 		}
 	} else if input.Coach != nil {
-		// TODO: do
+		_, err = coachs.Create(userObjectID, *input.Coach)
+
+		if err != nil {
+			return &databaseUser, err
+		}
 	}
 
 	return &databaseUser, nil
@@ -89,6 +94,24 @@ func Create(input model.NewUser) (*User, error) {
 
 func GetAll() ([]User, error) {
 	filter := bson.D{{}}
+
+	return GetFiltered(filter)
+}
+
+func GetForBuilders(builders []builders.Builder) ([]User, error) {
+	// We need to cnostruct an array with all the ids
+	buildersIDs := []primitive.ObjectID{}
+
+	for _, builder := range builders {
+		buildersIDs = append(buildersIDs, builder.UserID)
+	}
+
+	// Now we can construct the final filter
+	filter := bson.M{
+		"_id": bson.M{
+			"$in": buildersIDs,
+		},
+	}
 
 	return GetFiltered(filter)
 }

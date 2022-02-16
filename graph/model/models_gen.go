@@ -2,17 +2,6 @@
 
 package model
 
-import (
-	"time"
-)
-
-type Coach struct {
-	CandidatingDate time.Time `json:"candidatingDate"`
-	Situation       string    `json:"situation"`
-	Description     string    `json:"description"`
-	Builders        []*User   `json:"builders"`
-}
-
 type Login struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

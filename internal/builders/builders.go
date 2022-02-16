@@ -27,6 +27,7 @@ func (builder *Builder) ToModel() *model.Builder {
 	}
 
 	return &model.Builder{
+		ID:              builder.ID.Hex(),
 		CandidatingDate: builder.CandidatingDate,
 		Situation:       builder.Situation,
 		Description:     builder.Description,
@@ -114,6 +115,24 @@ func GetForUser(userID string) (*Builder, error) {
 	}
 
 	return &builders[0], nil
+}
+
+func GetForCoach(coachID string) ([]Builder, error) {
+	coachObjectID, err := primitive.ObjectIDFromHex(coachID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// We first need to get all the builders
+	coachFiler := bson.D{
+		primitive.E{
+			Key:   "coachID",
+			Value: coachObjectID,
+		},
+	}
+
+	return GetFiltered(coachFiler)
 }
 
 func GetFiltered(filter interface{}) ([]Builder, error) {

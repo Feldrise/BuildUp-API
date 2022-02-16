@@ -38,6 +38,8 @@ input Login {
 #############
 
 type Builder {
+  id: ID!
+
   candidatingDate: Time!
   situation: String!
   description: String!
@@ -55,6 +57,8 @@ input NewBuilder {
 ###########
 
 type Coach {
+  id: ID!
+
   candidatingDate: Time!
   situation: String!
   description: String!
