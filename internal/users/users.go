@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"new-talents.fr/buildup/graph/model"
+	"new-talents.fr/buildup/internal/builders"
 	"new-talents.fr/buildup/internal/database"
 )
 
@@ -46,11 +47,19 @@ func Create(input model.NewUser) (*User, error) {
 		return nil, err
 	}
 
+	// We need to change the role depending on who we create
+	userRole := USERROLE_BUILDER
+
+	if input.Coach != nil {
+		userRole = USERROLE_COACH
+	}
+
+	userObjectID := primitive.NewObjectID()
 	databaseUser := User{
-		ID:           primitive.NewObjectID(),
+		ID:           userObjectID,
 		CreatedAt:    time.Now(),
 		Email:        input.Email,
-		Role:         USERROLE_BUILDER, // TODO: will be modified later
+		Role:         userRole,
 		FirstName:    input.FirstName,
 		LastName:     input.LastName,
 		PasswordHash: hashedPassword,
@@ -60,6 +69,17 @@ func Create(input model.NewUser) (*User, error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	// Now we need to register the builder/coach
+	if input.Builder != nil {
+		_, err = builders.Create(userObjectID, *input.Builder)
+
+		if err != nil {
+			return &databaseUser, err
+		}
+	} else if input.Coach != nil {
+		// TODO: do
 	}
 
 	return &databaseUser, nil
@@ -119,6 +139,17 @@ func GetByEmail(email string) (*User, error) {
 	}
 
 	return &users[0], nil
+}
+
+func GetByRole(role string) ([]User, error) {
+	filter := bson.D{
+		primitive.E{
+			Key:   "role",
+			Value: role,
+		},
+	}
+
+	return GetFiltered(filter)
 }
 
 func GetFiltered(filter interface{}) ([]User, error) {

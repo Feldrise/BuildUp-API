@@ -6,23 +6,37 @@ import (
 	"time"
 )
 
+type Coach struct {
+	CandidatingDate time.Time `json:"candidatingDate"`
+	Situation       string    `json:"situation"`
+	Description     string    `json:"description"`
+	Builders        []*User   `json:"builders"`
+}
+
 type Login struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type NewUser struct {
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+type NewBuilder struct {
+	Situation   string `json:"situation"`
+	Description string `json:"description"`
 }
 
-type User struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-	Email     string    `json:"email"`
-	Role      string    `json:"role"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
+type NewCoach struct {
+	Situation   string `json:"situation"`
+	Description string `json:"description"`
+}
+
+type NewUser struct {
+	Email     string      `json:"email"`
+	Password  string      `json:"password"`
+	FirstName string      `json:"firstName"`
+	LastName  string      `json:"lastName"`
+	Builder   *NewBuilder `json:"builder"`
+	Coach     *NewCoach   `json:"coach"`
+}
+
+type Project struct {
+	ID string `json:"id"`
 }

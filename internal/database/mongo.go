@@ -12,6 +12,7 @@ import (
 var MongoContext = context.TODO()
 
 var CollectionUsers *mongo.Collection
+var CollectionBuilders *mongo.Collection
 
 // Initialize the database assuming the informations are in the
 // config file
@@ -38,6 +39,8 @@ func Init() {
 	// We affect the collections to access them later in the code
 	databaseName := config.Cfg.Database.Name
 	usersCollectionName := config.Cfg.Database.Collections.Users
+	buildersCollectionName := config.Cfg.Database.Collections.Builders
 
 	CollectionUsers = client.Database(databaseName).Collection(usersCollectionName)
+	CollectionBuilders = client.Database(databaseName).Collection(buildersCollectionName)
 }

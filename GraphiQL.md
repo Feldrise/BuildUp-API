@@ -51,11 +51,14 @@ query getUsers {
   }
 }
 
-query getUser {
-  user(id: "620c23c9079fdb7e08a10330") {
+query getBuilder {
+  user(id: "620cc6a17439836aca5f84c6") {
     email,
     firstName,
     lastName,
+    builder {
+      description
+    }
   }
 }
 
@@ -84,11 +87,18 @@ mutation createBuilder {
     email: "builder@me.com",
     password: "dE8bdTUE",
     firstName: "Bleuenne",
-    lastName: "ASTICOT"
+    lastName: "ASTICOT",
+    builder: {
+      situation: "Etudiant.e",
+      description: "Je suis une super étudiante qui aime plein de truc !"
+    }
   }) {
     id,
     email,
-    firstName
+    firstName, 
+    builder {
+      description
+    }
   }
 }
 
@@ -145,5 +155,4 @@ mutation failedLogin2 {
     password: "dE8bdTUE"
   })
 }
-
 ```
