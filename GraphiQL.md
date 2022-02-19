@@ -60,8 +60,22 @@ query getUsers {
   }
 }
 
+query getUser {
+  user {
+    email,
+    firstName,
+    lastName,
+    role
+  }
+}
+
 query getBuilders {
-  builders {
+  users(filters: [
+    {
+    	key: "role",
+    	value: "BUILDER"
+  	}
+  ]) {
     email,
     firstName,
     lastName,
@@ -79,7 +93,12 @@ query getBuilders {
 }
 
 query getCoachs {
-  coachs {
+  users(filters: [
+    {
+    	key: "role",
+    	value: "COACH"
+  	}
+  ]) {
     email,
     firstName,
     lastName,
@@ -154,7 +173,7 @@ mutation createBuilder {
   createUser(input: {
     email: "builder@me.com",
     password: "dE8bdTUE",
-    firstName: "Bleuenne",
+    firstName: "Bleuenn",
     lastName: "ASTICOT",
     builder: {
       situation: "Etudiant.e",

@@ -6,6 +6,8 @@ package graph
 import (
 	"context"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"new-talents.fr/buildup/graph/generated"
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/auth"
@@ -131,8 +133,18 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string
 	return token, nil
 }
 
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	databaseUsers, err := users.GetAll()
+func (r *queryResolver) Users(ctx context.Context, filters []*model.Filter) ([]*model.User, error) {
+	// We need to construct the filter first
+	databaseFilter := bson.D{{}}
+
+	for _, filter := range filters {
+		databaseFilter = append(databaseFilter, primitive.E{
+			Key:   filter.Key,
+			Value: filter.Value,
+		})
+	}
+
+	databaseUsers, err := users.GetFiltered(databaseFilter)
 
 	if err != nil {
 		return nil, err
@@ -168,42 +180,6 @@ func (r *queryResolver) User(ctx context.Context, id *string) (*model.User, erro
 	}
 
 	return databaseUser.ToModel(), nil
-}
-
-func (r *queryResolver) Builders(ctx context.Context) ([]*model.User, error) {
-	databaseBuilders, err := users.GetByRole(users.USERROLE_BUILDER)
-
-	if err != nil {
-		return nil, err
-	}
-
-	builders := []*model.User{}
-
-	for _, databaseBuilder := range databaseBuilders {
-		builder := databaseBuilder.ToModel()
-
-		builders = append(builders, builder)
-	}
-
-	return builders, nil
-}
-
-func (r *queryResolver) Coachs(ctx context.Context) ([]*model.User, error) {
-	databaseCoachs, err := users.GetByRole(users.USERROLE_COACH)
-
-	if err != nil {
-		return nil, err
-	}
-
-	coachs := []*model.User{}
-
-	for _, databaseCoach := range databaseCoachs {
-		coach := databaseCoach.ToModel()
-
-		coachs = append(coachs, coach)
-	}
-
-	return coachs, nil
 }
 
 func (r *userResolver) Builder(ctx context.Context, obj *model.User) (*model.Builder, error) {
@@ -254,3 +230,44 @@ type coachResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) Builders(ctx context.Context) ([]*model.User, error) {
+	databaseBuilders, err := users.GetByRole(users.USERROLE_BUILDER)
+
+	if err != nil {
+		return nil, err
+	}
+
+	builders := []*model.User{}
+
+	for _, databaseBuilder := range databaseBuilders {
+		builder := databaseBuilder.ToModel()
+
+		builders = append(builders, builder)
+	}
+
+	return builders, nil
+}
+func (r *queryResolver) Coachs(ctx context.Context) ([]*model.User, error) {
+	databaseCoachs, err := users.GetByRole(users.USERROLE_COACH)
+
+	if err != nil {
+		return nil, err
+	}
+
+	coachs := []*model.User{}
+
+	for _, databaseCoach := range databaseCoachs {
+		coach := databaseCoach.ToModel()
+
+		coachs = append(coachs, coach)
+	}
+
+	return coachs, nil
+}

@@ -109,16 +109,19 @@ input NewProject {
   isOfficialyRegistered: Boolean!
 }
 
+#############
+## FILTERS ##
+#############
+
+input Filter {
+  key: String!
+  value: String!
+}
+
 type Query {
   # USERS
-  users: [User!]! @needAuthentication
+  users(filters: [Filter!]): [User!]! @needAuthentication
   user(id: ID): User! @needAuthentication
-
-  # BUILDERS 
-  builders: [User!]! @needAuthentication
-  
-  # COACHS 
-  coachs: [User!]! @needAuthentication
 }
 
 type Mutation {

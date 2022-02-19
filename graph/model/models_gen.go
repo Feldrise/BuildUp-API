@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type Filter struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 type Login struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
