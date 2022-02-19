@@ -16,6 +16,8 @@ const USERROLE_ADMIN = "ADMIN"
 const USERROLE_BUILDER = "BUILDER"
 const USERROLE_COACH = "COACH"
 
+const USERSTEP_CANDIDATING = "CANDIDATING"
+
 // Type
 
 type User struct {
@@ -23,6 +25,7 @@ type User struct {
 	CreatedAt    time.Time          `bson:"createAt"`
 	Email        string             `bson:"email"`
 	Role         string             `bson:"role"`
+	Step         string             `bson:"step"`
 	FirstName    string             `bson:"firstName"`
 	LastName     string             `bson:"lastName"`
 	PasswordHash string             `bson:"password_hash"`
@@ -34,6 +37,7 @@ func (user *User) ToModel() *model.User {
 		CreatedAt: user.CreatedAt,
 		Email:     user.Email,
 		Role:      user.Role,
+		Step:      user.Step,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 	}
@@ -61,6 +65,7 @@ func Create(input model.NewUser) (*User, error) {
 		CreatedAt:    time.Now(),
 		Email:        input.Email,
 		Role:         userRole,
+		Step:         USERSTEP_CANDIDATING,
 		FirstName:    input.FirstName,
 		LastName:     input.LastName,
 		PasswordHash: hashedPassword,
