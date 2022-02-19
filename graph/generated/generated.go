@@ -86,7 +86,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Builders func(childComplexity int) int
 		Coachs   func(childComplexity int) int
-		User     func(childComplexity int, id string) int
+		User     func(childComplexity int, id *string) int
 		Users    func(childComplexity int) int
 	}
 
@@ -115,7 +115,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
-	User(ctx context.Context, id string) (*model.User, error)
+	User(ctx context.Context, id *string) (*model.User, error)
 	Builders(ctx context.Context) ([]*model.User, error)
 	Coachs(ctx context.Context) ([]*model.User, error)
 }
@@ -327,7 +327,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.User(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.User(childComplexity, args["id"].(*string)), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -570,7 +570,7 @@ input NewProject {
 type Query {
   # USERS
   users: [User!]! @needAuthentication
-  user(id: ID!): User! @needAuthentication
+  user(id: ID): User! @needAuthentication
 
   # BUILDERS 
   builders: [User!]! @needAuthentication
@@ -640,10 +640,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 *string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1567,7 +1567,7 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().User(rctx, args["id"].(string))
+			return ec.resolvers.Query().User(rctx, args["id"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.NeedAuthentication == nil {
@@ -4876,6 +4876,22 @@ func (ec *executionContext) marshalOCoach2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgrap
 		return graphql.Null
 	}
 	return ec._Coach(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalID(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalONewBuilder2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐNewBuilder(ctx context.Context, v interface{}) (*model.NewBuilder, error) {

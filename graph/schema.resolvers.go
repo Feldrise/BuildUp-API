@@ -8,6 +8,7 @@ import (
 
 	"new-talents.fr/buildup/graph/generated"
 	"new-talents.fr/buildup/graph/model"
+	"new-talents.fr/buildup/internal/auth"
 	"new-talents.fr/buildup/internal/builders"
 	"new-talents.fr/buildup/internal/coachs"
 	"new-talents.fr/buildup/internal/projects"
@@ -148,8 +149,15 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	return users, nil
 }
 
-func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	databaseUser, err := users.GetById(id)
+func (r *queryResolver) User(ctx context.Context, id *string) (*model.User, error) {
+	// If we don't specify any ID, we send the connected user
+	if id == nil {
+		user := auth.ForContext(ctx)
+
+		return user.ToModel(), nil
+	}
+
+	databaseUser, err := users.GetById(*id)
 
 	if err != nil {
 		return nil, err

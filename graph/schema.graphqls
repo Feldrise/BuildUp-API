@@ -112,7 +112,7 @@ input NewProject {
 type Query {
   # USERS
   users: [User!]! @needAuthentication
-  user(id: ID!): User! @needAuthentication
+  user(id: ID): User! @needAuthentication
 
   # BUILDERS 
   builders: [User!]! @needAuthentication
