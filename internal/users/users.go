@@ -85,7 +85,7 @@ func Create(input model.NewUser) (*User, error) {
 		Description:  input.Description,
 		Birthdate:    input.Birthdate,
 		Address:      input.Address,
-		Discord:      input.Linkedin,
+		Discord:      input.Discord,
 		Linkedin:     input.Linkedin,
 		PasswordHash: hashedPassword,
 	}
