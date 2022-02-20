@@ -15,8 +15,6 @@ type Builder struct {
 	UserID          primitive.ObjectID  `bson:"userID"`
 	CoachID         *primitive.ObjectID `bson:"coachID"`
 	CandidatingDate time.Time           `bson:"createdDate"`
-	Situation       string              `bson:"situation"`
-	Description     string              `bson:"description"`
 }
 
 func (builder *Builder) ToModel() *model.Builder {
@@ -30,26 +28,27 @@ func (builder *Builder) ToModel() *model.Builder {
 	return &model.Builder{
 		ID:              builder.ID.Hex(),
 		CandidatingDate: builder.CandidatingDate,
-		Situation:       builder.Situation,
-		Description:     builder.Description,
 		CoachID:         coachID,
 	}
 }
 
 // Creation operation
 
-func Create(userID primitive.ObjectID, input model.NewBuilder) (*Builder, error) {
+func Create(input model.NewBuilder) (*Builder, error) {
 	builderID := primitive.NewObjectID()
+	userObjectID, err := primitive.ObjectIDFromHex(*input.UserID)
+
+	if err != nil {
+		return nil, err
+	}
 
 	databaseBuilder := Builder{
 		ID:              builderID,
-		UserID:          userID,
+		UserID:          userObjectID,
 		CandidatingDate: time.Now(),
-		Situation:       input.Situation,
-		Description:     input.Description,
 	}
 
-	_, err := database.CollectionBuilders.InsertOne(database.MongoContext, databaseBuilder)
+	_, err = database.CollectionBuilders.InsertOne(database.MongoContext, databaseBuilder)
 
 	if err != nil {
 		return nil, err

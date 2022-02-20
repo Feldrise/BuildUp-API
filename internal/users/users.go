@@ -28,18 +28,30 @@ type User struct {
 	Step         string             `bson:"step"`
 	FirstName    string             `bson:"firstName"`
 	LastName     string             `bson:"lastName"`
+	Situation    string             `bson:"situation"`
+	Description  string             `bson:"description"`
+	Birthdate    *time.Time         `bson:"birthdate"`
+	Address      *string            `bson:"address"`
+	Discord      *string            `bson:"discord"`
+	Linkedin     *string            `bson:"linkedin"`
 	PasswordHash string             `bson:"password_hash"`
 }
 
 func (user *User) ToModel() *model.User {
 	return &model.User{
-		ID:        user.ID.Hex(),
-		CreatedAt: user.CreatedAt,
-		Email:     user.Email,
-		Role:      user.Role,
-		Step:      user.Step,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
+		ID:          user.ID.Hex(),
+		CreatedAt:   user.CreatedAt,
+		Email:       user.Email,
+		Role:        user.Role,
+		Step:        user.Step,
+		FirstName:   user.FirstName,
+		LastName:    user.LastName,
+		Situation:   user.Situation,
+		Description: user.Description,
+		Birthdate:   user.Birthdate,
+		Address:     user.Address,
+		Discord:     user.Discord,
+		Linkedin:    user.Linkedin,
 	}
 }
 
@@ -60,6 +72,7 @@ func Create(input model.NewUser) (*User, error) {
 	}
 
 	userObjectID := primitive.NewObjectID()
+	userID := userObjectID.Hex()
 	databaseUser := User{
 		ID:           userObjectID,
 		CreatedAt:    time.Now(),
@@ -68,6 +81,12 @@ func Create(input model.NewUser) (*User, error) {
 		Step:         USERSTEP_CANDIDATING,
 		FirstName:    input.FirstName,
 		LastName:     input.LastName,
+		Situation:    input.Situation,
+		Description:  input.Description,
+		Birthdate:    input.Birthdate,
+		Address:      input.Address,
+		Discord:      input.Linkedin,
+		Linkedin:     input.Linkedin,
 		PasswordHash: hashedPassword,
 	}
 
@@ -79,13 +98,15 @@ func Create(input model.NewUser) (*User, error) {
 
 	// Now we need to register the builder/coach
 	if input.Builder != nil {
-		_, err = builders.Create(userObjectID, *input.Builder)
+		input.Builder.UserID = &userID
+		_, err = builders.Create(*input.Builder)
 
 		if err != nil {
 			return &databaseUser, err
 		}
 	} else if input.Coach != nil {
-		_, err = coachs.Create(userObjectID, *input.Coach)
+		input.Coach.UserID = &userID
+		_, err = coachs.Create(*input.Coach)
 
 		if err != nil {
 			return &databaseUser, err

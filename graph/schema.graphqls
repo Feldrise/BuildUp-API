@@ -15,6 +15,15 @@ type User {
   firstName: String!
   lastName: String!
 
+  description: String!
+  situation: String!
+  birthdate: Time
+  address: String
+
+  # Contact
+  discord: String
+  linkedin: String
+
   builder: Builder
   coach: Coach
 }
@@ -24,6 +33,15 @@ input NewUser {
   password: String!
   firstName: String!
   lastName: String!
+
+  description: String!
+  situation: String!
+  birthdate: Time
+  address: String
+
+  # Contact
+  discord: String
+  linkedin: String
 
   builder: NewBuilder
   coach: NewCoach
@@ -42,8 +60,6 @@ type Builder {
   id: ID!
 
   candidatingDate: Time!
-  situation: String!
-  description: String!
 
   project: Project!
 
@@ -51,9 +67,7 @@ type Builder {
 }
 
 input NewBuilder {
-  situation: String!
-  description: String!
-
+  userID: ID
   project: NewProject!
 }
 
@@ -65,15 +79,12 @@ type Coach {
   id: ID!
 
   candidatingDate: Time!
-  situation: String!
-  description: String!
 
   builders: [User!]!
 }
 
 input NewCoach {
-  situation: String!
-  description: String!
+  userID: ID
 }
 
 ##############

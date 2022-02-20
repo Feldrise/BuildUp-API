@@ -13,31 +13,31 @@ type Coach struct {
 	ID              primitive.ObjectID `bson:"_id"`
 	UserID          primitive.ObjectID `bson:"userID"`
 	CandidatingDate time.Time          `bson:"candidatingDate"`
-	Situation       string             `bson:"situation"`
-	Description     string             `bson:"description"`
 }
 
 func (coach *Coach) ToModel() *model.Coach {
 	return &model.Coach{
 		ID:              coach.ID.Hex(),
 		CandidatingDate: coach.CandidatingDate,
-		Situation:       coach.Situation,
-		Description:     coach.Description,
 	}
 }
 
 // Creation operation
 
-func Create(userID primitive.ObjectID, input model.NewCoach) (*Coach, error) {
-	databaseCoach := Coach{
-		ID:              primitive.NewObjectID(),
-		UserID:          userID,
-		CandidatingDate: time.Now(),
-		Situation:       input.Situation,
-		Description:     input.Description,
+func Create(input model.NewCoach) (*Coach, error) {
+	userObjectID, err := primitive.ObjectIDFromHex(*input.UserID)
+
+	if err != nil {
+		return nil, err
 	}
 
-	_, err := database.CollectionCoachs.InsertOne(database.MongoContext, databaseCoach)
+	databaseCoach := Coach{
+		ID:              primitive.NewObjectID(),
+		UserID:          userObjectID,
+		CandidatingDate: time.Now(),
+	}
+
+	_, err = database.CollectionCoachs.InsertOne(database.MongoContext, databaseCoach)
 
 	if err != nil {
 		return nil, err

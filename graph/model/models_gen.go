@@ -17,14 +17,12 @@ type Login struct {
 }
 
 type NewBuilder struct {
-	Situation   string      `json:"situation"`
-	Description string      `json:"description"`
-	Project     *NewProject `json:"project"`
+	UserID  *string     `json:"userID"`
+	Project *NewProject `json:"project"`
 }
 
 type NewCoach struct {
-	Situation   string `json:"situation"`
-	Description string `json:"description"`
+	UserID *string `json:"userID"`
 }
 
 type NewProject struct {
@@ -39,12 +37,18 @@ type NewProject struct {
 }
 
 type NewUser struct {
-	Email     string      `json:"email"`
-	Password  string      `json:"password"`
-	FirstName string      `json:"firstName"`
-	LastName  string      `json:"lastName"`
-	Builder   *NewBuilder `json:"builder"`
-	Coach     *NewCoach   `json:"coach"`
+	Email       string      `json:"email"`
+	Password    string      `json:"password"`
+	FirstName   string      `json:"firstName"`
+	LastName    string      `json:"lastName"`
+	Description string      `json:"description"`
+	Situation   string      `json:"situation"`
+	Birthdate   *time.Time  `json:"birthdate"`
+	Address     *string     `json:"address"`
+	Discord     *string     `json:"discord"`
+	Linkedin    *string     `json:"linkedin"`
+	Builder     *NewBuilder `json:"builder"`
+	Coach       *NewCoach   `json:"coach"`
 }
 
 type Project struct {
