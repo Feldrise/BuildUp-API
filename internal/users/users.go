@@ -116,6 +116,20 @@ func Create(input model.NewUser) (*User, error) {
 	return &databaseUser, nil
 }
 
+// Update operations
+func Update(changes *User) error {
+	filter := bson.D{
+		primitive.E{
+			Key:   "_id",
+			Value: changes.ID,
+		},
+	}
+
+	_, err := database.CollectionUsers.ReplaceOne(database.MongoContext, filter, changes)
+
+	return err
+}
+
 // Get operation in database
 
 func GetAll() ([]User, error) {

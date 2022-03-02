@@ -15,6 +15,7 @@ import (
 	"new-talents.fr/buildup/internal/auth"
 	"new-talents.fr/buildup/internal/builders"
 	"new-talents.fr/buildup/internal/coachs"
+	"new-talents.fr/buildup/internal/helper"
 	"new-talents.fr/buildup/internal/projects"
 	"new-talents.fr/buildup/internal/users"
 	"new-talents.fr/buildup/pkg/jwt"
@@ -106,6 +107,72 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 
 	if err != nil {
 		return nil, err
+	}
+
+	return databaseUser.ToModel(), nil
+}
+
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, changes map[string]interface{}) (*model.User, error) {
+	// TODO: manage coach and builder update
+	user := auth.ForContext(ctx)
+
+	if user.Role != users.USERROLE_ADMIN && user.ID.Hex() != id {
+		return nil, &users.UserAccessDeniedError{}
+	}
+
+	// User
+	databaseUser, err := users.GetById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseUser == nil {
+		return nil, &users.UserNotFoundError{}
+	}
+
+	helper.ApplyChanges(changes, databaseUser)
+
+	err = users.Update(databaseUser)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Builder
+	builder := changes["builder"].(map[string]interface{})
+
+	if builder != nil {
+		databaseBuilder, err := builders.GetForUser(id)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if databaseBuilder == nil {
+			return nil, &builders.BuilderNotFoundError{}
+		}
+		project := builder["project"].(map[string]interface{})
+
+		if project != nil {
+			databaseProject, err := projects.GetForBuilder(databaseBuilder.ID.Hex())
+
+			if err != nil {
+				return nil, err
+			}
+
+			if databaseProject == nil {
+				return nil, &projects.ProjectNotFoundError{}
+			}
+
+			helper.ApplyChanges(project, databaseProject)
+
+			err = projects.Update(databaseProject)
+
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return databaseUser.ToModel(), nil

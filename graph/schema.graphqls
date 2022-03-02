@@ -47,6 +47,24 @@ input NewUser {
   coach: NewCoach
 }
 
+input ChangesUser {
+  email: String
+  password: String
+  firstName: String
+  lastName: String
+
+  description: String
+  situation: String
+  birthdate: Time
+  address: String
+
+  # Contact
+  discord: String
+  linkedin: String
+
+  builder: ChangesBuidler
+}
+
 input Login {
   email: String!
   password: String!
@@ -69,6 +87,10 @@ type Builder {
 input NewBuilder {
   userID: ID
   project: NewProject!
+}
+
+input ChangesBuidler {
+  project: ChangesProject
 }
 
 ###########
@@ -121,6 +143,20 @@ input NewProject {
   isOfficialyRegistered: Boolean!
 }
 
+input ChangesProject {
+    # Basic informations
+  name: String
+  description: String
+  team: String
+
+  # Complementary informations
+  categorie: String
+  keywords: String
+  launchDate: Time
+  isLucrative: Boolean
+  isOfficialyRegistered: Boolean
+}
+
 #############
 ## FILTERS ##
 #############
@@ -139,5 +175,6 @@ type Query {
 type Mutation {
   # USERS
   createUser(input: NewUser!): User!
+  updateUser(id: ID!, changes: ChangesUser!): User! @needAuthentication
   login(input: Login!): String!
 }

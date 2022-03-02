@@ -66,6 +66,22 @@ func Create(builderID primitive.ObjectID, input model.NewProject) (*Project, err
 	return &databaseProject, nil
 }
 
+// Update operation
+
+// Update operations
+func Update(changes *Project) error {
+	filter := bson.D{
+		primitive.E{
+			Key:   "_id",
+			Value: changes.ID,
+		},
+	}
+
+	_, err := database.CollectionProjects.ReplaceOne(database.MongoContext, filter, changes)
+
+	return err
+}
+
 // Getters operation
 
 func GetAll() ([]Project, error) {

@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+type ChangesBuidler struct {
+	Project map[string]interface{} `json:"project"`
+}
+
 type Filter struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
