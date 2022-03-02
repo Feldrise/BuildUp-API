@@ -22,7 +22,7 @@ const USERSTEP_CANDIDATING = "CANDIDATING"
 
 type User struct {
 	ID           primitive.ObjectID `bson:"_id"`
-	CreatedAt    time.Time          `bson:"createAt"`
+	CreatedAt    time.Time          `bson:"createdAt"`
 	Email        string             `bson:"email"`
 	Role         string             `bson:"role"`
 	Step         string             `bson:"step"`
