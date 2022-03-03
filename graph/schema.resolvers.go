@@ -140,9 +140,9 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, changes ma
 	}
 
 	// Builder
-	builder := changes["builder"].(map[string]interface{})
+	if changes["builder"] != nil {
+		builder := changes["builder"].(map[string]interface{})
 
-	if builder != nil {
 		databaseBuilder, err := builders.GetForUser(id)
 
 		if err != nil {
@@ -152,9 +152,10 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, changes ma
 		if databaseBuilder == nil {
 			return nil, &builders.BuilderNotFoundError{}
 		}
-		project := builder["project"].(map[string]interface{})
 
-		if project != nil {
+		if builder["project"] != nil {
+			project := builder["project"].(map[string]interface{})
+
 			databaseProject, err := projects.GetForBuilder(databaseBuilder.ID.Hex())
 
 			if err != nil {

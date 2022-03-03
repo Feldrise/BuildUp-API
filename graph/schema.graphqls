@@ -11,6 +11,7 @@ type User {
   createdAt: Time!
   email: String!
   role: String!
+  status: String!
   step: String!
   firstName: String!
   lastName: String!
@@ -52,6 +53,8 @@ input ChangesUser {
   password: String
   firstName: String
   lastName: String
+  status: String
+  step: String
 
   description: String
   situation: String

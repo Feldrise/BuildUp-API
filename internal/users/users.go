@@ -12,11 +12,16 @@ import (
 	"new-talents.fr/buildup/internal/database"
 )
 
+// Roles
 const USERROLE_ADMIN = "ADMIN"
 const USERROLE_BUILDER = "BUILDER"
 const USERROLE_COACH = "COACH"
 
-const USERSTEP_CANDIDATING = "CANDIDATING"
+// Status
+const USERSTATUS_CANDIDATING = "CANDIDATING"
+
+// Step
+const USERSTEP_DEFAULT = "PRESELECTED"
 
 // Type
 
@@ -25,6 +30,7 @@ type User struct {
 	CreatedAt    time.Time          `bson:"createdAt"`
 	Email        string             `bson:"email"`
 	Role         string             `bson:"role"`
+	Status       string             `bson:"status"`
 	Step         string             `bson:"step"`
 	FirstName    string             `bson:"firstName"`
 	LastName     string             `bson:"lastName"`
@@ -43,6 +49,7 @@ func (user *User) ToModel() *model.User {
 		CreatedAt:   user.CreatedAt,
 		Email:       user.Email,
 		Role:        user.Role,
+		Status:      user.Status,
 		Step:        user.Step,
 		FirstName:   user.FirstName,
 		LastName:    user.LastName,
@@ -78,7 +85,8 @@ func Create(input model.NewUser) (*User, error) {
 		CreatedAt:    time.Now(),
 		Email:        input.Email,
 		Role:         userRole,
-		Step:         USERSTEP_CANDIDATING,
+		Status:       USERSTATUS_CANDIDATING,
+		Step:         USERSTEP_DEFAULT,
 		FirstName:    input.FirstName,
 		LastName:     input.LastName,
 		Situation:    input.Situation,
