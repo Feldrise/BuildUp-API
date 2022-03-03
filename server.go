@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi"
 	"new-talents.fr/buildup/graph"
 	"new-talents.fr/buildup/graph/generated"
+	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/auth"
 	"new-talents.fr/buildup/internal/config"
 	"new-talents.fr/buildup/internal/database"
@@ -44,6 +45,13 @@ func main() {
 	c := generated.Config{Resolvers: &graph.Resolver{}}
 	c.Directives.NeedAuthentication = func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 		if auth.ForContext(ctx) == nil {
+			return nil, &users.UserAccessDeniedError{}
+		}
+
+		return next(ctx)
+	}
+	c.Directives.HasRole = func(ctx context.Context, obj interface{}, next graphql.Resolver, role model.Role) (interface{}, error) {
+		if !auth.ForContext(ctx).HasRole(role) {
 			return nil, &users.UserAccessDeniedError{}
 		}
 

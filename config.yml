@@ -9,3 +9,5 @@ database:
     builders: "builders"
     coachs: "coachs"
     projects: "projects"
+    buildOns: "buildOns"
+    buildOnSteps: "buildOnSteps"

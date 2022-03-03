@@ -62,6 +62,24 @@ func (user *User) ToModel() *model.User {
 	}
 }
 
+func (user *User) HasRole(role model.Role) bool {
+	if user == nil {
+		return false
+	}
+
+	if user.Role == USERROLE_ADMIN && role == model.RoleAdmin {
+		return true
+	}
+	if user.Role == USERROLE_BUILDER && role == model.RoleBuilder {
+		return true
+	}
+	if user.Role == USERROLE_COACH && role == model.RoleCoach {
+		return true
+	}
+
+	return false
+}
+
 // Creation operation
 
 func Create(input model.NewUser) (*User, error) {

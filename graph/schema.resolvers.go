@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,12 +13,17 @@ import (
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/auth"
 	"new-talents.fr/buildup/internal/builders"
+	"new-talents.fr/buildup/internal/buildons"
 	"new-talents.fr/buildup/internal/coachs"
 	"new-talents.fr/buildup/internal/helper"
 	"new-talents.fr/buildup/internal/projects"
 	"new-talents.fr/buildup/internal/users"
 	"new-talents.fr/buildup/pkg/jwt"
 )
+
+func (r *buildOnResolver) Steps(ctx context.Context, obj *model.BuildOn) ([]*model.BuildOnStep, error) {
+	panic(fmt.Errorf("not implemented"))
+}
 
 func (r *builderResolver) Project(ctx context.Context, obj *model.Builder) (*model.Project, error) {
 	databaseProjet, err := projects.GetForBuilder(obj.ID)
@@ -203,6 +207,20 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string
 	return token, nil
 }
 
+func (r *mutationResolver) CreateBuildOn(ctx context.Context, input model.NewBuildOn) (*model.BuildOn, error) {
+	databaseBuildOn, err := buildons.Create(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return databaseBuildOn.ToModel(), nil
+}
+
+func (r *mutationResolver) CreateBuildOnStep(ctx context.Context, buildOnID string, input model.NewBuildOnStep) (*model.BuildOnStep, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) Users(ctx context.Context, filters []*model.Filter) ([]*model.User, error) {
 	// We need to construct the filter first
 	databaseFilter := bson.D{{}}
@@ -252,6 +270,34 @@ func (r *queryResolver) User(ctx context.Context, id *string) (*model.User, erro
 	return databaseUser.ToModel(), nil
 }
 
+func (r *queryResolver) Buildons(ctx context.Context, filters []*model.Filter) ([]*model.BuildOn, error) {
+	// We need to construct the filter first
+	databaseFilter := bson.D{{}}
+
+	for _, filter := range filters {
+		databaseFilter = append(databaseFilter, primitive.E{
+			Key:   filter.Key,
+			Value: filter.Value,
+		})
+	}
+
+	databaseBuildOns, err := buildons.GetFiltered(databaseFilter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	buildons := []*model.BuildOn{}
+
+	for _, databaseBuildOn := range databaseBuildOns {
+		buildon := databaseBuildOn.ToModel()
+
+		buildons = append(buildons, buildon)
+	}
+
+	return buildons, nil
+}
+
 func (r *userResolver) Builder(ctx context.Context, obj *model.User) (*model.Builder, error) {
 	databaseBuilder, err := builders.GetForUser(obj.ID)
 
@@ -280,6 +326,9 @@ func (r *userResolver) Coach(ctx context.Context, obj *model.User) (*model.Coach
 	return databaseCoach.ToModel(), nil
 }
 
+// BuildOn returns generated.BuildOnResolver implementation.
+func (r *Resolver) BuildOn() generated.BuildOnResolver { return &buildOnResolver{r} }
+
 // Builder returns generated.BuilderResolver implementation.
 func (r *Resolver) Builder() generated.BuilderResolver { return &builderResolver{r} }
 
@@ -295,6 +344,7 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
+type buildOnResolver struct{ *Resolver }
 type builderResolver struct{ *Resolver }
 type coachResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
@@ -307,27 +357,6 @@ type userResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *userResolver) Description(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) Situation(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) Birthdate(ctx context.Context, obj *model.User) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) Address(ctx context.Context, obj *model.User) (*string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) Discord(ctx context.Context, obj *model.User) (*string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) Linkedin(ctx context.Context, obj *model.User) (*string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) Step(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
 func (r *queryResolver) Builders(ctx context.Context) ([]*model.User, error) {
 	databaseBuilders, err := users.GetByRole(users.USERROLE_BUILDER)
 

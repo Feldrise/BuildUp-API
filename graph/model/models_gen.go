@@ -3,8 +3,20 @@
 package model
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 )
+
+type BuildOnStep struct {
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	Description      string `json:"description"`
+	Index            int    `json:"index"`
+	ProofType        string `json:"proofType"`
+	ProofDescription string `json:"proofDescription"`
+}
 
 type ChangesBuidler struct {
 	Project map[string]interface{} `json:"project"`
@@ -18,6 +30,22 @@ type Filter struct {
 type Login struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type NewBuildOn struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Index       int    `json:"index"`
+	AnnexeURL   string `json:"annexeUrl"`
+	Rewards     string `json:"rewards"`
+}
+
+type NewBuildOnStep struct {
+	Name             string `json:"name"`
+	Description      string `json:"description"`
+	Index            int    `json:"index"`
+	ProofType        string `json:"proofType"`
+	ProofDescription string `json:"proofDescription"`
 }
 
 type NewBuilder struct {
@@ -55,14 +83,45 @@ type NewUser struct {
 	Coach       *NewCoach   `json:"coach"`
 }
 
-type Project struct {
-	ID                    string    `json:"id"`
-	Name                  string    `json:"name"`
-	Description           string    `json:"description"`
-	Team                  string    `json:"team"`
-	Categorie             string    `json:"categorie"`
-	Keywords              string    `json:"keywords"`
-	LaunchDate            time.Time `json:"launchDate"`
-	IsLucrative           bool      `json:"isLucrative"`
-	IsOfficialyRegistered bool      `json:"isOfficialyRegistered"`
+type Role string
+
+const (
+	RoleAdmin   Role = "ADMIN"
+	RoleBuilder Role = "BUILDER"
+	RoleCoach   Role = "COACH"
+)
+
+var AllRole = []Role{
+	RoleAdmin,
+	RoleBuilder,
+	RoleCoach,
+}
+
+func (e Role) IsValid() bool {
+	switch e {
+	case RoleAdmin, RoleBuilder, RoleCoach:
+		return true
+	}
+	return false
+}
+
+func (e Role) String() string {
+	return string(e)
+}
+
+func (e *Role) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Role(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Role", str)
+	}
+	return nil
+}
+
+func (e Role) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

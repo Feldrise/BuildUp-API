@@ -15,6 +15,8 @@ var CollectionUsers *mongo.Collection
 var CollectionBuilders *mongo.Collection
 var CollectionCoachs *mongo.Collection
 var CollectionProjects *mongo.Collection
+var CollectionBuildOns *mongo.Collection
+var CollectionBuildOnSteps *mongo.Collection
 
 // Initialize the database assuming the informations are in the
 // config file
@@ -44,9 +46,13 @@ func Init() {
 	buildersCollectionName := config.Cfg.Database.Collections.Builders
 	coachsColletionName := config.Cfg.Database.Collections.Coachs
 	projectsColletionName := config.Cfg.Database.Collections.Projects
+	buildOnsCollectionName := config.Cfg.Database.Collections.BuildOns
+	buildOnStepsCollectionName := config.Cfg.Database.Collections.BuildOnSteps
 
 	CollectionUsers = client.Database(databaseName).Collection(usersCollectionName)
 	CollectionBuilders = client.Database(databaseName).Collection(buildersCollectionName)
 	CollectionCoachs = client.Database(databaseName).Collection(coachsColletionName)
 	CollectionProjects = client.Database(databaseName).Collection(projectsColletionName)
+	CollectionBuildOns = client.Database(databaseName).Collection(buildOnsCollectionName)
+	CollectionBuildOnSteps = client.Database(databaseName).Collection(buildOnStepsCollectionName)
 }

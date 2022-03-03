@@ -1,4 +1,11 @@
 directive @needAuthentication on FIELD_DEFINITION
+directive @hasRole(role: Role!) on FIELD_DEFINITION
+
+enum Role {
+  ADMIN,
+  BUILDER,
+  COACH
+}
 
 scalar Time
 
@@ -160,6 +167,51 @@ input ChangesProject {
   isOfficialyRegistered: Boolean
 }
 
+##############
+## BUILDONS ##
+##############
+
+# BuildOns
+
+type BuildOn {
+  id: ID!
+
+  name: String!
+  description: String!
+  index: Int!
+  annexeUrl: String!
+  rewards: String!
+
+  steps: [BuildOnStep!]!
+}
+
+input NewBuildOn {
+  name: String!
+  description: String!
+  index: Int!
+  annexeUrl: String!
+  rewards: String!
+}
+
+# Steps
+type BuildOnStep {
+  id: ID!
+
+  name: String!
+  description: String!
+  index: Int!
+  proofType: String! # TODO: document
+  proofDescription: String!
+}
+
+input NewBuildOnStep {
+  name: String!
+  description: String!
+  index: Int!
+  proofType: String!
+  proofDescription: String!
+}
+
 #############
 ## FILTERS ##
 #############
@@ -173,6 +225,9 @@ type Query {
   # USERS
   users(filters: [Filter!]): [User!]! @needAuthentication
   user(id: ID): User! @needAuthentication
+
+  # BUILDONS
+  buildons(filters: [Filter!]): [BuildOn!]! @needAuthentication
 }
 
 type Mutation {
@@ -180,4 +235,8 @@ type Mutation {
   createUser(input: NewUser!): User!
   updateUser(id: ID!, changes: ChangesUser!): User! @needAuthentication
   login(input: Login!): String!
+
+  # BUILDONS
+  createBuildOn(input: NewBuildOn!): BuildOn! @hasRole(role: ADMIN)
+  createBuildOnStep(buildOnID: ID!, input: NewBuildOnStep!): BuildOnStep! @hasRole(role: ADMIN)
 }

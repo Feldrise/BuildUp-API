@@ -17,10 +17,12 @@ type Config struct {
 		Name             string `yaml:"name"`
 		ConnectionString string `yaml:"connectionString"`
 		Collections      struct {
-			Users    string `yaml:"users"`
-			Builders string `yaml:"builders"`
-			Coachs   string `yaml:"coachs"`
-			Projects string `yaml:"projects"`
+			Users        string `yaml:"users"`
+			Builders     string `yaml:"builders"`
+			Coachs       string `yaml:"coachs"`
+			Projects     string `yaml:"projects"`
+			BuildOns     string `yaml:"buildOns"`
+			BuildOnSteps string `yaml:"buildOnSteps"`
 		} `yaml:"collections"`
 	} `yaml:"database"`
 }
