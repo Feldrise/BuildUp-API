@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,6 +12,7 @@ import (
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/auth"
 	"new-talents.fr/buildup/internal/builders"
+	buildonsteps "new-talents.fr/buildup/internal/buildon_steps"
 	"new-talents.fr/buildup/internal/buildons"
 	"new-talents.fr/buildup/internal/coachs"
 	"new-talents.fr/buildup/internal/helper"
@@ -22,7 +22,21 @@ import (
 )
 
 func (r *buildOnResolver) Steps(ctx context.Context, obj *model.BuildOn) ([]*model.BuildOnStep, error) {
-	panic(fmt.Errorf("not implemented"))
+	databaseBuildOnSteps, err := buildonsteps.GetForBuildOn(obj.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	buildonSteps := []*model.BuildOnStep{}
+
+	for _, databaseBuildOnStep := range databaseBuildOnSteps {
+		buildonStep := databaseBuildOnStep.ToModel()
+
+		buildonSteps = append(buildonSteps, buildonStep)
+	}
+
+	return buildonSteps, nil
 }
 
 func (r *builderResolver) Project(ctx context.Context, obj *model.Builder) (*model.Project, error) {
@@ -218,7 +232,23 @@ func (r *mutationResolver) CreateBuildOn(ctx context.Context, input model.NewBui
 }
 
 func (r *mutationResolver) CreateBuildOnStep(ctx context.Context, buildOnID string, input model.NewBuildOnStep) (*model.BuildOnStep, error) {
-	panic(fmt.Errorf("not implemented"))
+	databaseBuildOn, err := buildons.GetById(buildOnID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseBuildOn == nil {
+		return nil, &buildons.BuildOnNotFoundError{}
+	}
+
+	databaseBuildOnStep, err := buildonsteps.Create(buildOnID, input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return databaseBuildOnStep.ToModel(), nil
 }
 
 func (r *queryResolver) Users(ctx context.Context, filters []*model.Filter) ([]*model.User, error) {
