@@ -231,6 +231,24 @@ func (r *mutationResolver) CreateBuildOn(ctx context.Context, input model.NewBui
 	return databaseBuildOn.ToModel(), nil
 }
 
+func (r *mutationResolver) UpdateBuildOn(ctx context.Context, id string, changes map[string]interface{}) (*model.BuildOn, error) {
+	databaseBuildOn, err := buildons.GetById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseBuildOn == nil {
+		return nil, &buildons.BuildOnNotFoundError{}
+	}
+
+	helper.ApplyChanges(changes, databaseBuildOn)
+
+	buildons.Update(databaseBuildOn)
+
+	return databaseBuildOn.ToModel(), nil
+}
+
 func (r *mutationResolver) CreateBuildOnStep(ctx context.Context, buildOnID string, input model.NewBuildOnStep) (*model.BuildOnStep, error) {
 	databaseBuildOn, err := buildons.GetById(buildOnID)
 
@@ -247,6 +265,24 @@ func (r *mutationResolver) CreateBuildOnStep(ctx context.Context, buildOnID stri
 	if err != nil {
 		return nil, err
 	}
+
+	return databaseBuildOnStep.ToModel(), nil
+}
+
+func (r *mutationResolver) UpdateBuildOnStep(ctx context.Context, id string, changes map[string]interface{}) (*model.BuildOnStep, error) {
+	databaseBuildOnStep, err := buildonsteps.GetById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseBuildOnStep == nil {
+		return nil, &buildonsteps.BuildOnStepNotFoundError{}
+	}
+
+	helper.ApplyChanges(changes, databaseBuildOnStep)
+
+	buildonsteps.Update(databaseBuildOnStep)
 
 	return databaseBuildOnStep.ToModel(), nil
 }

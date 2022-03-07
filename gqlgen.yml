@@ -60,3 +60,7 @@ models:
     model: "map[string]interface{}"
   ChangesProject:
     model: "map[string]interface{}"
+  ChangesBuildOn:
+    model: "map[string]interface{}"
+  ChangesBuildOnStep:
+    model: "map[string]interface{}"

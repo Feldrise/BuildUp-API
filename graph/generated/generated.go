@@ -88,6 +88,8 @@ type ComplexityRoot struct {
 		CreateBuildOnStep func(childComplexity int, buildOnID string, input model.NewBuildOnStep) int
 		CreateUser        func(childComplexity int, input model.NewUser) int
 		Login             func(childComplexity int, input model.Login) int
+		UpdateBuildOn     func(childComplexity int, id string, changes map[string]interface{}) int
+		UpdateBuildOnStep func(childComplexity int, id string, changes map[string]interface{}) int
 		UpdateUser        func(childComplexity int, id string, changes map[string]interface{}) int
 	}
 
@@ -144,7 +146,9 @@ type MutationResolver interface {
 	UpdateUser(ctx context.Context, id string, changes map[string]interface{}) (*model.User, error)
 	Login(ctx context.Context, input model.Login) (string, error)
 	CreateBuildOn(ctx context.Context, input model.NewBuildOn) (*model.BuildOn, error)
+	UpdateBuildOn(ctx context.Context, id string, changes map[string]interface{}) (*model.BuildOn, error)
 	CreateBuildOnStep(ctx context.Context, buildOnID string, input model.NewBuildOnStep) (*model.BuildOnStep, error)
+	UpdateBuildOnStep(ctx context.Context, id string, changes map[string]interface{}) (*model.BuildOnStep, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context, filters []*model.Filter) ([]*model.User, error)
@@ -358,6 +362,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.Login)), true
+
+	case "Mutation.updateBuildOn":
+		if e.complexity.Mutation.UpdateBuildOn == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateBuildOn_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateBuildOn(childComplexity, args["id"].(string), args["changes"].(map[string]interface{})), true
+
+	case "Mutation.updateBuildOnStep":
+		if e.complexity.Mutation.UpdateBuildOnStep == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateBuildOnStep_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateBuildOnStep(childComplexity, args["id"].(string), args["changes"].(map[string]interface{})), true
 
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
@@ -841,6 +869,15 @@ input NewBuildOn {
   rewards: String!
 }
 
+input ChangesBuildOn {
+  name: String
+  description: String
+  index: Int
+  annexeUrl: String
+  rewards: String
+}
+
+
 # Steps
 type BuildOnStep {
   id: ID!
@@ -859,6 +896,15 @@ input NewBuildOnStep {
   proofType: String!
   proofDescription: String!
 }
+
+input ChangesBuildOnStep {
+  name: String
+  description: String
+  index: Int
+  proofType: String
+  proofDescription: String
+}
+
 
 #############
 ## FILTERS ##
@@ -886,7 +932,11 @@ type Mutation {
 
   # BUILDONS
   createBuildOn(input: NewBuildOn!): BuildOn! @hasRole(role: ADMIN)
+  updateBuildOn(id: ID!, changes: ChangesBuildOn!): BuildOn! @hasRole(role: ADMIN)
+
+  # BUILDON STEPS
   createBuildOnStep(buildOnID: ID!, input: NewBuildOnStep!): BuildOnStep! @hasRole(role: ADMIN)
+  updateBuildOnStep(id: ID!, changes: ChangesBuildOnStep!): BuildOnStep! @hasRole(role: ADMIN)
 }
 `, BuiltIn: false},
 }
@@ -977,6 +1027,54 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateBuildOnStep_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["changes"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("changes"))
+		arg1, err = ec.unmarshalNChangesBuildOnStep2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["changes"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateBuildOn_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["changes"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("changes"))
+		arg1, err = ec.unmarshalNChangesBuildOn2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["changes"] = arg1
 	return args, nil
 }
 
@@ -2026,6 +2124,72 @@ func (ec *executionContext) _Mutation_createBuildOn(ctx context.Context, field g
 	return ec.marshalNBuildOn2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐBuildOn(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_updateBuildOn(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateBuildOn_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateBuildOn(rctx, args["id"].(string), args["changes"].(map[string]interface{}))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			role, err := ec.unmarshalNRole2newᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐRole(ctx, "ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasRole == nil {
+				return nil, errors.New("directive hasRole is not implemented")
+			}
+			return ec.directives.HasRole(ctx, nil, directive0, role)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.BuildOn); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *new-talents.fr/buildup/graph/model.BuildOn`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.BuildOn)
+	fc.Result = res
+	return ec.marshalNBuildOn2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐBuildOn(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_createBuildOnStep(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2053,6 +2217,72 @@ func (ec *executionContext) _Mutation_createBuildOnStep(ctx context.Context, fie
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
 			return ec.resolvers.Mutation().CreateBuildOnStep(rctx, args["buildOnID"].(string), args["input"].(model.NewBuildOnStep))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			role, err := ec.unmarshalNRole2newᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐRole(ctx, "ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasRole == nil {
+				return nil, errors.New("directive hasRole is not implemented")
+			}
+			return ec.directives.HasRole(ctx, nil, directive0, role)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.BuildOnStep); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *new-talents.fr/buildup/graph/model.BuildOnStep`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.BuildOnStep)
+	fc.Result = res
+	return ec.marshalNBuildOnStep2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐBuildOnStep(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateBuildOnStep(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateBuildOnStep_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateBuildOnStep(rctx, args["id"].(string), args["changes"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalNRole2newᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐRole(ctx, "ADMIN")
@@ -5162,9 +5392,29 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateBuildOn":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateBuildOn(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createBuildOnStep":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createBuildOnStep(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateBuildOnStep":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateBuildOnStep(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
@@ -6130,6 +6380,14 @@ func (ec *executionContext) marshalNBuildOnStep2ᚖnewᚑtalentsᚗfrᚋbuildup�
 	return ec._BuildOnStep(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNChangesBuildOn2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
+	return v.(map[string]interface{}), nil
+}
+
+func (ec *executionContext) unmarshalNChangesBuildOnStep2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
+	return v.(map[string]interface{}), nil
+}
+
 func (ec *executionContext) unmarshalNChangesUser2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
 	return v.(map[string]interface{}), nil
 }
@@ -6647,6 +6905,22 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	res := graphql.MarshalID(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
 	return res
 }
 

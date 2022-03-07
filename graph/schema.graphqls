@@ -193,6 +193,15 @@ input NewBuildOn {
   rewards: String!
 }
 
+input ChangesBuildOn {
+  name: String
+  description: String
+  index: Int
+  annexeUrl: String
+  rewards: String
+}
+
+
 # Steps
 type BuildOnStep {
   id: ID!
@@ -211,6 +220,15 @@ input NewBuildOnStep {
   proofType: String!
   proofDescription: String!
 }
+
+input ChangesBuildOnStep {
+  name: String
+  description: String
+  index: Int
+  proofType: String
+  proofDescription: String
+}
+
 
 #############
 ## FILTERS ##
@@ -238,5 +256,9 @@ type Mutation {
 
   # BUILDONS
   createBuildOn(input: NewBuildOn!): BuildOn! @hasRole(role: ADMIN)
+  updateBuildOn(id: ID!, changes: ChangesBuildOn!): BuildOn! @hasRole(role: ADMIN)
+
+  # BUILDON STEPS
   createBuildOnStep(buildOnID: ID!, input: NewBuildOnStep!): BuildOnStep! @hasRole(role: ADMIN)
+  updateBuildOnStep(id: ID!, changes: ChangesBuildOnStep!): BuildOnStep! @hasRole(role: ADMIN)
 }

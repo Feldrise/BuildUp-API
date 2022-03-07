@@ -3,6 +3,7 @@ package buildons
 import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"new-talents.fr/buildup/graph/model"
 	"new-talents.fr/buildup/internal/database"
 )
@@ -48,6 +49,21 @@ func Create(input model.NewBuildOn) (*BuildOn, error) {
 	return &databaseBuildOn, nil
 }
 
+// Update operation
+
+func Update(changes *BuildOn) error {
+	filter := bson.D{
+		primitive.E{
+			Key:   "_id",
+			Value: changes.ID,
+		},
+	}
+
+	_, err := database.CollectionBuildOns.ReplaceOne(database.MongoContext, filter, changes)
+
+	return err
+}
+
 // Getters
 func GetById(id string) (*BuildOn, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -79,7 +95,16 @@ func GetById(id string) (*BuildOn, error) {
 func GetFiltered(filter interface{}) ([]BuildOn, error) {
 	buildOns := []BuildOn{}
 
-	cursor, err := database.CollectionBuildOns.Find(database.MongoContext, filter)
+	// We always want to sort by index here
+	opts := options.Find()
+	opts.SetSort(bson.D{
+		primitive.E{
+			Key:   "index",
+			Value: 1,
+		},
+	})
+
+	cursor, err := database.CollectionBuildOns.Find(database.MongoContext, filter, opts)
 
 	if err != nil {
 		return buildOns, err

@@ -3,89 +3,47 @@
 Ce fichier contient les requêtes créés pour tester l'API. Vous pouvez les copier/coller lorsque vous lancez l'API.
 
 ```graphql
-# Welcome to GraphiQL
-#
-# GraphiQL is an in-browser tool for writing, validating, and
-# testing GraphQL queries.
-#
-# Type queries into this side of the screen, and you will see intelligent
-# typeaheads aware of the current GraphQL type schema and live syntax and
-# validation errors highlighted within the text.
-#
-# GraphQL queries typically start with a "{" character. Lines that start
-# with a # are ignored.
-#
-# An example GraphQL query might look like:
-#
-#     {
-#       field(arg: "value") {
-#         subField
-#       }
-#     }
-#
-# Keyboard shortcuts:
-#
-#  Prettify Query:  Shift-Ctrl-P (or press the prettify button above)
-#
-#     Merge Query:  Shift-Ctrl-M (or press the merge button above)
-#
-#       Run Query:  Ctrl-Enter (or press the play button above)
-#
-#   Auto Complete:  Ctrl-Space (or just start typing)
-#
-
-##################
-## UTILISATEURS ##
-##################
-
-# ----- #
-# QUERY #
-# ----- #
-
 query getUsers {
   users {
-    id,
-    createdAt,
-    email,
-    firstName,
-    lastName,
+    id
+    createdAt
+    email
+    firstName
+    lastName
+    description
     coach {
-      id,
-      description
+      id
     }
     builder {
-      id,
-      description
+      id
     }
   }
 }
 
 query getUser {
   user {
-    email,
-    firstName,
-    lastName,
+    email
+    firstName
+    lastName
     role
   }
 }
 
 query getBuilders {
-  users(filters: [
-    {
-    	key: "role",
-    	value: "BUILDER"
-  	}
-  ]) {
-    email,
-    firstName,
-    lastName,
+  users(
+    filters: [{key: "role", value: "BUILDER"}, {key: "status", value: "CANDIDATING"}]
+  ) {
+    email
+    firstName
+    lastName
+    step
+    description
     builder {
-      description,
       coach {
         firstName
-      },
+      }
       project {
-        name,
+        name
         description
       }
     }
@@ -93,17 +51,12 @@ query getBuilders {
 }
 
 query getCoachs {
-  users(filters: [
-    {
-    	key: "role",
-    	value: "COACH"
-  	}
-  ]) {
-    email,
-    firstName,
-    lastName,
+  users(filters: [{key: "role", value: "COACH"}]) {
+    email
+    firstName
+    lastName
+    description
     coach {
-      description,
       builders {
         firstName
       }
@@ -112,17 +65,17 @@ query getCoachs {
 }
 
 query getBuilder {
-  user(id: "620d3324b758ac25982681d8") {
-    email,
-    firstName,
-    lastName,
+  user(id: "6211d866cb19bf019d02f75e") {
+    email
+    firstName
+    lastName
+    description
     builder {
-      description,
       coach {
         firstName
-      },
+      }
       project {
-        name,
+        name
         description
       }
     }
@@ -130,17 +83,17 @@ query getBuilder {
 }
 
 query getCoach {
-  user(id: "620ccedca1e77c53925b35e6") {
-    email,
-    firstName,
-    lastName,
+  user(id: "6211d8c1cb19bf019d02f761") {
+    email
+    firstName
+    lastName
+    description
     coach {
-      description,
       builders {
-        firstName,
+        firstName
         builder {
           project {
-            name,
+            name
             description
           }
         }
@@ -149,114 +102,121 @@ query getCoach {
   }
 }
 
-# -------- #
-# MUTATION #
-# -------- #
-
-# INSCRIPTION
-
 mutation createAdmin {
-  createUser(input: {
-    email: "admin@me.com",
-    password: "dE8bdTUE",
-    firstName: "Victor",
-    lastName: "DENIS"
-  }) {
-    id,
-    email,
+  createUser(
+    input: {email: "admin@me.com", password: "dE8bdTUE", firstName: "Victor", lastName: "DENIS", situation: "Créateur", description: "Je suis le créateur de ce back-end !"}
+  ) {
+    id
+    email
     firstName
   }
 }
 
-
 mutation createBuilder {
-  createUser(input: {
-    email: "builder@me.com",
-    password: "dE8bdTUE",
-    firstName: "Bleuenn",
-    lastName: "ASTICOT",
-    builder: {
-      situation: "Etudiant.e",
-      description: "Je suis une super étudiante qui aime plein de truc !",
-      project: {
-        name: "Le chemin des fées",
-        description: "Ce projet à pour but de répertorier tous les endroits entourée de mystères et de légendes qui peuvent se trouver dans le monde.",
-        team: "Moi, mon sac et beaucoup de livre",
-        categorie: "Voyage",
-        keywords: "fée, lieux, voyage, légende",
-        launchDate: "2022-03-01T12:00:00.782Z"
-        isLucrative: false,
-        isOfficialyRegistered: true
+  createUser(
+    input: {email: "builder@me.com", password: "dE8bdTUE", firstName: "Bleuenn", lastName: "ASTICOT", situation: "Fée", description: "Je suis une super étudiante qui aime plein de truc !", birthdate: "2004-06-05T12:00:00.782Z", address: "9 Allée de la Prairie, 29000 La Forêt", discord: "BleuennAsticot#1234", linkedin: "https://linkedin.me/bleuenn", builder: {project: {name: "Le chemin des fées", description: "Ce projet à pour but de répertorier tous les endroits entourée de mystères et de légendes qui peuvent se trouver dans le monde.", team: "Moi, mon sac et beaucoup de livre", categorie: "Voyage", keywords: "fée, lieux, voyage, légende", launchDate: "2022-03-01T12:00:00.782Z", isLucrative: false, isOfficialyRegistered: true}}}
+  ) {
+    id
+    email
+    firstName
+    builder {
+      project {
+        name
+        description
       }
     }
-  }) {
-    id,
-    email,
-    firstName, 
-    builder {
-      description
-    }
   }
 }
-
 
 mutation createCoach {
-  createUser(input: {
-    email: "coach@me.com",
-    password: "dE8bdTUE",
-    firstName: "Guillaume",
-    lastName: "EOCHE",
-    coach: {
-      situation: "Alternant",
-      description: "Fondateur de New Talents, je sers aujourd'hui d'exemple dans l'API de BuildUP"
-    }
-  }) {
-    id,
-    email,
-    firstName,
-    coach {
-      description
+  createUser(
+    input: {email: "coach@me.com", password: "dE8bdTUE", firstName: "Guillaume", lastName: "EOCHE", situation: "Alternant", description: "Fondateur de New Talents, je sers aujourd'hui d'exemple dans l'API de BuildUP", coach: {}}
+  ) {
+    id
+    email
+    firstName
+  }
+}
+
+mutation updateBuilder {
+  updateUser(
+    id: "6211d866cb19bf019d02f75e"
+    changes: {firstName: "Bleuenn", status: "CANDIDATING", step: "PRESELECTED", builder: {project: {name: "Le nouveau chemin des fée"}}}
+  ) {
+    firstName
+    builder {
+      project {
+        name
+        description
+      }
     }
   }
 }
 
-# CONNEXION
-
-# Token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDUwNTA1MTUsImlkIjoiNjIwYzIzYzIwNzlmZGI3ZTA4YTEwMzJmIn0.DX-Bc44m99GINZMzqn_nncEaQEl7k1lhwLg3u6fGL9c
 mutation loginAdmin {
-  login(input: {
-    email: "admin@me.com",
-    password: "dE8bdTUE"
-  })
+  login(input: {email: "admin@me.com", password: "dE8bdTUE"})
 }
 
-# Token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDUwNTA1MzAsImlkIjoiNjIwYzIzYzkwNzlmZGI3ZTA4YTEwMzMwIn0.tcEYDdKHtVGOthyr48Wpp7N1mrn6JCteij7pH7bIS3o
 mutation loginBuilder {
-  login(input: {
-    email: "builder@me.com",
-    password: "dE8bdTUE"
-  })
+  login(input: {email: "builder@me.com", password: "dE8bdTUE"})
 }
 
-# Token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDUwNTA1NDAsImlkIjoiNjIwYzIzY2MwNzlmZGI3ZTA4YTEwMzMxIn0.SoRl2oRo7QoatPtS_Rida0CW21nJg2Wl8l0J0bONrQI
 mutation loginCoach {
-  login(input: {
-    email: "coach@me.com",
-    password: "dE8bdTUE"
-  })
+  login(input: {email: "coach@me.com", password: "dE8bdTUE"})
 }
 
 mutation failedLogin1 {
-  login(input: {
-    email: "admin@me.com",
-    password: "dE8bdUE"
-  })
+  login(input: {email: "admin@me.com", password: "dE8bdUE"})
 }
 
 mutation failedLogin2 {
-  login(input: {
-    email: "adm@me.com",
-    password: "dE8bdTUE"
-  })
+  login(input: {email: "adm@me.com", password: "dE8bdTUE"})
+}
+
+query getBuildOns {
+  buildons {
+    id
+    name
+    description
+    index
+    annexeUrl
+    rewards
+    steps {
+      id
+      name
+    }
+  }
+}
+
+mutation createBuildOn {
+  createBuildOn(
+    input: {name: "BuildOn #1", description: "Ceci est le tout premier BuildOn", index: 1, annexeUrl: "https://url.com", rewards: "Toutes nos félicitations"}
+  ) {
+    id
+    name
+    description
+  }
+}
+
+mutation updateBuildOn {
+  updateBuildOn(id: "6220c0b1e5fcfb1eed83674a", changes: {name: "BuildOn /1"}) {
+    name
+  }
+}
+
+mutation createBuildOnStep {
+  createBuildOnStep(
+    buildOnID: "6220c0b1e5fcfb1eed83674a"
+    input: {name: "L'étape 2", description: "Une super seconde étape !", index: 2, proofType: "COMMENT", proofDescription: "Vous devez founrnir un commenaire sur oh combien vous aimez Victor"}
+  ) {
+    name
+    description
+  }
+}
+
+mutation updateBuildOnStep {
+  updateBuildOnStep(id: "6220c8e7d45cf394c04a3c82", changes: {name: "L'étape n°1"}) {
+    name
+  }
 }
 ```

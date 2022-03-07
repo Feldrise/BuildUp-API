@@ -56,9 +56,23 @@ func Create(buildOnID string, input model.NewBuildOnStep) (*BuildOnStep, error) 
 	return &databaseBuildOnStep, nil
 }
 
-// Getters
+// Update operation
+
+func Update(changes *BuildOnStep) error {
+	filter := bson.D{
+		primitive.E{
+			Key:   "_id",
+			Value: changes.ID,
+		},
+	}
+
+	_, err := database.CollectionBuildOnSteps.ReplaceOne(database.MongoContext, filter, changes)
+
+	return err
+}
 
 // Getters
+
 func GetById(id string) (*BuildOnStep, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 
