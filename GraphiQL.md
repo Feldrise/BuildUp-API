@@ -188,6 +188,20 @@ query getBuildOns {
   }
 }
 
+query getBuildOn {
+  buildon(id: "6220c0b1e5fcfb1eed83674a") {
+    name
+    description
+    index
+    annexeUrl
+    rewards
+    steps {
+      id
+      name
+    }
+  }
+}
+
 mutation createBuildOn {
   createBuildOn(
     input: {name: "BuildOn #1", description: "Ceci est le tout premier BuildOn", index: 1, annexeUrl: "https://url.com", rewards: "Toutes nos félicitations"}
@@ -215,7 +229,10 @@ mutation createBuildOnStep {
 }
 
 mutation updateBuildOnStep {
-  updateBuildOnStep(id: "6220c8e7d45cf394c04a3c82", changes: {name: "L'étape n°1"}) {
+  updateBuildOnStep(
+    id: "6220c8e7d45cf394c04a3c82"
+    changes: {name: "L'étape n°1"}
+  ) {
     name
   }
 }

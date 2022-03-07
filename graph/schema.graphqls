@@ -246,6 +246,7 @@ type Query {
 
   # BUILDONS
   buildons(filters: [Filter!]): [BuildOn!]! @needAuthentication
+  buildon(id: ID!): BuildOn! @needAuthentication
 }
 
 type Mutation {

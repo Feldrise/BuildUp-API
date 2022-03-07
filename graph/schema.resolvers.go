@@ -364,6 +364,20 @@ func (r *queryResolver) Buildons(ctx context.Context, filters []*model.Filter) (
 	return buildons, nil
 }
 
+func (r *queryResolver) Buildon(ctx context.Context, id string) (*model.BuildOn, error) {
+	databaseBuildOn, err := buildons.GetById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if databaseBuildOn == nil {
+		return nil, &buildons.BuildOnNotFoundError{}
+	}
+
+	return databaseBuildOn.ToModel(), nil
+}
+
 func (r *userResolver) Builder(ctx context.Context, obj *model.User) (*model.Builder, error) {
 	databaseBuilder, err := builders.GetForUser(obj.ID)
 

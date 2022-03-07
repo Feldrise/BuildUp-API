@@ -106,6 +106,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Buildon  func(childComplexity int, id string) int
 		Buildons func(childComplexity int, filters []*model.Filter) int
 		User     func(childComplexity int, id *string) int
 		Users    func(childComplexity int, filters []*model.Filter) int
@@ -154,6 +155,7 @@ type QueryResolver interface {
 	Users(ctx context.Context, filters []*model.Filter) ([]*model.User, error)
 	User(ctx context.Context, id *string) (*model.User, error)
 	Buildons(ctx context.Context, filters []*model.Filter) ([]*model.BuildOn, error)
+	Buildon(ctx context.Context, id string) (*model.BuildOn, error)
 }
 type UserResolver interface {
 	Builder(ctx context.Context, obj *model.User) (*model.Builder, error)
@@ -461,6 +463,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Team(childComplexity), true
+
+	case "Query.buildon":
+		if e.complexity.Query.Buildon == nil {
+			break
+		}
+
+		args, err := ec.field_Query_buildon_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Buildon(childComplexity, args["id"].(string)), true
 
 	case "Query.buildons":
 		if e.complexity.Query.Buildons == nil {
@@ -922,6 +936,7 @@ type Query {
 
   # BUILDONS
   buildons(filters: [Filter!]): [BuildOn!]! @needAuthentication
+  buildon(id: ID!): BuildOn! @needAuthentication
 }
 
 type Mutation {
@@ -1114,6 +1129,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_buildon_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -2821,6 +2851,68 @@ func (ec *executionContext) _Query_buildons(ctx context.Context, field graphql.C
 	res := resTmp.([]*model.BuildOn)
 	fc.Result = res
 	return ec.marshalNBuildOn2ᚕᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐBuildOnᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_buildon(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_buildon_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Buildon(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.NeedAuthentication == nil {
+				return nil, errors.New("directive needAuthentication is not implemented")
+			}
+			return ec.directives.NeedAuthentication(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.BuildOn); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *new-talents.fr/buildup/graph/model.BuildOn`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.BuildOn)
+	fc.Result = res
+	return ec.marshalNBuildOn2ᚖnewᚑtalentsᚗfrᚋbuildupᚋgraphᚋmodelᚐBuildOn(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5619,6 +5711,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_buildons(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "buildon":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_buildon(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
